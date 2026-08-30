@@ -48,17 +48,6 @@
             font-weight: 700;
             color: #00e676;
         }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 24px;
-        }
-        @media (max-width: 900px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
         .card {
             background: #1e1e1e;
             border: 1px solid #333;
@@ -66,15 +55,49 @@
             padding: 20px;
         }
         .card h3 {
-            margin: 0 0 15px 0;
+            margin: 0;
             color: #fff;
             font-size: 1.1rem;
         }
         .map-card {
-            height: 320px;
+            height: 380px;
             display: flex;
             flex-direction: column;
+            margin-bottom: 24px;
         }
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .map-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: #aaa;
+            background: #282828;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-green { background-color: #00e676; box-shadow: 0 0 4px #00e67688; }
+        .dot-yellow { background-color: #ffeb3b; box-shadow: 0 0 4px #ffeb3b88; }
+        .dot-red { background-color: #ff5252; box-shadow: 0 0 4px #ff525288; }
+
         #map {
             width: 100%;
             height: 100%;
@@ -100,19 +123,15 @@
             color: #fff;
             font-size: 1.1rem;
         }
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .action-card {
             background: #1e1e1e;
             border: 1px solid #333;
             border-radius: 10px;
             padding: 20px;
-            height: 100%;
-            box-sizing: border-box;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
         }
         .btn-summary {
             background-color: #00e676;
@@ -139,7 +158,7 @@
             margin-bottom: 24px;
         }
         @media (max-width: 600px) {
-            .export-card {
+            .action-card, .export-card {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
@@ -187,27 +206,18 @@
         </div>
     </div>
 
-    <!-- Map and Action Bar Grid -->
-    <div class="dashboard-grid">
-        <!-- Keyless Map Tile Card -->
-        <div class="card map-card">
-            <h3>📍 Noise Monitor House Location & Status</h3>
-            <div style="flex-grow: 1; position: relative;">
-                <div id="map"></div>
+    <!-- Map Section -->
+    <div class="card map-card">
+        <div class="map-header">
+            <h3>📍 Noise Monitor Location & Status</h3>
+            <div class="map-legend">
+                <span class="legend-item"><span class="legend-dot dot-green"></span> 0 Exceedances (Normal)</span>
+                <span class="legend-item"><span class="legend-dot dot-yellow"></span> 1 Exceedance (Warning)</span>
+                <span class="legend-item"><span class="legend-dot dot-red"></span> 2+ Exceedances (Alert)</span>
             </div>
         </div>
-
-        <!-- Action Header Box -->
-        <div class="action-bar">
-            <div>
-                <h2 style="margin: 0 0 8px 0; font-size: 1.2rem;">📋 Daily Summary Submission Queue</h2>
-                <p style="margin: 0 0 20px 0; color: #888; font-size: 0.9rem;">
-                    Public static dashboard view connected directly via Supabase.
-                </p>
-            </div>
-            <button class="btn-summary" onclick="handleFileDailySummary()">
-                📊 Simulate / Log Summary Status
-            </button>
+        <div style="flex-grow: 1; position: relative;">
+            <div id="map"></div>
         </div>
     </div>
 
@@ -223,12 +233,25 @@
         </div>
     </div>
 
+    <!-- Daily Summary Submission Queue Card -->
+    <div class="action-card">
+        <div>
+            <h3 style="margin: 0 0 5px 0; color: #fff; font-size: 1.1rem;">📋 Daily Summary Submission Queue</h3>
+            <p style="margin: 0; color: #888; font-size: 0.9rem;">
+                Public static dashboard view connected directly via Supabase.
+            </p>
+        </div>
+        <button class="btn-summary" onclick="handleFileDailySummary()">
+            📊 Simulate / Log Summary Status
+        </button>
+    </div>
+
     <!-- Dataset Export Card -->
     <div class="export-card">
         <div>
             <h3 style="margin: 0 0 5px 0; color: #fff; font-size: 1.1rem;">📥 Download Noise Exceedance Dataset</h3>
             <p style="margin: 0; color: #888; font-size: 0.9rem;">
-                Export recorded noise exceedances ($\ge 85.0\text{ dBA}$) as a CSV file directly from Supabase.
+                Export recorded noise exceedances as a CSV file directly from Supabase.
             </p>
         </div>
         <button class="btn-export" onclick="downloadExceedanceDataset()">
@@ -238,15 +261,15 @@
 
     <script>
     // --- SUPABASE CONFIGURATION ---
-    const SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co"; // Replace with your URL
-    const SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";             // Replace with your anon key
+    const SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
     const DECIBEL_THRESHOLD = 85.0;
 
     document.getElementById('threshold-val').innerText = DECIBEL_THRESHOLD;
 
-    // --- MAP INITIALIZATION ---
-    const meterLat = 39.7617;
-    const meterLng = -105.0205;
+    // --- MAP INITIALIZATION (3265 Federal Blvd, Denver, CO 80211) ---
+    const meterLat = 39.76285;
+    const meterLng = -105.02506;
     
     const map = L.map('map').setView([meterLat, meterLng], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -273,6 +296,7 @@
         meterMarker.bindPopup(`
             <div style="color: #111; font-family: sans-serif;">
                 <strong>Denver 311 Acoustic Meter</strong><br>
+                Address: 3265 Federal Blvd<br>
                 Status: <b>${count === 0 ? '🟢 Normal' : count === 1 ? '🟡 Warning' : '🔴 Alert'}</b><br>
                 Exceedances Today: <b>${count}</b>
             </div>
@@ -280,29 +304,35 @@
     }
     updateMarkerPopup(0);
 
-    // --- CHARTS SETUP ---
-    const labels = Array.from({length: 14}, (_, i) => {
+    // --- CHART LABELS SETUP ---
+    const dateMap = new Map();
+    const labels = [];
+    for (let i = 13; i >= 0; i--) {
         const d = new Date();
-        d.setDate(d.getDate() - (13 - i));
-        return (d.getMonth() + 1) + '/' + d.getDate();
-    });
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        const label = (d.getMonth() + 1) + '/' + d.getDate();
+        labels.push(label);
+        dateMap.set(key, labels.length - 1);
+    }
 
+    // Initialize Charts
     const ctxStacked = document.getElementById('stackedChart').getContext('2d');
     const stackedChart = new Chart(ctxStacked, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
-                { label: 'Morning (06:00 - 12:00)', data: [2, 1, 3, 0, 4, 2, 1, 5, 2, 3, 1, 2, 4, 1], backgroundColor: '#42a5f5' },
-                { label: 'Afternoon (12:00 - 18:00)', data: [5, 4, 6, 2, 8, 5, 3, 7, 6, 4, 5, 3, 6, 2], backgroundColor: '#ffb74d' },
-                { label: 'Night (18:00 - 06:00)', data: [12, 15, 9, 14, 18, 11, 8, 16, 20, 14, 11, 15, 12, 5], backgroundColor: '#ef5350' }
+                { label: 'Morning (06:00 - 12:00)', data: Array(14).fill(0), backgroundColor: '#42a5f5' },
+                { label: 'Afternoon (12:00 - 18:00)', data: Array(14).fill(0), backgroundColor: '#ffb74d' },
+                { label: 'Night (18:00 - 06:00)', data: Array(14).fill(0), backgroundColor: '#ef5350' }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { stacked: true, grid: { color: '#2a2a2a' }, ticks: { color: '#aaa' } },
+                x: { stacked: true, grid: { color: '#2a2a2a' }, ticks: { color: '#aaa' } }  ,
                 y: { stacked: true, grid: { color: '#2a2a2a' }, ticks: { color: '#aaa' } }
             },
             plugins: { legend: { labels: { color: '#ccc' } } }
@@ -316,7 +346,7 @@
             labels: labels,
             datasets: [{
                 label: 'Peak Sound Level (dBA)',
-                data: [91.2, 88.5, 95.1, 87.0, 96.4, 89.2, 86.5, 98.1, 94.0, 91.8, 88.9, 93.5, 92.0, 48.9],
+                data: Array(14).fill(0),
                 borderColor: '#00e676',
                 backgroundColor: 'rgba(0, 230, 118, 0.1)',
                 fill: true,
@@ -336,7 +366,83 @@
         }
     });
 
-    // --- FETCH LIVE DATA FROM SUPABASE ---
+    // --- FETCH 14-DAY ANALYTICS FROM SUPABASE ---
+    async function fetch14DayAnalytics() {
+        if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_SUPABASE")) return;
+
+        try {
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 13);
+            startDate.setHours(0, 0, 0, 0);
+
+            // Fetch 14 days of noise logs
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=timestamp.asc`, {
+                headers: {
+                    "apikey": SUPABASE_ANON_KEY,
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            const logs = await res.json();
+
+            const morning = Array(14).fill(0);
+            const afternoon = Array(14).fill(0);
+            const night = Array(14).fill(0);
+            const peak = Array(14).fill(0);
+
+            if (Array.isArray(logs)) {
+                logs.forEach(log => {
+                    const dt = new Date(log.timestamp);
+                    const dateKey = dt.toISOString().split('T')[0];
+                    
+                    if (dateMap.has(dateKey)) {
+                        const idx = dateMap.get(dateKey);
+                        const dba = Number(log.dba);
+
+                        // Track peak reading
+                        if (dba > peak[idx]) peak[idx] = dba;
+
+                        // Track exceedances by time of day
+                        if (dba >= DECIBEL_THRESHOLD) {
+                            const hour = dt.getHours();
+                            if (hour >= 6 && hour < 12) {
+                                morning[idx]++;
+                            } else if (hour >= 12 && hour < 18) {
+                                afternoon[idx]++;
+                            } else {
+                                night[idx]++;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Update Chart.js instances
+            stackedChart.data.datasets[0].data = morning;
+            stackedChart.data.datasets[1].data = afternoon;
+            stackedChart.data.datasets[2].data = night;
+            stackedChart.update();
+
+            peakChart.data.datasets[0].data = peak;
+            peakChart.update();
+
+            // Fetch total 311 submissions stats from Supabase
+            const statsRes = await fetch(`${SUPABASE_URL}/rest/v1/report_stats?select=total_submitted&id=eq.1`, {
+                headers: {
+                    "apikey": SUPABASE_ANON_KEY,
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            const statsData = await statsRes.json();
+            if (Array.isArray(statsData) && statsData.length > 0) {
+                document.getElementById('submitted-count').innerText = statsData[0].total_submitted;
+            }
+
+        } catch (err) {
+            console.error("Error fetching 14-day analytics:", err);
+        }
+    }
+
+    // --- FETCH LIVE SOUND LEVEL FROM SUPABASE ---
     async function fetchSupabaseLive() {
         if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_SUPABASE")) return;
 
@@ -350,8 +456,7 @@
             });
             const data = await res.json();
             if (data && data.length > 0) {
-                const latest = data[0];
-                document.getElementById('current-db').innerText = Number(latest.dba).toFixed(1);
+                document.getElementById('current-db').innerText = Number(data[0].dba).toFixed(1);
             }
 
             // Fetch today's exceedance count
@@ -374,9 +479,12 @@
         }
     }
 
-    // Poll every 5 seconds
-    setInterval(fetchSupabaseLive, 5000);
+    // Initial load & timers
     fetchSupabaseLive();
+    fetch14DayAnalytics();
+
+    setInterval(fetchSupabaseLive, 5000);        // Live poll every 5s
+    setInterval(fetch14DayAnalytics, 60000);     // Refresh charts every 1 minute
 
     function handleFileDailySummary() {
         alert("Daily summary filing requires a backend or serverless function handler. Your static GitHub Pages view is successfully tracking live data from Supabase!");
@@ -390,7 +498,6 @@
         }
 
         try {
-            // Query all rows where dba >= threshold from Supabase
             const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba,dbc&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc`, {
                 headers: {
                     "apikey": SUPABASE_ANON_KEY,
@@ -404,13 +511,11 @@
                 return;
             }
 
-            // Build CSV content
             let csvContent = "Timestamp,Peak_dBA,Peak_dBC\n";
             rows.forEach(row => {
                 csvContent += `"${row.timestamp}",${row.dba},${row.dbc}\n`;
             });
 
-            // Trigger browser download via Blob
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
