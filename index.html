@@ -108,9 +108,9 @@
         }
 
         /* Status Colors */
-        .badge-green { background-color: #00e676; color: #000; }  /* 0 Exceedances */
-        .badge-yellow { background-color: #ffeb3b; color: #000; } /* 1-2 Exceedances */
-        .badge-red { background-color: #ff5252; color: #fff; }    /* 3+ Exceedances */
+        .badge-green { background-color: #00e676; color: #000; }
+        .badge-yellow { background-color: #ffeb3b; color: #000; }
+        .badge-red { background-color: #ff5252; color: #fff; }
 
         /* Slide-out Drawer Panel (Dark Chrome) */
         .detail-panel {
@@ -204,43 +204,16 @@
 
         /* Responsive Mobile Layout Fixes */
         @media (max-width: 600px) {
-            .navbar {
-                padding: 0 12px;
-            }
-            .navbar-brand {
-                font-size: 0.95rem;
-            }
-            .navbar-stats {
-                gap: 10px;
-                font-size: 0.75rem;
-            }
-            .detail-panel {
-                width: 100%;
-                right: -100%;
-                padding: 16px;
-                border-left: none;
-            }
-            .detail-panel.open {
-                right: 0;
-            }
-            .metrics-subgrid {
-                gap: 6px;
-            }
-            .metric-card {
-                padding: 8px 6px;
-            }
-            .metric-val {
-                font-size: 1.1rem;
-            }
-            .metric-card h4 {
-                font-size: 0.62rem;
-            }
-            .map-overlay-legend {
-                top: 12px;
-                right: 12px;
-                padding: 8px 12px;
-                font-size: 0.72rem;
-            }
+            .navbar { padding: 0 12px; }
+            .navbar-brand { font-size: 0.95rem; }
+            .navbar-stats { gap: 10px; font-size: 0.75rem; }
+            .detail-panel { width: 100%; right: -100%; padding: 16px; border-left: none; }
+            .detail-panel.open { right: 0; }
+            .metrics-subgrid { gap: 6px; }
+            .metric-card { padding: 8px 6px; }
+            .metric-val { font-size: 1.1rem; }
+            .metric-card h4 { font-size: 0.62rem; }
+            .map-overlay-legend { top: 12px; right: 12px; padding: 8px 12px; font-size: 0.72rem; }
         }
     </style>
 </head>
@@ -251,6 +224,7 @@
         <div class="navbar-stats">
             <div>Active Stations: <span class="stat-highlight" id="active-count">4</span></div>
             <div>City Threshold: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
+            <div>Total 311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
     </div>
 
@@ -308,7 +282,7 @@
                 </div>
             </div>
 
-            <button class="action-btn btn-primary" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
+            <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Exceedance CSV Log</button>
 
             <!-- Hardware Standard & Accuracy Footnote -->
@@ -373,7 +347,7 @@
         }
     ];
 
-    // --- LEAFLET MAP INITIALIZATION (CARTO VOYAGER TILE) ---
+    // --- LEAFLET MAP INITIALIZATION ---
     const map = L.map('map').setView([39.735, -105.000], 12);
     
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
@@ -386,7 +360,6 @@
     let stackedChartInstance = null;
     let peakChartInstance = null;
 
-    // --- AQICN-STYLE NUMERICAL BADGE ICONS ---
     function getBadgeClass(exceedances) {
         if (exceedances === 0) return 'badge-green';
         if (exceedances <= 2) return 'badge-yellow';
@@ -403,7 +376,6 @@
         });
     }
 
-    // Render Markers on Map
     const markersMap = new Map();
     METER_STATIONS.forEach(station => {
         const marker = L.marker([station.lat, station.lng], {
@@ -414,25 +386,21 @@
         markersMap.set(station.id, marker);
     });
 
-    // --- 14-DAY DATE LABELS GENERATOR (LOCAL TIMEZONE FIXED) ---
     function generate14DayLabels() {
         const dateMap = new Map();
         const labels = [];
         for (let i = 13; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            
-            // Format as YYYY-MM-DD in local timezone
             const dateKey = d.toLocaleDateString('en-CA');
             const label = (d.getMonth() + 1) + '/' + d.getDate();
-            
             labels.push(label);
             dateMap.set(dateKey, labels.length - 1);
         }
         return { dateMap, labels };
     }
 
-    // --- FETCH REAL DATA FOR PRIMARY SENSOR FROM SUPABASE ---
+    // --- FETCH REAL DATA & 311 STATS FROM SUPABASE ---
     async function fetchLivePrimaryMeter() {
         try {
             // Live sound level
@@ -444,7 +412,6 @@
             if (data && data.length > 0) {
                 const liveDba = Number(data[0].dba);
                 
-                // Past hour exceedances
                 const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
                 const exceedRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`, {
                     headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
@@ -452,7 +419,6 @@
                 const exceedData = await exceedRes.json();
                 const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                // Today's total exceedances (Start of local day)
                 const startOfToday = new Date();
                 startOfToday.setHours(0, 0, 0, 0);
 
@@ -462,31 +428,36 @@
                 const todayData = await todayRes.json();
                 const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
-                // Update primary station data
                 const primary = METER_STATIONS[0];
                 primary.currentDba = liveDba;
                 primary.hourlyExceedances = hourlyCount;
                 primary.todayExceedances = todayCount;
 
-                // Update Map Badge
                 const primaryMarker = markersMap.get(primary.id);
                 if (primaryMarker) {
                     primaryMarker.setIcon(createBadgeIcon(liveDba, hourlyCount));
                 }
 
-                // Update side panel if active
                 if (activeMarkerObj && activeMarkerObj.id === primary.id) {
                     document.getElementById('panel-db').innerText = liveDba.toFixed(1);
                     document.getElementById('panel-hourly').innerText = hourlyCount;
                     document.getElementById('panel-today').innerText = todayCount;
                 }
             }
+
+            // Fetch Total 311 Reports Count from Supabase
+            const statsRes = await fetch(`${SUPABASE_URL}/rest/v1/report_stats?select=total_submitted&station_id=eq.meter-01`, {
+                headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+            });
+            const statsData = await statsRes.json();
+            if (Array.isArray(statsData) && statsData.length > 0) {
+                document.getElementById('total-311-count').innerText = statsData[0].total_submitted;
+            }
         } catch (err) {
             console.error("Supabase live sync error:", err);
         }
     }
 
-    // --- DRAWER & CHART RENDERER ---
     async function openDetailPanel(station) {
         activeMarkerObj = station;
         document.getElementById('panel-title').innerText = station.name;
@@ -520,7 +491,6 @@
                 startDate.setDate(startDate.getDate() - 13);
                 startDate.setHours(0, 0, 0, 0);
 
-                // 1. Fetch filtered exceedances (prevents hitting 1000 row REST cap)
                 const exceedRes = await fetch(
                     `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`, 
                     { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
@@ -531,11 +501,9 @@
                     exceedLogs.forEach(log => {
                         const dt = new Date(log.timestamp);
                         const dateKey = dt.toLocaleDateString('en-CA');
-                        
                         if (dateMap.has(dateKey)) {
                             const idx = dateMap.get(dateKey);
                             const hour = dt.getHours();
-
                             if (hour >= 6 && hour < 12) morning[idx]++;
                             else if (hour >= 12 && hour < 18) afternoon[idx]++;
                             else night[idx]++;
@@ -543,7 +511,6 @@
                     });
                 }
 
-                // 2. Fetch peak noise records per timeframe
                 const peakRes = await fetch(
                     `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`, 
                     { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
@@ -565,18 +532,15 @@
                 console.error("Error fetching Supabase 14-day history:", e);
             }
         } else {
-            // Simulated data for non-live demo stations
             morning = [0, 1, 0, 2, 0, 1, 0, 0, 1, 2, 0, 1, 0, station.hourlyExceedances > 0 ? 1 : 0];
             afternoon = [1, 2, 1, 0, 3, 1, 2, 0, 1, 1, 2, 0, 1, 2];
             night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
             peak = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
         }
 
-        // Destroy existing instances prior to re-rendering
         if (stackedChartInstance) stackedChartInstance.destroy();
         if (peakChartInstance) peakChartInstance.destroy();
 
-        // Render Stacked Bar Chart
         const ctxStacked = document.getElementById('stackedChart').getContext('2d');
         stackedChartInstance = new Chart(ctxStacked, {
             type: 'bar',
@@ -599,7 +563,6 @@
             }
         });
 
-        // Render Peak dBA Line Chart
         const ctxPeak = document.getElementById('peakChart').getContext('2d');
         peakChartInstance = new Chart(ctxPeak, {
             type: 'line',
@@ -627,8 +590,32 @@
         });
     }
 
-    function trigger311Report() {
-        alert(`Filing 311 Report for ${activeMarkerObj ? activeMarkerObj.name : 'Selected Location'}...`);
+    // --- TRIGGER FLASK BACKEND 311 AUTOMATION ---
+    async function trigger311Report() {
+        const btn = document.getElementById('btn-311');
+        const origText = btn.innerText;
+        btn.innerText = "⏳ Filing 311 Report with Denver Gov...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/file_daily_summary', { method: 'POST' });
+            const data = await res.json();
+            
+            if (data.success) {
+                alert(`✅ 311 Report Filed Successfully!\n${data.message}`);
+                if (data.total_submitted !== undefined) {
+                    document.getElementById('total-311-count').innerText = data.total_submitted;
+                }
+            } else {
+                alert(`⚠️ Notice: ${data.message}`);
+            }
+        } catch (err) {
+            console.error("Failed to execute 311 automation:", err);
+            alert("Could not reach local Flask server endpoint `/file_daily_summary`.");
+        } finally {
+            btn.innerText = origText;
+            btn.disabled = false;
+        }
     }
 
     // --- EXCEEDANCE LOG CSV EXPORT GENERATOR ---
@@ -648,7 +635,6 @@
                 let offset = 0;
                 const fetchLimit = 1000;
 
-                // Server-side filter: fetch only records where dba >= DECIBEL_THRESHOLD (85.0)
                 while (keepFetching) {
                     const res = await fetch(
                         `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`, 
@@ -678,7 +664,6 @@
                 console.error("Failed to fetch exceedance logs for CSV export:", err);
             }
         } else {
-            // Simulated exceedance records (>85.0 dBA) for demo sensors
             const now = new Date();
             for (let i = 0; i < 8; i++) {
                 const timestamp = new Date(now.getTime() - i * 180 * 60 * 1000).toISOString();
@@ -693,7 +678,6 @@
             }
         }
 
-        // Check if any exceedances were found
         if (rows.length === 1) {
             alert(`No noise exceedances (> ${DECIBEL_THRESHOLD} dBA) recorded for ${activeMarkerObj.name}.`);
             btn.innerText = origText;
@@ -701,7 +685,6 @@
             return;
         }
 
-        // Format to CSV Blob and trigger download
         const csvString = rows.map(row => row.join(",")).join("\n");
         const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
