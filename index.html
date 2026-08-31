@@ -336,10 +336,10 @@
     const map = L.map('map').setView([39.735, -105.000], 12);
     
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
-		maxZoom: 19,
-		subdomains: 'abcd',
-		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-	}).addTo(map);
+        maxZoom: 19,
+        subdomains: 'abcd',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
 
     let activeMarkerObj = null;
     let stackedChartInstance = null;
@@ -373,17 +373,20 @@
         markersMap.set(station.id, marker);
     });
 
-    // --- 14-DAY DATE LABELS GENERATOR ---
+    // --- 14-DAY DATE LABELS GENERATOR (LOCAL TIMEZONE FIXED) ---
     function generate14DayLabels() {
         const dateMap = new Map();
         const labels = [];
         for (let i = 13; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            const key = d.toISOString().split('T')[0];
+            
+            // Format as YYYY-MM-DD in local timezone
+            const dateKey = d.toLocaleDateString('en-CA');
             const label = (d.getMonth() + 1) + '/' + d.getDate();
+            
             labels.push(label);
-            dateMap.set(key, labels.length - 1);
+            dateMap.set(dateKey, labels.length - 1);
         }
         return { dateMap, labels };
     }
@@ -408,9 +411,11 @@
                 const exceedData = await exceedRes.json();
                 const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                // Today's total exceedances
-                const todayStr = new Date().toISOString().split('T')[0];
-                const todayRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${todayStr}T00:00:00&dba=gte.${DECIBEL_THRESHOLD}`, {
+                // Today's total exceedances (Start of local day)
+                const startOfToday = new Date();
+                startOfToday.setHours(0, 0, 0, 0);
+
+                const todayRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`, {
                     headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
                 });
                 const todayData = await todayRes.json();
@@ -474,27 +479,44 @@
                 startDate.setDate(startDate.getDate() - 13);
                 startDate.setHours(0, 0, 0, 0);
 
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=timestamp.asc`, {
-                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const logs = await res.json();
+                // 1. Fetch filtered exceedances (prevents hitting 1000 row REST cap)
+                const exceedRes = await fetch(
+                    `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`, 
+                    { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
+                );
+                const exceedLogs = await exceedRes.json();
 
-                if (Array.isArray(logs)) {
-                    logs.forEach(log => {
+                if (Array.isArray(exceedLogs)) {
+                    exceedLogs.forEach(log => {
                         const dt = new Date(log.timestamp);
-                        const dateKey = dt.toISOString().split('T')[0];
+                        const dateKey = dt.toLocaleDateString('en-CA');
+                        
+                        if (dateMap.has(dateKey)) {
+                            const idx = dateMap.get(dateKey);
+                            const hour = dt.getHours();
+
+                            if (hour >= 6 && hour < 12) morning[idx]++;
+                            else if (hour >= 12 && hour < 18) afternoon[idx]++;
+                            else night[idx]++;
+                        }
+                    });
+                }
+
+                // 2. Fetch peak noise records per timeframe
+                const peakRes = await fetch(
+                    `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`, 
+                    { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
+                );
+                const peakLogs = await peakRes.json();
+
+                if (Array.isArray(peakLogs)) {
+                    peakLogs.forEach(log => {
+                        const dt = new Date(log.timestamp);
+                        const dateKey = dt.toLocaleDateString('en-CA');
                         if (dateMap.has(dateKey)) {
                             const idx = dateMap.get(dateKey);
                             const dba = Number(log.dba);
-
                             if (dba > peak[idx]) peak[idx] = dba;
-
-                            if (dba >= DECIBEL_THRESHOLD) {
-                                const hour = dt.getHours();
-                                if (hour >= 6 && hour < 12) morning[idx]++;
-                                else if (hour >= 12 && hour < 18) afternoon[idx]++;
-                                else night[idx]++;
-                            }
                         }
                     });
                 }
@@ -502,18 +524,18 @@
                 console.error("Error fetching Supabase 14-day history:", e);
             }
         } else {
-            // Realistic simulated data for dummy stations
+            // Simulated data for non-live demo stations
             morning = [0, 1, 0, 2, 0, 1, 0, 0, 1, 2, 0, 1, 0, station.hourlyExceedances > 0 ? 1 : 0];
             afternoon = [1, 2, 1, 0, 3, 1, 2, 0, 1, 1, 2, 0, 1, 2];
             night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
             peak = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
         }
 
-        // Destroy existing chart instances to avoid overlap
+        // Destroy existing instances prior to re-rendering
         if (stackedChartInstance) stackedChartInstance.destroy();
         if (peakChartInstance) peakChartInstance.destroy();
 
-        // 1. Render Stacked Bar Chart
+        // Render Stacked Bar Chart
         const ctxStacked = document.getElementById('stackedChart').getContext('2d');
         stackedChartInstance = new Chart(ctxStacked, {
             type: 'bar',
@@ -536,7 +558,7 @@
             }
         });
 
-        // 2. Render Peak dBA Line Chart
+        // Render Peak dBA Line Chart
         const ctxPeak = document.getElementById('peakChart').getContext('2d');
         peakChartInstance = new Chart(ctxPeak, {
             type: 'line',
