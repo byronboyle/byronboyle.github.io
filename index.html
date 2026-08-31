@@ -23,7 +23,7 @@
             overflow: hidden;
         }
 
-        /* Top Navigation Bar */
+        /* Navigation Bar */
         .navbar {
             height: 56px;
             background: #1a1a1a;
@@ -50,7 +50,7 @@
         }
         .stat-highlight { color: #00e676; font-weight: 700; }
 
-        /* Map & Layout Container */
+        /* Main Container & Map */
         .main-container {
             position: relative;
             flex: 1;
@@ -60,11 +60,11 @@
         #map {
             width: 100%;
             height: 100%;
-            background: #1e1e1e;
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+            background: #121212;
+            /* Filter removed for clean CartoDB Dark Matter rendering */
         }
 
-        /* Map Floating Legend (AQICN Style) */
+        /* AQICN-Style Floating Map Legend */
         .map-overlay-legend {
             position: absolute;
             top: 16px;
@@ -87,20 +87,19 @@
             display: inline-block;
         }
 
-        /* AQICN-Style Map Badge Markers */
+        /* Marker Badges */
         .aqi-marker-badge {
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 0.82rem;
-            color: #000;
             border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.8);
             border: 1.5px solid #ffffff;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
-            padding: 2px 6px;
+            padding: 2px 8px;
             white-space: nowrap;
         }
         .aqi-marker-badge:hover {
@@ -108,17 +107,17 @@
             z-index: 1000 !important;
         }
 
-        /* Color States based on Last Hour Exceedances */
+        /* Status Colors */
         .badge-green { background-color: #00e676; color: #000; }  /* 0 Exceedances */
         .badge-yellow { background-color: #ffeb3b; color: #000; } /* 1-2 Exceedances */
         .badge-red { background-color: #ff5252; color: #fff; }    /* 3+ Exceedances */
 
-        /* Site Detail Slide-Out Panel */
+        /* Slide-out Drawer Panel */
         .detail-panel {
             position: absolute;
             top: 0;
-            right: -420px;
-            width: 400px;
+            right: -480px;
+            width: 450px;
             height: 100%;
             background: #1a1a1a;
             border-left: 1px solid #333;
@@ -128,7 +127,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.6);
         }
         .detail-panel.open { right: 0; }
         .close-btn {
@@ -141,19 +140,41 @@
         }
         .close-btn:hover { color: #fff; }
 
-        .panel-header h2 { margin: 0 0 4px 0; color: #fff; font-size: 1.2rem; }
+        .panel-header h2 { margin: 0 0 4px 0; color: #fff; font-size: 1.25rem; }
         .panel-header p { margin: 0 0 16px 0; color: #888; font-size: 0.85rem; }
 
+        /* Metric Grid inside Drawer */
+        .metrics-subgrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
         .metric-card {
             background: #242424;
             border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 16px;
+            padding: 10px;
             border: 1px solid #333;
         }
-        .metric-card h4 { margin: 0 0 6px 0; color: #888; font-size: 0.75rem; text-transform: uppercase; }
-        .metric-val { font-size: 1.8rem; font-weight: 700; color: #00e676; }
+        .metric-card h4 { margin: 0 0 4px 0; color: #888; font-size: 0.7rem; text-transform: uppercase; }
+        .metric-val { font-size: 1.3rem; font-weight: 700; color: #00e676; }
 
+        /* Chart Sections */
+        .chart-container {
+            background: #242424;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            height: 200px;
+        }
+        .chart-container h4 {
+            margin: 0 0 8px 0;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+
+        /* Buttons & Footnote */
         .action-btn {
             width: 100%;
             padding: 12px;
@@ -161,7 +182,7 @@
             border: none;
             font-weight: 700;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 0.85rem;
             transition: background 0.2s;
         }
@@ -170,7 +191,16 @@
         .btn-secondary { background: #333; color: #fff; }
         .btn-secondary:hover { background: #444; }
 
-        .chart-box { height: 180px; margin: 15px 0; }
+        .sensor-footnote {
+            margin-top: 12px;
+            padding: 10px;
+            background: #121212;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: #777;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -179,12 +209,12 @@
         <div class="navbar-brand">🔊 Denver Acoustic Noise Network</div>
         <div class="navbar-stats">
             <div>Active Stations: <span class="stat-highlight" id="active-count">3</span></div>
-            <div>City Threshold: <span style="color:#ff9100; font-weight:bold;">85 dBA</span></div>
+            <div>City Threshold: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
         </div>
     </div>
 
     <div class="main-container">
-        <!-- Floating Map Legend -->
+        <!-- Map Legend Overlay -->
         <div class="map-overlay-legend">
             <div class="legend-title">Exceedances (Last Hour)</div>
             <div class="legend-scale">
@@ -205,22 +235,46 @@
                 <p id="panel-address">Address details...</p>
             </div>
 
-            <div class="metric-card">
-                <h4>Live Sound Level</h4>
-                <div class="metric-val"><span id="panel-db">0.0</span> <span style="font-size: 1rem; color: #888;">dBA</span></div>
+            <!-- Metrics Summary Grid -->
+            <div class="metrics-subgrid">
+                <div class="metric-card">
+                    <h4>Live Level</h4>
+                    <div class="metric-val"><span id="panel-db">0.0</span> <span style="font-size: 0.7rem; color: #888;">dBA</span></div>
+                </div>
+                <div class="metric-card">
+                    <h4>Past Hour</h4>
+                    <div class="metric-val" id="panel-hourly" style="color: #ffb74d;">0</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Today Total</h4>
+                    <div class="metric-val" id="panel-today" style="color: #ff5252;">0</div>
+                </div>
             </div>
 
-            <div class="metric-card">
-                <h4>Exceedances (Last Hour)</h4>
-                <div class="metric-val" id="panel-hourly" style="color: #ff5252;">0</div>
+            <!-- 14-Day Stacked Time-of-Day Chart -->
+            <div class="chart-container">
+                <h4>Exceedances by Time of Day (14-Day History)</h4>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="stackedChart"></canvas>
+                </div>
             </div>
 
-            <div class="chart-box">
-                <canvas id="miniChart"></canvas>
+            <!-- 14-Day Peak dBA Line Chart -->
+            <div class="chart-container">
+                <h4>Highest Peak dBA Reading (14-Day History)</h4>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="peakChart"></canvas>
+                </div>
             </div>
 
             <button class="action-btn btn-primary" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
             <button class="action-btn btn-secondary" onclick="exportStationCSV()">📥 Export Station CSV Data</button>
+
+            <!-- Hardware Standard & Accuracy Footnote -->
+            <div class="sensor-footnote">
+                <strong>Hardware Standard & Compliance:</strong><br>
+                IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA). Accuracy: ±1.5 dBA (Slow Response Mode). Data collected via RS485 Modbus RTU at 1Hz sampling frequency.
+            </div>
         </div>
     </div>
 
@@ -230,48 +284,57 @@
     const SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
     const DECIBEL_THRESHOLD = 85.0;
 
-    // --- MULTI-METER LOCATIONS DATA ---
+    // --- STATIONS DATA (Real primary sensor + Simulated stations) ---
     const METER_STATIONS = [
         {
             id: "meter-01",
             name: "Federal Blvd Monitor",
-            address: "3265 Federal Blvd, Denver, CO",
+            address: "3265 Federal Blvd, Denver, CO 80211",
             lat: 39.76285,
             lng: -105.02506,
             currentDba: 64.2,
-            hourlyExceedances: 0
+            hourlyExceedances: 0,
+            todayExceedances: 0,
+            isLiveSupabase: true
         },
         {
             id: "meter-02",
             name: "Colfax & Broadway",
-            address: "1500 Broadway, Denver, CO",
+            address: "1500 Broadway, Denver, CO 80202",
             lat: 39.7402,
             lng: -104.9877,
-            currentDba: 87.5,
-            hourlyExceedances: 3
+            currentDba: 88.2,
+            hourlyExceedances: 4,
+            todayExceedances: 14,
+            isLiveSupabase: false
         },
         {
             id: "meter-03",
             name: "RiNo Arts District",
-            address: "2901 Blake St, Denver, CO",
+            address: "2901 Blake St, Denver, CO 80205",
             lat: 39.7635,
             lng: -104.9785,
-            currentDba: 78.1,
-            hourlyExceedances: 1
+            currentDba: 76.4,
+            hourlyExceedances: 1,
+            todayExceedances: 5,
+            isLiveSupabase: false
         }
     ];
 
-    // --- LEAFLET MAP SETUP ---
+    // --- LEAFLET MAP INITIALIZATION (CARTO DB DARK MATTER) ---
     const map = L.map('map').setView([39.752, -105.000], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
+        subdomains: 'abcd',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
 
     let activeMarkerObj = null;
-    let miniChartInstance = null;
+    let stackedChartInstance = null;
+    let peakChartInstance = null;
 
-    // --- GENERATE AQICN-STYLE NUMERICAL BADGES ---
+    // --- AQICN-STYLE NUMERICAL BADGE ICONS ---
     function getBadgeClass(exceedances) {
         if (exceedances === 0) return 'badge-green';
         if (exceedances <= 2) return 'badge-yellow';
@@ -290,7 +353,6 @@
 
     // Render Markers on Map
     const markersMap = new Map();
-
     METER_STATIONS.forEach(station => {
         const marker = L.marker([station.lat, station.lng], {
             icon: createBadgeIcon(station.currentDba, station.hourlyExceedances)
@@ -300,10 +362,25 @@
         markersMap.set(station.id, marker);
     });
 
-    // --- SUPABASE LIVE FETCH FOR PRIMARY METER ---
+    // --- 14-DAY DATE LABELS GENERATOR ---
+    function generate14DayLabels() {
+        const dateMap = new Map();
+        const labels = [];
+        for (let i = 13; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const key = d.toISOString().split('T')[0];
+            const label = (d.getMonth() + 1) + '/' + d.getDate();
+            labels.push(label);
+            dateMap.set(key, labels.length - 1);
+        }
+        return { dateMap, labels };
+    }
+
+    // --- FETCH REAL DATA FOR PRIMARY SENSOR FROM SUPABASE ---
     async function fetchLivePrimaryMeter() {
         try {
-            // Fetch live reading for Federal Blvd meter from Supabase
+            // Live sound level
             const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=*&order=timestamp.desc&limit=1`, {
                 headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
             });
@@ -312,7 +389,7 @@
             if (data && data.length > 0) {
                 const liveDba = Number(data[0].dba);
                 
-                // Fetch last hour exceedances
+                // Past hour exceedances
                 const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
                 const exceedRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`, {
                     headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
@@ -320,21 +397,31 @@
                 const exceedData = await exceedRes.json();
                 const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                // Update primary station record
+                // Today's total exceedances
+                const todayStr = new Date().toISOString().split('T')[0];
+                const todayRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${todayStr}T00:00:00&dba=gte.${DECIBEL_THRESHOLD}`, {
+                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                const todayData = await todayRes.json();
+                const todayCount = Array.isArray(todayData) ? todayData.length : 0;
+
+                // Update primary station data
                 const primary = METER_STATIONS[0];
                 primary.currentDba = liveDba;
                 primary.hourlyExceedances = hourlyCount;
+                primary.todayExceedances = todayCount;
 
-                // Update map marker icon live
+                // Update Map Badge
                 const primaryMarker = markersMap.get(primary.id);
                 if (primaryMarker) {
                     primaryMarker.setIcon(createBadgeIcon(liveDba, hourlyCount));
                 }
 
-                // Update side panel if open
+                // Update side panel if active
                 if (activeMarkerObj && activeMarkerObj.id === primary.id) {
                     document.getElementById('panel-db').innerText = liveDba.toFixed(1);
                     document.getElementById('panel-hourly').innerText = hourlyCount;
+                    document.getElementById('panel-today').innerText = todayCount;
                 }
             }
         } catch (err) {
@@ -342,18 +429,19 @@
         }
     }
 
-    // --- PANEL & CHART INTERACTIVITY ---
-    function openDetailPanel(station) {
+    // --- DRAWER & CHART RENDERER ---
+    async function openDetailPanel(station) {
         activeMarkerObj = station;
         document.getElementById('panel-title').innerText = station.name;
         document.getElementById('panel-address').innerText = station.address;
         document.getElementById('panel-db').innerText = station.currentDba.toFixed(1);
         document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
+        document.getElementById('panel-today').innerText = station.todayExceedances;
 
         document.getElementById('detail-panel').classList.add('open');
         map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
 
-        renderMiniChart();
+        await renderStationCharts(station);
     }
 
     function closePanel() {
@@ -361,31 +449,106 @@
         activeMarkerObj = null;
     }
 
-    function renderMiniChart() {
-        const ctx = document.getElementById('miniChart').getContext('2d');
-        if (miniChartInstance) miniChartInstance.destroy();
+    async function renderStationCharts(station) {
+        const { dateMap, labels } = generate14DayLabels();
 
-        miniChartInstance = new Chart(ctx, {
+        let morning = Array(14).fill(0);
+        let afternoon = Array(14).fill(0);
+        let night = Array(14).fill(0);
+        let peak = Array(14).fill(0);
+
+        if (station.isLiveSupabase) {
+            try {
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 13);
+                startDate.setHours(0, 0, 0, 0);
+
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=timestamp.asc`, {
+                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                const logs = await res.json();
+
+                if (Array.isArray(logs)) {
+                    logs.forEach(log => {
+                        const dt = new Date(log.timestamp);
+                        const dateKey = dt.toISOString().split('T')[0];
+                        if (dateMap.has(dateKey)) {
+                            const idx = dateMap.get(dateKey);
+                            const dba = Number(log.dba);
+
+                            if (dba > peak[idx]) peak[idx] = dba;
+
+                            if (dba >= DECIBEL_THRESHOLD) {
+                                const hour = dt.getHours();
+                                if (hour >= 6 && hour < 12) morning[idx]++;
+                                else if (hour >= 12 && hour < 18) afternoon[idx]++;
+                                else night[idx]++;
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Error fetching Supabase 14-day history:", e);
+            }
+        } else {
+            // Realistic simulated data for dummy stations
+            morning = [0, 1, 0, 2, 0, 1, 0, 0, 1, 2, 0, 1, 0, station.hourlyExceedances > 0 ? 1 : 0];
+            afternoon = [1, 2, 1, 0, 3, 1, 2, 0, 1, 1, 2, 0, 1, 2];
+            night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
+            peak = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
+        }
+
+        // Destroy existing chart instances to avoid overlap
+        if (stackedChartInstance) stackedChartInstance.destroy();
+        if (peakChartInstance) peakChartInstance.destroy();
+
+        // 1. Render Stacked Bar Chart
+        const ctxStacked = document.getElementById('stackedChart').getContext('2d');
+        stackedChartInstance = new Chart(ctxStacked, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Morning', data: morning, backgroundColor: '#42a5f5' },
+                    { label: 'Afternoon', data: afternoon, backgroundColor: '#ffb74d' },
+                    { label: 'Night', data: night, backgroundColor: '#ef5350' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
+                    y: { stacked: true, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
+                },
+                plugins: { legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 9 } } } }
+            }
+        });
+
+        // 2. Render Peak dBA Line Chart
+        const ctxPeak = document.getElementById('peakChart').getContext('2d');
+        peakChartInstance = new Chart(ctxPeak, {
             type: 'line',
             data: {
-                labels: ['12m ago', '9m ago', '6m ago', '3m ago', 'Now'],
+                labels: labels,
                 datasets: [{
-                    label: 'dBA Level',
-                    data: [62.1, 65.4, 82.0, 71.3, activeMarkerObj ? activeMarkerObj.currentDba : 65.0],
+                    label: 'Peak dBA',
+                    data: peak,
                     borderColor: '#00e676',
                     backgroundColor: 'rgba(0, 230, 118, 0.1)',
                     fill: true,
-                    tension: 0.3
+                    tension: 0.3,
+                    pointRadius: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: '#333' } },
-                    y: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: '#333' } }
-                }
+                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
+                    y: { min: 40, max: 110, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
+                },
+                plugins: { legend: { display: false } }
             }
         });
     }
