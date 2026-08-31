@@ -201,6 +201,47 @@
             color: #777;
             line-height: 1.4;
         }
+
+        /* Responsive Mobile Layout Fixes */
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 0 12px;
+            }
+            .navbar-brand {
+                font-size: 0.95rem;
+            }
+            .navbar-stats {
+                gap: 10px;
+                font-size: 0.75rem;
+            }
+            .detail-panel {
+                width: 100%;
+                right: -100%;
+                padding: 16px;
+                border-left: none;
+            }
+            .detail-panel.open {
+                right: 0;
+            }
+            .metrics-subgrid {
+                gap: 6px;
+            }
+            .metric-card {
+                padding: 8px 6px;
+            }
+            .metric-val {
+                font-size: 1.1rem;
+            }
+            .metric-card h4 {
+                font-size: 0.62rem;
+            }
+            .map-overlay-legend {
+                top: 12px;
+                right: 12px;
+                padding: 8px 12px;
+                font-size: 0.72rem;
+            }
+        }
     </style>
 </head>
 <body>
