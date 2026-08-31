@@ -50,7 +50,7 @@
         }
         .stat-highlight { color: #00e676; font-weight: 700; }
 
-        /* Main Container & Map */
+        /* Main Container & Hybrid Framed Map */
         .main-container {
             position: relative;
             flex: 1;
@@ -60,26 +60,26 @@
         #map {
             width: 100%;
             height: 100%;
-            background: #121212;
-            /* Filter removed for clean CartoDB Dark Matter rendering */
+            background: #e5e5e5; /* Muted light neutral fallback */
         }
 
-        /* AQICN-Style Floating Map Legend */
+        /* AQICN-Style Floating Dark Glass Legend */
         .map-overlay-legend {
             position: absolute;
             top: 16px;
             right: 16px;
-            background: rgba(26, 26, 26, 0.9);
+            background: rgba(26, 26, 26, 0.92);
             backdrop-filter: blur(8px);
             border: 1px solid #333;
             border-radius: 8px;
             padding: 12px 16px;
             z-index: 999;
             font-size: 0.8rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .legend-title { font-weight: 600; margin-bottom: 8px; color: #fff; }
         .legend-scale { display: flex; flex-direction: column; gap: 6px; }
-        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; color: #ccc; }
         .legend-badge {
             width: 24px;
             height: 16px;
@@ -87,7 +87,7 @@
             display: inline-block;
         }
 
-        /* Marker Badges */
+        /* High-Contrast Marker Badges for Light Map Surfaces */
         .aqi-marker-badge {
             display: flex;
             align-items: center;
@@ -95,8 +95,8 @@
             font-weight: 700;
             font-size: 0.82rem;
             border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.8);
-            border: 1.5px solid #ffffff;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+            border: 1.5px solid #1a1a1a;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
             padding: 2px 8px;
@@ -112,7 +112,7 @@
         .badge-yellow { background-color: #ffeb3b; color: #000; } /* 1-2 Exceedances */
         .badge-red { background-color: #ff5252; color: #fff; }    /* 3+ Exceedances */
 
-        /* Slide-out Drawer Panel */
+        /* Slide-out Drawer Panel (Dark Chrome) */
         .detail-panel {
             position: absolute;
             top: 0;
@@ -214,7 +214,7 @@
     </div>
 
     <div class="main-container">
-        <!-- Map Legend Overlay -->
+        <!-- Floating Map Legend Overlay -->
         <div class="map-overlay-legend">
             <div class="legend-title">Exceedances (Last Hour)</div>
             <div class="legend-scale">
@@ -224,7 +224,7 @@
             </div>
         </div>
 
-        <!-- Fullscreen Map -->
+        <!-- Fullscreen Light Map Canvas -->
         <div id="map"></div>
 
         <!-- Site Specific Detail Drawer -->
@@ -284,7 +284,7 @@
     const SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
     const DECIBEL_THRESHOLD = 85.0;
 
-    // --- STATIONS DATA (Real primary sensor + Simulated stations) ---
+    // --- STATIONS DATA ---
     const METER_STATIONS = [
         {
             id: "meter-01",
@@ -321,10 +321,10 @@
         }
     ];
 
-    // --- LEAFLET MAP INITIALIZATION (CARTO DB DARK MATTER) ---
+    // --- LEAFLET MAP INITIALIZATION (CARTO POSITRON LIGHT TILE) ---
     const map = L.map('map').setView([39.752, -105.000], 13);
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
         maxZoom: 19,
         subdomains: 'abcd',
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
