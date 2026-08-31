@@ -123,10 +123,11 @@
             border-left: 1px solid #333;
             z-index: 1001;
             transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 20px;
+            padding: 20px 20px 40px 20px;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             box-shadow: -4px 0 20px rgba(0,0,0,0.6);
         }
         .detail-panel.open { right: 0; }
@@ -167,6 +168,7 @@
             padding: 12px;
             margin-bottom: 16px;
             height: 200px;
+            flex-shrink: 0;
         }
         .chart-container h4 {
             margin: 0 0 8px 0;
@@ -185,6 +187,7 @@
             margin-bottom: 8px;
             font-size: 0.85rem;
             transition: background 0.2s;
+            flex-shrink: 0;
         }
         .btn-primary { background: #00e676; color: #000; }
         .btn-primary:hover { background: #00c853; }
@@ -200,6 +203,7 @@
             font-size: 0.72rem;
             color: #777;
             line-height: 1.4;
+            flex-shrink: 0;
         }
 
         /* Responsive Mobile Layout Fixes */
@@ -207,7 +211,13 @@
             .navbar { padding: 0 12px; }
             .navbar-brand { font-size: 0.95rem; }
             .navbar-stats { gap: 10px; font-size: 0.75rem; }
-            .detail-panel { width: 100%; right: -100%; padding: 16px; border-left: none; }
+            .detail-panel { 
+                width: 100%; 
+                height: 100%;
+                right: -100%; 
+                padding: 16px 16px 50px 16px; 
+                border-left: none; 
+            }
             .detail-panel.open { right: 0; }
             .metrics-subgrid { gap: 6px; }
             .metric-card { padding: 8px 6px; }
@@ -233,9 +243,9 @@
         <div class="map-overlay-legend">
             <div class="legend-title">Exceedances (Last Hour)</div>
             <div class="legend-scale">
-                <div class="legend-item"><span class="legend-badge badge-green"></span> 0 Exceedances (Normal)</div>
-                <div class="legend-item"><span class="legend-badge badge-yellow"></span> 1–2 Exceedances (Warning)</div>
-                <div class="legend-item"><span class="legend-badge badge-red"></span> 3+ Exceedances (Alert)</div>
+                <div class="legend-item"><span class="legend-badge badge-green"></span> 0 Exceedances (Safe)</div>
+                <div class="legend-item"><span class="legend-badge badge-yellow"></span> 1–2 Exceedances (High Stress)</div>
+                <div class="legend-item"><span class="legend-badge badge-red"></span> 3+ Exceedances (Critical Risk)</div>
             </div>
         </div>
 
@@ -288,7 +298,7 @@
             <!-- Hardware Standard & Accuracy Footnote -->
             <div class="sensor-footnote">
                 <strong>Hardware Standard & Compliance:</strong><br>
-                IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA). Accuracy: ±1.5 dBA (Slow Response Mode). Data collected via RS485 Modbus RTU at 1Hz sampling frequency.
+                IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA). Accuracy: ±1.5 dBA (Slow Response Mode). Measurements recorded 50 ft from center lane of travel. Data collected via RS485 Modbus RTU at 1Hz sampling frequency.
             </div>
         </div>
     </div>
