@@ -335,11 +335,11 @@
     // --- LEAFLET MAP INITIALIZATION (CARTO VOYAGER TILE) ---
     const map = L.map('map').setView([39.735, -105.000], 12);
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-    }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
+		maxZoom: 19,
+		subdomains: 'abcd',
+		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+	}).addTo(map);
 
     let activeMarkerObj = null;
     let stackedChartInstance = null;
