@@ -270,16 +270,16 @@
 
             <!-- Clarified Metrics Summary Grid -->
             <div class="metrics-subgrid">
-                <div class="metric-card clickable-card" id="live-level-card" onclick="toggleLiveChart()" title="Click to view real-time decibel trend">
+                <div class="metric-card clickable-card" id="live-level-card" onclick="toggleChart('live')" title="Click to view real-time decibel trend">
                     <h4>Live Level 📈</h4>
                     <div class="metric-val"><span id="panel-db">0.0</span> <span style="font-size: 0.7rem; color: #888;">dBA</span></div>
                 </div>
-                <div class="metric-card">
-                    <h4>Exceedances (Past Hour)</h4>
+                <div class="metric-card clickable-card" id="hourly-card" onclick="toggleChart('hourly')" title="Click to view past hour exceedances chart">
+                    <h4>Exceedances (Past Hour) 📈</h4>
                     <div class="metric-val" id="panel-hourly" style="color: #ffb74d;">0</div>
                 </div>
-                <div class="metric-card">
-                    <h4>Exceedances (Today)</h4>
+                <div class="metric-card clickable-card" id="today-card" onclick="toggleChart('today')" title="Click to view today's exceedances chart">
+                    <h4>Exceedances (Today) 📈</h4>
                     <div class="metric-val" id="panel-today" style="color: #ff5252;">0</div>
                 </div>
             </div>
@@ -289,6 +289,22 @@
                 <h4>Live 5-Minute Decibel History (1Hz Sampling)</h4>
                 <div style="height: 150px; position: relative;">
                     <canvas id="liveMinuteChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Past Hour Exceedance Level Chart (Hidden by Default) -->
+            <div class="chart-container" id="hourly-chart-container" style="display: none;">
+                <h4>Past Hour Exceedances (Time & Level)</h4>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="hourlyExceedanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Today's Exceedance Level Chart (Hidden by Default) -->
+            <div class="chart-container" id="today-chart-container" style="display: none;">
+                <h4>Today's Exceedances (Time & Level)</h4>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="todayExceedanceChart"></canvas>
                 </div>
             </div>
 
@@ -386,19 +402,55 @@
     let stackedChartInstance = null;
     let peakChartInstance = null;
     let liveMinuteChartInstance = null;
+    let hourlyChartInstance = null;
+    let todayChartInstance = null;
 
     // Real-Time 5-Minute Buffer (300 points @ 1Hz)
     const MAX_LIVE_POINTS = 300;
     let liveDbHistory = [];
     let liveTimeLabels = [];
 
-    function toggleLiveChart() {
-        const container = document.getElementById('live-chart-container');
-        const isHidden = container.style.display === 'none';
-        container.style.display = isHidden ? 'block' : 'none';
-        
-        if (isHidden) {
-            initLiveChart();
+    async function toggleChart(type) {
+        const liveC = document.getElementById('live-chart-container');
+        const hourlyC = document.getElementById('hourly-chart-container');
+        const todayC = document.getElementById('today-chart-container');
+
+        if (type === 'live') {
+            const isHidden = liveC.style.display === 'none';
+            liveC.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                await preloadLiveHistory();
+                initLiveChart();
+            }
+        } else if (type === 'hourly') {
+            const isHidden = hourlyC.style.display === 'none';
+            hourlyC.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                await renderHourlyExceedanceChart();
+            }
+        } else if (type === 'today') {
+            const isHidden = todayC.style.display === 'none';
+            todayC.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                await renderTodayExceedanceChart();
+            }
+        }
+    }
+
+    async function preloadLiveHistory() {
+        if (!activeMarkerObj || !activeMarkerObj.isLiveSupabase) return;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&order=timestamp.desc&limit=300`, {
+                headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+            });
+            const data = await res.json();
+            if (data && data.length > 0) {
+                const sorted = data.reverse();
+                liveDbHistory = sorted.map(d => Number(d.dba));
+                liveTimeLabels = sorted.map(d => new Date(d.timestamp).toTimeString().split(' ')[0]);
+            }
+        } catch (err) {
+            console.error("Error preloading live history:", err);
         }
     }
 
@@ -458,6 +510,135 @@
                 },
                 plugins: { 
                     legend: { display: false } 
+                }
+            }
+        });
+    }
+
+    async function renderHourlyExceedanceChart() {
+        if (!activeMarkerObj) return;
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        let chartData = [];
+
+        if (activeMarkerObj.isLiveSupabase) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`, {
+                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                const logs = await res.json();
+                if (Array.isArray(logs)) {
+                    chartData = logs.map(l => ({
+                        time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                        dba: Number(l.dba)
+                    }));
+                }
+            } catch(e) { console.error(e); }
+        } else {
+            const now = Date.now();
+            for (let i = 0; i < activeMarkerObj.hourlyExceedances; i++) {
+                chartData.push({
+                    time: new Date(now - (i + 1) * 10 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    dba: Number((Math.random() * 10 + 85.5).toFixed(1))
+                });
+            }
+            chartData.reverse();
+        }
+
+        const labels = chartData.map(d => d.time);
+        const values = chartData.map(d => d.dba);
+
+        if (hourlyChartInstance) hourlyChartInstance.destroy();
+        const ctx = document.getElementById('hourlyExceedanceChart').getContext('2d');
+        hourlyChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Exceedance (dBA)',
+                    data: values,
+                    backgroundColor: '#ffb74d',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
+                    y: { min: 80, suggestedMax: 110, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `Level: ${ctx.raw} dBA`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function renderTodayExceedanceChart() {
+        if (!activeMarkerObj) return;
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        let chartData = [];
+
+        if (activeMarkerObj.isLiveSupabase) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`, {
+                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                const logs = await res.json();
+                if (Array.isArray(logs)) {
+                    chartData = logs.map(l => ({
+                        time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        dba: Number(l.dba)
+                    }));
+                }
+            } catch(e) { console.error(e); }
+        } else {
+            const now = Date.now();
+            for (let i = 0; i < Math.min(activeMarkerObj.todayExceedances, 15); i++) {
+                chartData.push({
+                    time: new Date(now - (i + 1) * 45 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    dba: Number((Math.random() * 12 + 85.5).toFixed(1))
+                });
+            }
+            chartData.reverse();
+        }
+
+        const labels = chartData.map(d => d.time);
+        const values = chartData.map(d => d.dba);
+
+        if (todayChartInstance) todayChartInstance.destroy();
+        const ctx = document.getElementById('todayExceedanceChart').getContext('2d');
+        todayChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Exceedance (dBA)',
+                    data: values,
+                    backgroundColor: '#ff5252',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
+                    y: { min: 80, suggestedMax: 110, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `Level: ${ctx.raw} dBA`
+                        }
+                    }
                 }
             }
         });
