@@ -914,7 +914,7 @@
         btn.innerText = "⏳ Exporting Exceedances...";
         btn.disabled = true;
 
-        let rows = [["Timestamp", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)"]];
+        let rows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Raw ISO Timestamp"]];
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
@@ -932,12 +932,18 @@
                     if (Array.isArray(logs) && logs.length > 0) {
                         logs.forEach(log => {
                             const dba = Number(log.dba);
+                            const dt = new Date(log.timestamp);
+                            const dateStr = dt.toLocaleDateString('en-US');
+                            const timeStr = dt.toLocaleTimeString('en-US');
+
                             rows.push([
-                                log.timestamp,
+                                dateStr,
+                                timeStr,
                                 activeMarkerObj.id,
                                 `"${activeMarkerObj.name}"`,
                                 dba.toFixed(1),
-                                DECIBEL_THRESHOLD
+                                DECIBEL_THRESHOLD,
+                                log.timestamp
                             ]);
                         });
                         
@@ -953,14 +959,16 @@
         } else {
             const now = new Date();
             for (let i = 0; i < 8; i++) {
-                const timestamp = new Date(now.getTime() - i * 180 * 60 * 1000).toISOString();
+                const sampleDate = new Date(now.getTime() - i * 180 * 60 * 1000);
                 const dba = parseFloat((Math.random() * 10 + 85.5).toFixed(1));
                 rows.push([
-                    timestamp,
+                    sampleDate.toLocaleDateString('en-US'),
+                    sampleDate.toLocaleTimeString('en-US'),
                     activeMarkerObj.id,
                     `"${activeMarkerObj.name}"`,
                     dba.toFixed(1),
-                    DECIBEL_THRESHOLD
+                    DECIBEL_THRESHOLD,
+                    sampleDate.toISOString()
                 ]);
             }
         }
