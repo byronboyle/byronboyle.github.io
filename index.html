@@ -336,10 +336,22 @@
     </div>
 
     <script>
-    // --- SUPABASE CONFIGURATION ---
+    // --- SUPABASE CONFIGURATION & HELPER ---
     const SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
     const DECIBEL_THRESHOLD = 85.0;
+
+    // Unified Supabase REST API Query Helper
+    async function fetchSupabase(table, queryParams = "") {
+        const url = `${SUPABASE_URL}/rest/v1/${table}${queryParams ? '?' + queryParams : ''}`;
+        const res = await fetch(url, {
+            headers: {
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+        return res.json();
+    }
 
     // --- STATIONS DATA ---
     const METER_STATIONS = [
@@ -440,10 +452,7 @@
     async function preloadLiveHistory() {
         if (!activeMarkerObj || !activeMarkerObj.isLiveSupabase) return;
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&order=timestamp.desc&limit=300`, {
-                headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            const data = await res.json();
+            const data = await fetchSupabase("noise_logs", "select=timestamp,dba&order=timestamp.desc&limit=300");
             if (data && data.length > 0) {
                 const sorted = data.reverse();
                 liveDbHistory = sorted.map(d => Number(d.dba));
@@ -522,10 +531,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`, {
-                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const logs = await res.json();
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -587,10 +593,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`, {
-                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const logs = await res.json();
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -688,10 +691,7 @@
     async function fetchLivePrimaryMeter() {
         try {
             // Live sound level
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=*&order=timestamp.desc&limit=1`, {
-                headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            const data = await res.json();
+            const data = await fetchSupabase("noise_logs", "select=*&order=timestamp.desc&limit=1");
             
             if (data && data.length > 0) {
                 const liveDba = Number(data[0].dba);
@@ -700,19 +700,13 @@
                 updateLiveHistory(liveDba);
                 
                 const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-                const exceedRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`, {
-                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const exceedData = await exceedRes.json();
+                const exceedData = await fetchSupabase("noise_logs", `select=id&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`);
                 const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
                 const startOfToday = new Date();
                 startOfToday.setHours(0, 0, 0, 0);
 
-                const todayRes = await fetch(`${SUPABASE_URL}/rest/v1/noise_logs?select=id&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`, {
-                    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const todayData = await todayRes.json();
+                const todayData = await fetchSupabase("noise_logs", `select=id&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
                 const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
                 const primary = METER_STATIONS[0];
@@ -733,10 +727,7 @@
             }
 
             // Fetch Total 311 Reports Count from Supabase
-            const statsRes = await fetch(`${SUPABASE_URL}/rest/v1/report_stats?select=total_submitted&station_id=eq.meter-01`, {
-                headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            const statsData = await statsRes.json();
+            const statsData = await fetchSupabase("report_stats", "select=total_submitted&station_id=eq.meter-01");
             if (Array.isArray(statsData) && statsData.length > 0) {
                 document.getElementById('total-311-count').innerText = statsData[0].total_submitted;
             }
@@ -778,11 +769,10 @@
                 startDate.setDate(startDate.getDate() - 13);
                 startDate.setHours(0, 0, 0, 0);
 
-                const exceedRes = await fetch(
-                    `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`, 
-                    { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
+                const exceedLogs = await fetchSupabase(
+                    "noise_logs", 
+                    `select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`
                 );
-                const exceedLogs = await exceedRes.json();
 
                 if (Array.isArray(exceedLogs)) {
                     exceedLogs.forEach(log => {
@@ -798,11 +788,10 @@
                     });
                 }
 
-                const peakRes = await fetch(
-                    `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`, 
-                    { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
+                const peakLogs = await fetchSupabase(
+                    "noise_logs", 
+                    `select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`
                 );
-                const peakLogs = await peakRes.json();
 
                 if (Array.isArray(peakLogs)) {
                     peakLogs.forEach(log => {
@@ -923,11 +912,10 @@
                 const fetchLimit = 1000;
 
                 while (keepFetching) {
-                    const res = await fetch(
-                        `${SUPABASE_URL}/rest/v1/noise_logs?select=timestamp,dba&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`, 
-                        { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
+                    const logs = await fetchSupabase(
+                        "noise_logs", 
+                        `select=timestamp,dba&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`
                     );
-                    const logs = await res.json();
                     
                     if (Array.isArray(logs) && logs.length > 0) {
                         logs.forEach(log => {
