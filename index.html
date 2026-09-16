@@ -395,7 +395,7 @@
             currentDba: 88.2,
             hourlyExceedances: 4,
             todayExceedances: 14,
-            isLiveSupabase: false
+            isLiveSupabase: true
         },
         {
             id: "meter-03",
@@ -472,7 +472,7 @@
     async function preloadLiveHistory() {
         if (!activeMarkerObj || !activeMarkerObj.isLiveSupabase) return;
         try {
-            const data = await fetchSupabase("noise_logs", "select=timestamp,dba&order=timestamp.desc&limit=300");
+            const data = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&order=timestamp.desc&limit=300`);
             if (data && data.length > 0) {
                 const sorted = data.reverse();
                 liveDbHistory = sorted.map(d => Number(d.dba));
@@ -551,7 +551,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`);
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -613,7 +613,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`);
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -707,49 +707,57 @@
         return { dateMap, labels };
     }
 
-    // --- FETCH REAL DATA & 311 STATS FROM SUPABASE ---
-    async function fetchLivePrimaryMeter() {
+    // --- FETCH REAL DATA & 311 STATS FROM SUPABASE FOR ALL STATIONS ---
+    async function fetchLiveMeters() {
         try {
-            // Live sound level
-            const data = await fetchSupabase("noise_logs", "select=*&order=timestamp.desc&limit=1");
-            
-            if (data && data.length > 0) {
-                const liveDba = Number(data[0].dba);
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+
+            for (const station of METER_STATIONS) {
+                if (!station.isLiveSupabase) continue;
+
+                // Query live sound level for specific station
+                const data = await fetchSupabase("noise_logs", `select=*&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
                 
-                // Update live buffer history chart
-                updateLiveHistory(liveDba);
-                
-                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-                const exceedData = await fetchSupabase("noise_logs", `select=id&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`);
-                const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
+                if (Array.isArray(data) && data.length > 0) {
+                    const liveDba = Number(data[0].dba);
 
-                const startOfToday = new Date();
-                startOfToday.setHours(0, 0, 0, 0);
+                    // Update live buffer history if active station
+                    if (activeMarkerObj && activeMarkerObj.id === station.id) {
+                        updateLiveHistory(liveDba);
+                    }
 
-                const todayData = await fetchSupabase("noise_logs", `select=id&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
-                const todayCount = Array.isArray(todayData) ? todayData.length : 0;
+                    // Query hourly exceedances for specific station
+                    const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                const primary = METER_STATIONS[0];
-                primary.currentDba = liveDba;
-                primary.hourlyExceedances = hourlyCount;
-                primary.todayExceedances = todayCount;
+                    // Query today exceedances for specific station
+                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
-                const primaryMarker = markersMap.get(primary.id);
-                if (primaryMarker) {
-                    primaryMarker.setIcon(createBadgeIcon(liveDba, hourlyCount));
-                }
+                    station.currentDba = liveDba;
+                    station.hourlyExceedances = hourlyCount;
+                    station.todayExceedances = todayCount;
 
-                if (activeMarkerObj && activeMarkerObj.id === primary.id) {
-                    document.getElementById('panel-db').innerText = liveDba.toFixed(1);
-                    document.getElementById('panel-hourly').innerText = hourlyCount;
-                    document.getElementById('panel-today').innerText = todayCount;
+                    const marker = markersMap.get(station.id);
+                    if (marker) {
+                        marker.setIcon(createBadgeIcon(liveDba, hourlyCount));
+                    }
+
+                    if (activeMarkerObj && activeMarkerObj.id === station.id) {
+                        document.getElementById('panel-db').innerText = liveDba.toFixed(1);
+                        document.getElementById('panel-hourly').innerText = hourlyCount;
+                        document.getElementById('panel-today').innerText = todayCount;
+                    }
                 }
             }
 
-            // Fetch Total 311 Reports Count from Supabase
-            const statsData = await fetchSupabase("report_stats", "select=total_submitted&station_id=eq.meter-01");
+            // Fetch Aggregate 311 Reports Count across all stations
+            const statsData = await fetchSupabase("report_stats", "select=total_submitted");
             if (Array.isArray(statsData) && statsData.length > 0) {
-                document.getElementById('total-311-count').innerText = statsData[0].total_submitted;
+                const total311 = statsData.reduce((sum, item) => sum + (Number(item.total_submitted) || 0), 0);
+                document.getElementById('total-311-count').innerText = total311;
             }
         } catch (err) {
             console.error("Supabase live sync error:", err);
@@ -758,6 +766,9 @@
 
     async function openDetailPanel(station) {
         activeMarkerObj = station;
+        liveDbHistory = [];
+        liveTimeLabels = [];
+
         document.getElementById('panel-title').innerText = station.name;
         document.getElementById('panel-address').innerText = station.address;
         document.getElementById('panel-db').innerText = station.currentDba.toFixed(1);
@@ -766,6 +777,11 @@
 
         document.getElementById('detail-panel').classList.add('open');
         map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
+
+        // Reset toggled charts when switching stations
+        document.getElementById('live-chart-container').style.display = 'none';
+        document.getElementById('hourly-chart-container').style.display = 'none';
+        document.getElementById('today-chart-container').style.display = 'none';
 
         await renderStationCharts(station);
     }
@@ -791,7 +807,7 @@
 
                 const exceedLogs = await fetchSupabase(
                     "noise_logs", 
-                    `select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`
+                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`
                 );
 
                 if (Array.isArray(exceedLogs)) {
@@ -810,7 +826,7 @@
 
                 const peakLogs = await fetchSupabase(
                     "noise_logs", 
-                    `select=timestamp,dba&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`
+                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`
                 );
 
                 if (Array.isArray(peakLogs)) {
@@ -894,7 +910,11 @@
         btn.disabled = true;
 
         try {
-            const res = await fetch('/file_daily_summary', { method: 'POST' });
+            const res = await fetch('/file_daily_summary', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ station_id: activeMarkerObj ? activeMarkerObj.id : null })
+            });
             const data = await res.json();
             
             if (data.success) {
@@ -934,7 +954,7 @@
                 while (keepFetching) {
                     const logs = await fetchSupabase(
                         "noise_logs", 
-                        `select=timestamp,dba&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`
+                        `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`
                     );
                     
                     if (Array.isArray(logs) && logs.length > 0) {
@@ -1007,8 +1027,8 @@
     // App Initialization & Live Timers
     async function startApp() {
         await loadRuntimeConfig();
-        fetchLivePrimaryMeter();
-        setInterval(fetchLivePrimaryMeter, 5000);
+        fetchLiveMeters();
+        setInterval(fetchLiveMeters, 5000);
     }
 
     startApp();
