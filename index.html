@@ -336,20 +336,40 @@
     </div>
 
     <script>
-    // --- SUPABASE CONFIGURATION & HELPER ---
-    const SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
+    // --- DYNAMIC RUNTIME CONFIGURATION ---
+    let SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co";
+    let SUPABASE_ANON_KEY = "";
     const DECIBEL_THRESHOLD = 85.0;
+
+    // Fetch key dynamically from backend persistent config endpoint to avoid hardcoding credentials
+    async function loadRuntimeConfig() {
+        try {
+            const res = await fetch('/api/config');
+            if (res.ok) {
+                const config = await res.json();
+                if (config.SUPABASE_URL) SUPABASE_URL = config.SUPABASE_URL;
+                if (config.SUPABASE_ANON_KEY) SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+            }
+        } catch (err) {
+            console.warn("Could not fetch backend persistent config, using dynamic fallbacks.", err);
+        }
+    }
 
     // Unified Supabase REST API Query Helper
     async function fetchSupabase(table, queryParams = "") {
+        if (!SUPABASE_ANON_KEY) {
+            await loadRuntimeConfig();
+        }
+        
         const url = `${SUPABASE_URL}/rest/v1/${table}${queryParams ? '?' + queryParams : ''}`;
-        const res = await fetch(url, {
-            headers: {
-                "apikey": SUPABASE_ANON_KEY,
-                "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-            }
-        });
+        const headers = { "Content-Type": "application/json" };
+        
+        if (SUPABASE_ANON_KEY) {
+            headers["apikey"] = SUPABASE_ANON_KEY;
+            headers["Authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
+        }
+
+        const res = await fetch(url, { headers });
         return res.json();
     }
 
@@ -404,7 +424,7 @@
     // --- LEAFLET MAP INITIALIZATION ---
     const map = L.map('map').setView([39.735, -105.000], 12);
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd',
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -984,9 +1004,14 @@
         btn.disabled = false;
     }
 
-    // Live Sync Timers
-    fetchLivePrimaryMeter();
-    setInterval(fetchLivePrimaryMeter, 5000);
+    // App Initialization & Live Timers
+    async function startApp() {
+        await loadRuntimeConfig();
+        fetchLivePrimaryMeter();
+        setInterval(fetchLivePrimaryMeter, 5000);
+    }
+
+    startApp();
     </script>
 </body>
 </html>
