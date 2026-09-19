@@ -27,61 +27,32 @@
 
         /* Navigation Bar */
         .navbar {
-            min-height: 56px;
+            height: 56px;
             background: #1a1a1a;
             border-bottom: 1px solid #333;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 20px;
             z-index: 1000;
-            gap: 12px;
-            flex-wrap: wrap;
         }
         .navbar-brand {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #fff;
             display: flex;
             align-items: center;
             gap: 8px;
-            white-space: nowrap;
         }
-        .nav-links {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 4px 0;
-            -webkit-overflow-scrolling: touch;
-        }
-        .nav-btn {
-            background: #242424;
-            border: 1px solid #3a3a3a;
-            color: #ccc;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .nav-btn:hover, .nav-btn.active {
-            background: #00e676;
-            color: #000;
-            font-weight: 600;
-            border-color: #00e676;
-        }
-
         .navbar-stats {
             display: flex;
-            gap: 16px;
-            font-size: 0.8rem;
+            gap: 20px;
+            font-size: 0.85rem;
             color: #aaa;
-            white-space: nowrap;
         }
         .stat-highlight { color: #00e676; font-weight: 700; }
 
-        /* Main Container & Framed Map */
+        /* Main Container & Hybrid Framed Map */
         .main-container {
             position: relative;
             flex: 1;
@@ -118,7 +89,7 @@
             display: inline-block;
         }
 
-        /* High-Contrast Marker Badges */
+        /* High-Contrast Marker Badges for Light Map Surfaces */
         .aqi-marker-badge {
             display: flex;
             align-items: center;
@@ -169,8 +140,6 @@
             font-size: 1.5rem;
             cursor: pointer;
             align-self: flex-end;
-            line-height: 1;
-            padding: 4px;
         }
         .close-btn:hover { color: #fff; }
 
@@ -224,48 +193,6 @@
         }
         .metric-val { font-size: 1.3rem; font-weight: 700; color: #00e676; }
 
-        /* Educational Module Components */
-        .info-card {
-            background: #242424;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 14px;
-        }
-        .info-card h3 {
-            margin: 0 0 8px 0;
-            font-size: 0.95rem;
-            color: #00e676;
-        }
-        .info-card p, .info-card li {
-            font-size: 0.83rem;
-            color: #ccc;
-            line-height: 1.5;
-            margin: 0 0 8px 0;
-        }
-        .info-card ul { padding-left: 18px; margin: 0 0 8px 0; }
-        .comparison-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            background: #181818;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #2a2a2a;
-            margin: 10px 0;
-        }
-        .comp-item { text-align: center; font-size: 0.78rem; }
-        .comp-val { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
-
-        .calc-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin: 12px 0;
-        }
-        .calc-input-group label { font-size: 0.8rem; color: #aaa; }
-        .calc-slider { width: 100%; accent-color: #00e676; cursor: pointer; }
-
         /* Chart Sections */
         .chart-container {
             background: #242424;
@@ -294,9 +221,6 @@
             font-size: 0.85rem;
             transition: background 0.2s;
             flex-shrink: 0;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
         }
         .btn-primary { background: #00e676; color: #000; }
         .btn-primary:hover { background: #00c853; }
@@ -317,18 +241,17 @@
 
         /* Responsive Mobile Layout Fixes */
         @media (max-width: 600px) {
-            .navbar { padding: 8px 12px; }
+            .navbar { padding: 0 12px; }
             .navbar-brand { font-size: 0.95rem; }
-            .navbar-stats { font-size: 0.75rem; width: 100%; justify-content: space-between; }
-            .nav-links { width: 100%; }
+            .navbar-stats { gap: 10px; font-size: 0.75rem; }
             .detail-panel { 
-                width: 100% !important; 
-                height: 100% !important;
-                right: -100% !important; 
+                width: 100%; 
+                height: 100%;
+                right: -100%; 
                 padding: 16px 16px calc(100px + env(safe-area-inset-bottom, 0px)) 16px; 
                 border-left: none; 
             }
-            .detail-panel.open { right: 0 !important; }
+            .detail-panel.open { right: 0; }
             .metrics-subgrid { gap: 6px; }
             .metric-card { padding: 8px 6px; }
             .metric-val { font-size: 1.1rem; }
@@ -341,21 +264,10 @@
 
     <div class="navbar">
         <div class="navbar-brand">🔊 Denver Acoustic Noise Network</div>
-        
-        <!-- Navigation Buttons -->
-        <div class="nav-links">
-            <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
-            <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
-            <button class="nav-btn" onclick="openInfoModal('action')">Take Action</button>
-            <button class="nav-btn" onclick="openInfoModal('resources')">Resources</button>
-            <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
-            <button class="nav-btn" onclick="openInfoModal('calculator')">Sleep Risk</button>
-        </div>
-
         <div class="navbar-stats">
-            <div>Active: <span class="stat-highlight" id="active-count">4</span></div>
-            <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
-            <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
+            <div>Active Stations: <span class="stat-highlight" id="active-count">4</span></div>
+            <div>City Threshold: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
+            <div>Total 311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
     </div>
 
@@ -372,14 +284,6 @@
 
         <!-- Fullscreen Light Map Canvas -->
         <div id="map"></div>
-
-        <!-- Educational Info Slide-out Panel -->
-        <div class="detail-panel" id="info-panel">
-            <button class="close-btn" onclick="closeInfoPanel()">&times;</button>
-            <div id="info-panel-content">
-                <!-- Dynamic Content injected via JavaScript -->
-            </div>
-        </div>
 
         <!-- Site Specific Detail Drawer -->
         <div class="detail-panel" id="detail-panel">
@@ -581,214 +485,6 @@
     const MAX_LIVE_POINTS = 300;
     let liveDbHistory = [];
     let liveTimeLabels = [];
-
-    // --- EDUCATIONAL MODAL DRAWER CONTROLLER ---
-    function openInfoModal(topic) {
-        closePanel(); // Close station detail drawer if active
-        
-        const infoPanel = document.getElementById('info-panel');
-        const container = document.getElementById('info-panel-content');
-        
-        // Highlight active nav button
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(topic));
-        if (activeBtn) activeBtn.classList.add('active');
-
-        let htmlContent = '';
-
-        switch (topic) {
-            case 'dba-dbc':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>🎛️ Acoustic Weighting: dBA vs. dBC</h2>
-                        <p>Why standard enforcement misses low-frequency noise pollution.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Understanding Frequency Weighting</h3>
-                        <p>Most municipal noise codes rely exclusively on <strong>dBA (A-weighting)</strong>. This standard was designed to mimic the human ear by heavily filtering out low and high frequencies (&lt; 1,000 Hz).</p>
-                        <p>However, modern noise disturbance is dominated by <strong>low-frequency energy</strong>—subwoofers, straight-pipe exhausts, and diesel engine rumbles that easily pass through building walls.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>A-Weighting vs C-Weighting</h3>
-                        <div class="comparison-box">
-                            <div class="comp-item">
-                                <div style="color: #ffb74d; font-weight: bold;">dBA Scale</div>
-                                <p style="font-size: 0.72rem; margin: 4px 0;">Rolls off low frequencies. Treats deep bass as almost quiet.</p>
-                                <div class="comp-val" style="color: #00e676;">68 dBA</div>
-                                <span style="font-size: 0.68rem; color: #888;">"Compliant"</span>
-                            </div>
-                            <div class="comp-item">
-                                <div style="color: #ff5252; font-weight: bold;">dBC Scale</div>
-                                <p style="font-size: 0.72rem; margin: 4px 0;">Flat frequency curve. Measures actual acoustic power output.</p>
-                                <div class="comp-val" style="color: #ff5252;">88 dBC</div>
-                                <span style="font-size: 0.68rem; color: #888;">"Disruptive"</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-card">
-                        <h3>Key Takeaway for Enforcement</h3>
-                        <p>A vehicle exhaust can easily register a legal <strong>68 dBA</strong> while generating an intrusive <strong>88 dBC</strong> low-frequency rumble. Modern acoustic monitoring networks must measure both dBA and dBC to capture real disturbance.</p>
-                    </div>
-                `;
-                break;
-
-            case 'myths':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>❓ Myths vs. Facts</h2>
-                        <p>Clearing up common misconceptions around urban sound pressure.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 1: "It's just an annoyance."</h3>
-                        <p><strong>Fact:</strong> According to the World Health Organization (WHO), chronic environmental noise is a major physiological stressor linked directly to high cortisol, hypertension, ischemic heart disease, and cognitive impairment in children.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 2: "If you don't wake up, it doesn't affect sleep."</h3>
-                        <p><strong>Fact:</strong> Even when you remain asleep, noise spikes above 45 dBA trigger micro-arousals, shifting your brain out of deep restorative REM sleep and driving daytime cardiovascular stress.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 3: "Noise is an unavoidable part of city living."</h3>
-                        <p><strong>Fact:</strong> Over 80% of urban acoustic spikes come from a small minority of illegal aftermarket modified vehicle exhausts and aggressive acceleration, not standard city traffic.</p>
-                    </div>
-                `;
-                break;
-
-            case 'action':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>📢 Take Action & Advocacy</h2>
-                        <p>Empowering neighbors with data to drive civic enforcement.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>1. File Automated 311 Reports</h3>
-                        <p>Use our interactive map monitors to identify recurring noise exceedance corridors and file official reports directly to Denver 311.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>2. Email City Council Representatives</h3>
-                        <p>Send a pre-filled message citing Denver Revised Municipal Code (DRMC) Chapter 36 to your district representative requesting acoustic enforcement.</p>
-                        <a href="mailto:denvercouncil@denvergov.org?subject=Acoustic%20Noise%20Mitigation%20Request&body=Dear%20City%20Council,%20I%20am%20writing%20to%20request%20focused%20acoustic%20enforcement%20along%20major%20transit%20corridors..." class="action-btn btn-primary">✉️ Send Council Email Template</a>
-                    </div>
-                    <div class="info-card">
-                        <h3>3. Community Outreach</h3>
-                        <p>Download printable QR-code flyers linking neighbors directly to live real-time station metrics along your corridor.</p>
-                        <button class="action-btn btn-secondary" onclick="alert('PDF Flyer generation coming soon!')">📄 Download Station Flyer</button>
-                    </div>
-                `;
-                break;
-
-            case 'resources':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>📚 Links & Technical Resources</h2>
-                        <p>Standards, legal codes, and open data endpoints.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Legal & Regulatory Codes</h3>
-                        <ul>
-                            <li><a href="https://library.municode.com/co/denver" target="_blank" style="color: #00e676;">Denver Revised Municipal Code Chapter 36</a> (55 dBA daytime / 50 dBA night limit)</li>
-                            <li><a href="https://www.who.int/europe/news-room/fact-sheets/item/noise" target="_blank" style="color: #00e676;">WHO Environmental Noise Guidelines</a></li>
-                        </ul>
-                    </div>
-                    <div class="info-card">
-                        <h3>Hardware Specifications</h3>
-                        <p>All network monitors utilize Class 2 IEC 61672-1 sound level sensors calibrated to ANSI S1.4 Type 2 accuracy standard (±1.5 dBA accuracy tolerance).</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Open Data API</h3>
-                        <p>Developers and researchers can access public REST endpoints for hourly noise logs and exceedance summaries.</p>
-                    </div>
-                `;
-                break;
-
-            case 'hotspots':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>🏆 Denver Noise Leaderboard</h2>
-                        <p>Monthly ranking of top exceedance corridors.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Top Daily Exceedance Intersections</h3>
-                        <div style="font-size: 0.83rem; color: #ccc;">
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>1. W Colfax Ave & Sheridan Blvd</span>
-                                <span style="color:#ff5252; font-weight:bold;">14/day</span>
-                            </div>
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>2. RiNo District (29th & Blake)</span>
-                                <span style="color:#ffb74d; font-weight:bold;">5/day</span>
-                            </div>
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>3. S Broadway & Evans Ave</span>
-                                <span style="color:#ffb74d; font-weight:bold;">2/day</span>
-                            </div>
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>4. Federal Blvd & 32nd Ave</span>
-                                <span style="color:#00e676; font-weight:bold;">0/day</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                break;
-
-            case 'calculator':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>💤 Sleep Disruption Risk Calculator</h2>
-                        <p>Estimate night-time health impacts based on local noise spikes.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Calculate Estimated Sleep Arousal</h3>
-                        <div class="calc-input-group">
-                            <label>Night Spikes (&gt;75 dBA) per hour: <strong id="spike-val" style="color: #00e676;">3</strong></label>
-                            <input type="range" class="calc-slider" id="spike-slider" min="0" max="15" value="3" oninput="updateSleepCalc(this.value)">
-                        </div>
-                        <div class="comparison-box" style="margin-top: 14px;">
-                            <div class="comp-item">
-                                <div>Sleep Arousal Risk</div>
-                                <div class="comp-val" id="calc-arousal" style="color:#ffb74d;">Moderate (32%)</div>
-                            </div>
-                            <div class="comp-item">
-                                <div>Cortisol Impact</div>
-                                <div class="comp-val" id="calc-stress" style="color:#ffb74d;">Elevated</div>
-                            </div>
-                        </div>
-                        <p style="font-size:0.75rem; color:#888; margin-top:8px;">Calculated using World Health Organization Night Noise Guidelines models for urban residences.</p>
-                    </div>
-                `;
-                break;
-
-            default:
-                htmlContent = `<p>Select a topic from the navigation bar.</p>`;
-        }
-
-        container.innerHTML = htmlContent;
-        infoPanel.classList.add('open');
-    }
-
-    function closeInfoPanel() {
-        document.getElementById('info-panel').classList.remove('open');
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    }
-
-    function updateSleepCalc(val) {
-        document.getElementById('spike-val').innerText = val;
-        const arousal = document.getElementById('calc-arousal');
-        const stress = document.getElementById('calc-stress');
-
-        if (val == 0) {
-            arousal.innerText = "Low (5%)"; arousal.style.color = "#00e676";
-            stress.innerText = "Normal"; stress.style.color = "#00e676";
-        } else if (val <= 3) {
-            arousal.innerText = "Moderate (32%)"; arousal.style.color = "#ffb74d";
-            stress.innerText = "Elevated"; stress.style.color = "#ffb74d";
-        } else if (val <= 7) {
-            arousal.innerText = "High (64%)"; arousal.style.color = "#ff9100";
-            stress.innerText = "High"; stress.style.color = "#ff9100";
-        } else {
-            arousal.innerText = "Severe (88%+)"; arousal.style.color = "#ff5252";
-            stress.innerText = "Critical"; stress.style.color = "#ff5252";
-        }
-    }
 
     async function toggleChart(type) {
         const liveC = document.getElementById('live-chart-container');
@@ -1157,7 +853,6 @@
     }
 
     async function openDetailPanel(station) {
-        closeInfoPanel(); // Close educational info drawer if active
         activeMarkerObj = station;
         liveDbHistory = [];
         liveTimeLabels = [];
