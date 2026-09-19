@@ -1464,6 +1464,31 @@
         btn.disabled = false;
     }
 
+    // --- MOBILE TOUCH & SWIPE GESTURE HANDLER ---
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.querySelectorAll('.detail-panel').forEach(panel => {
+        panel.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        panel.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+
+            // Trigger close if horizontal swipe is dominant and exceeds 50px threshold
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                closePanel();
+                closeInfoPanel();
+            }
+        }, { passive: true });
+    });
+
     // App Initialization & Live Timers
     async function startApp() {
         await loadRuntimeConfig();
