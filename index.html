@@ -97,14 +97,6 @@
             border-color: #00e676;
         }
 
-        .navbar-stats {
-            display: flex;
-            gap: 16px;
-            font-size: 0.8rem;
-            color: #aaa;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
         .stat-highlight { color: #00e676; font-weight: 700; }
 
         /* Main Container & Framed Map */
@@ -147,6 +139,26 @@
             border-radius: 4px;
             display: inline-block;
             flex-shrink: 0;
+        }
+
+        /* Floating Dark Glass Stats Banner (Bottom of Map) */
+        .map-overlay-stats {
+            position: absolute;
+            bottom: 20px;
+            left: 16px;
+            background: rgba(26, 26, 26, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 8px 16px;
+            z-index: 999;
+            font-size: 0.8rem;
+            color: #aaa;
+            display: flex;
+            gap: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            max-width: calc(100vw - 32px);
         }
 
         /* Marker Badges */
@@ -400,15 +412,6 @@
             .navbar-brand { font-size: 0.9rem; }
             .navbar-brand .brand-title { font-size: 0.92rem; }
             .navbar-brand .tagline { font-size: 0.65rem; }
-            .navbar-stats {
-                font-size: 0.72rem;
-                width: 100%;
-                justify-content: space-between;
-                gap: 8px;
-                border-top: 1px solid #282828;
-                padding-top: 4px;
-                margin-top: 2px;
-            }
             .nav-links {
                 width: 100%;
                 padding: 2px 0;
@@ -438,6 +441,13 @@
                 font-size: 0.7rem;
                 max-width: calc(100vw - 16px);
             }
+            .map-overlay-stats {
+                bottom: 8px;
+                left: 8px;
+                padding: 6px 10px;
+                font-size: 0.72rem;
+                gap: 10px;
+            }
             .legend-badge { width: 18px; height: 12px; }
         }
     </style>
@@ -459,12 +469,6 @@
             <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
             <button class="nav-btn" onclick="openInfoModal('calculator')">Sleep Risk</button>
         </div>
-
-        <div class="navbar-stats">
-            <div>Active: <span class="stat-highlight" id="active-count">4</span></div>
-            <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
-            <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
-        </div>
     </div>
 
     <div class="main-container">
@@ -476,6 +480,13 @@
                 <div class="legend-item"><span class="legend-badge badge-yellow"></span> 1–2 Exceedances (High Stress)</div>
                 <div class="legend-item"><span class="legend-badge badge-red"></span> 3+ Exceedances (Critical Risk)</div>
             </div>
+        </div>
+
+        <!-- Floating Map Bottom Stats Overlay -->
+        <div class="map-overlay-stats">
+            <div>Active: <span class="stat-highlight" id="active-count">4</span></div>
+            <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
+            <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
 
         <!-- Fullscreen Light Map Canvas -->
