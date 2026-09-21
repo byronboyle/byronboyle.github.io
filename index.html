@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mile High Noise Project | Live Map</title>
     <!-- Leaflet.js CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -13,19 +13,26 @@
 
     <style>
         * { box-sizing: border-box; }
-        body {
+        html, body {
             margin: 0;
             padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #121212;
             color: #e0e0e0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
         }
 
-        /* Navigation Bar */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar - Fixed on Top */
         .navbar {
             min-height: 56px;
             background: #1a1a1a;
@@ -34,12 +41,11 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 16px;
-            z-index: 1000;
+            z-index: 2000;
             gap: 12px;
             flex-wrap: wrap;
             flex-shrink: 0;
-            position: sticky;
-            top: 0;
+            position: relative;
         }
         .navbar-brand {
             display: flex;
@@ -97,6 +103,8 @@
             position: relative;
             flex: 1;
             width: 100%;
+            height: calc(100% - 56px);
+            overflow: hidden;
         }
 
         #map {
@@ -353,7 +361,7 @@
     <div class="navbar">
         <div class="navbar-brand">
             <span class="brand-title">🔊 Mile High Noise Project</span>
-            <span class="tagline">Mapping high-decibel vehicle noise across Denver</span>
+            <span class="tagline">Mapping illegal high-decibel vehicle noise across Denver</span>
         </div>
         
         <!-- Navigation Buttons -->
@@ -476,20 +484,20 @@
     let SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
     const DECIBEL_THRESHOLD = 85.0;
 
-    // Shared Threshold Annotation Object for Chart.js
+    // Shared Threshold Annotation Object for Chart.js (High Contrast Yellow)
     const thresholdAnnotation = {
         type: 'line',
         yMin: DECIBEL_THRESHOLD,
         yMax: DECIBEL_THRESHOLD,
-        borderColor: '#ff5252',
-        borderWidth: 1.5,
+        borderColor: '#ffeb3b',
+        borderWidth: 2,
         borderDash: [5, 5],
         label: {
             display: true,
             content: '85 dBA Threshold',
             position: 'start',
-            backgroundColor: 'rgba(255, 82, 82, 0.85)',
-            color: '#ffffff',
+            backgroundColor: 'rgba(255, 235, 59, 0.9)',
+            color: '#000000',
             font: { size: 9, weight: 'bold' },
             padding: 3
         }
@@ -731,19 +739,19 @@
                     <div class="info-card">
                         <h3>Top Daily Exceedance Intersections</h3>
                         <div style="font-size: 0.83rem; color: #ccc;">
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
+                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
                                 <span>1. W Colfax Ave & Sheridan Blvd</span>
                                 <span style="color:#ff5252; font-weight:bold;">14/day</span>
                             </div>
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
+                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
                                 <span>2. RiNo District (29th & Blake)</span>
                                 <span style="color:#ffb74d; font-weight:bold;">5/day</span>
                             </div>
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
+                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
                                 <span>3. S Broadway & Evans Ave</span>
                                 <span style="color:#ffb74d; font-weight:bold;">2/day</span>
                             </div>
-                            <div style="display:flex; justify-shadow:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
+                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
                                 <span>4. Federal Blvd & 32nd Ave</span>
                                 <span style="color:#00e676; font-weight:bold;">0/day</span>
                             </div>
@@ -784,6 +792,7 @@
         }
 
         container.innerHTML = htmlContent;
+        infoPanel.scrollTop = 0;
         infoPanel.classList.add('open');
     }
 
@@ -1148,7 +1157,7 @@
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
                     // Query today exceedances for specific station
-                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
                     const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
                     station.currentDba = liveDba;
@@ -1191,7 +1200,10 @@
         document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
         document.getElementById('panel-today').innerText = station.todayExceedances;
 
-        document.getElementById('detail-panel').classList.add('open');
+        const detailPanel = document.getElementById('detail-panel');
+        detailPanel.scrollTop = 0;
+        detailPanel.classList.add('open');
+        
         map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
 
         // Reset toggled charts & card active states when switching stations
@@ -1470,19 +1482,22 @@
 
     document.querySelectorAll('.detail-panel').forEach(panel => {
         panel.addEventListener('touchstart', (e) => {
+            // Ignore touch gestures starting on interactive elements like charts, inputs, buttons, or links
+            if (e.target.closest('canvas, input, button, a')) return;
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
         }, { passive: true });
 
         panel.addEventListener('touchend', (e) => {
+            if (e.target.closest('canvas, input, button, a')) return;
             const touchEndX = e.changedTouches[0].screenX;
             const touchEndY = e.changedTouches[0].screenY;
 
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            // Trigger close if horizontal swipe is dominant and exceeds 50px threshold
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            // Trigger close only if horizontal swipe to the right is dominant and exceeds 50px
+            if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
                 closePanel();
                 closeInfoPanel();
             }
