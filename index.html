@@ -585,6 +585,11 @@
     </div>
 
     <script>
+    // Explicitly register Chart.js Annotation Plugin UMD module
+    if (window['chartjs-plugin-annotation']) {
+        Chart.register(window['chartjs-plugin-annotation']);
+    }
+
     // --- DYNAMIC RUNTIME CONFIGURATION ---
     let SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co";
     let SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
@@ -760,7 +765,7 @@
                 `;
                 break;
 
-			case 'myths':
+            case 'myths':
                 htmlContent = `
                     <div class="panel-header">
                         <h2>❓ Myths vs. Facts</h2>
@@ -788,7 +793,7 @@
                     </div>
                     <div class="info-card">
                         <h3>Myth 6: "Noise laws cannot be enforced without physical police stops."</h3>
-                        <p><strong>Fact:</strong> Automated enforcement using acoustic cameras combines calibrated directional microphone arrays with optical cameras to isolate noise spikes in multi-lane traffic, precise sound pressure readings (dBA/dBC), and vehicle license plates for automated citation.</p>
+                        <p><strong>Fact:</strong> Automated enforcement using acoustic cameras combines calibrated directional microphone arrays with optical cameras to isolate noise spikes in multi-lane traffic, precise sound pressure readings, and vehicle license plates for automated citation.</p>
                     </div>
                 `;
                 break;
@@ -946,7 +951,7 @@
         const todayCard = document.getElementById('today-card');
 
         if (type === 'live') {
-            const isHidden = liveC.style.display === 'none';
+            const isHidden = liveC.style.display === 'none' || liveC.style.display === '';
             liveC.style.display = isHidden ? 'block' : 'none';
             liveCard.classList.toggle('active', isHidden);
             liveCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
@@ -954,24 +959,33 @@
                 await preloadLiveHistory();
                 initLiveChart();
                 detailPanel.scrollTo({ top: liveC.offsetTop - 20, behavior: 'smooth' });
+            } else if (liveMinuteChartInstance) {
+                liveMinuteChartInstance.destroy();
+                liveMinuteChartInstance = null;
             }
         } else if (type === 'hourly') {
-            const isHidden = hourlyC.style.display === 'none';
+            const isHidden = hourlyC.style.display === 'none' || hourlyC.style.display === '';
             hourlyC.style.display = isHidden ? 'block' : 'none';
             hourlyCard.classList.toggle('active', isHidden);
             hourlyCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
             if (isHidden) {
                 await renderHourlyExceedanceChart();
                 detailPanel.scrollTo({ top: hourlyC.offsetTop - 20, behavior: 'smooth' });
+            } else if (hourlyChartInstance) {
+                hourlyChartInstance.destroy();
+                hourlyChartInstance = null;
             }
         } else if (type === 'today') {
-            const isHidden = todayC.style.display === 'none';
+            const isHidden = todayC.style.display === 'none' || todayC.style.display === '';
             todayC.style.display = isHidden ? 'block' : 'none';
             todayCard.classList.toggle('active', isHidden);
             todayCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
             if (isHidden) {
                 await renderTodayExceedanceChart();
                 detailPanel.scrollTo({ top: todayC.offsetTop - 20, behavior: 'smooth' });
+            } else if (todayChartInstance) {
+                todayChartInstance.destroy();
+                todayChartInstance = null;
             }
         }
     }
@@ -1012,6 +1026,7 @@
         
         if (liveMinuteChartInstance) {
             liveMinuteChartInstance.destroy();
+            liveMinuteChartInstance = null;
         }
 
         liveMinuteChartInstance = new Chart(ctxLive, {
@@ -1096,7 +1111,15 @@
         const labels = chartData.map(d => d.time);
         const values = chartData.map(d => d.dba);
 
-        if (hourlyChartInstance) hourlyChartInstance.destroy();
+        // Dynamically compute y-axis maximum scale so exceedance bars fill chart area properly
+        const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
+        const yMax = Math.max(Math.ceil(maxVal + 2), 95);
+
+        if (hourlyChartInstance) {
+            hourlyChartInstance.destroy();
+            hourlyChartInstance = null;
+        }
+
         const ctx = document.getElementById('hourlyExceedanceChart').getContext('2d');
         hourlyChartInstance = new Chart(ctx, {
             type: 'bar',
@@ -1114,7 +1137,12 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { min: 80, suggestedMax: 110, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
+                    y: { 
+                        min: 80, 
+                        suggestedMax: yMax, 
+                        grid: { color: '#333' }, 
+                        ticks: { color: '#888', font: { size: 9 } } 
+                    }
                 },
                 plugins: {
                     legend: { display: false },
@@ -1167,7 +1195,15 @@
         const labels = chartData.map(d => d.time);
         const values = chartData.map(d => d.dba);
 
-        if (todayChartInstance) todayChartInstance.destroy();
+        // Dynamically compute y-axis upper bound based on dataset peak (prevents data points from looking tiny)
+        const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
+        const yMax = Math.max(Math.ceil(maxVal + 2), 95);
+
+        if (todayChartInstance) {
+            todayChartInstance.destroy();
+            todayChartInstance = null;
+        }
+
         const ctx = document.getElementById('todayExceedanceChart').getContext('2d');
         todayChartInstance = new Chart(ctx, {
             type: 'bar',
@@ -1185,7 +1221,12 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { min: 80, suggestedMax: 110, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
+                    y: { 
+                        min: 80, 
+                        suggestedMax: yMax, 
+                        grid: { color: '#333' }, 
+                        ticks: { color: '#888', font: { size: 9 } } 
+                    }
                 },
                 plugins: {
                     legend: { display: false },
@@ -1323,6 +1364,11 @@
         
         map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
 
+        // Ensure dynamic toggle chart instances are destroyed before resetting view
+        if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
+        if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
+        if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
+
         // Reset toggled charts & card active states when switching stations
         document.getElementById('live-chart-container').style.display = 'none';
         document.getElementById('hourly-chart-container').style.display = 'none';
@@ -1341,6 +1387,11 @@
 
     function closePanel() {
         document.getElementById('detail-panel').classList.remove('open');
+        if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
+        if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
+        if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
+        if (stackedChartInstance) { stackedChartInstance.destroy(); stackedChartInstance = null; }
+        if (peakChartInstance) { peakChartInstance.destroy(); peakChartInstance = null; }
         activeMarkerObj = null;
     }
 
@@ -1475,32 +1526,39 @@
         });
     }
 
-    // --- TRIGGER FLASK BACKEND 311 AUTOMATION ---
+    // --- TRIGGER 311 REPORT VIA SUPABASE QUEUE ---
     async function trigger311Report() {
         const btn = document.getElementById('btn-311');
         const origText = btn.innerText;
-        btn.innerText = "⏳ Filing 311 Report with Denver Gov...";
+        btn.innerText = "⏳ Requesting 311 Report...";
         btn.disabled = true;
 
         try {
-            const res = await fetch('/file_daily_summary', { 
+            const targetStationId = activeMarkerObj ? activeMarkerObj.id : "meter-01";
+
+            // Insert pending report request into Supabase
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/pending_reports`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ station_id: activeMarkerObj ? activeMarkerObj.id : null })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    station_id: targetStationId,
+                    status: 'pending'
+                })
             });
-            const data = await res.json();
-            
-            if (data.success) {
-                alert(`✅ 311 Report Filed Successfully!\n${data.message}`);
-                if (data.total_submitted !== undefined) {
-                    document.getElementById('total-311-count').innerText = data.total_submitted;
-                }
+
+            if (response.ok || response.status === 201) {
+                alert("✅ 311 Report Request Queued!\n\nYour Raspberry Pi backend will pick up this task and process the filing through Playwright automation.");
             } else {
-                alert(`⚠️ Notice: ${data.message}`);
+                alert("⚠️ Failed to submit report request to Supabase queue.");
             }
         } catch (err) {
-            console.error("Failed to execute 311 automation:", err);
-            alert("Could not reach local Flask server endpoint `/file_daily_summary`.");
+            console.error("Failed to insert pending report trigger:", err);
+            alert("Could not connect to Supabase database server.");
         } finally {
             btn.innerText = origText;
             btn.disabled = false;
