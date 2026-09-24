@@ -620,6 +620,12 @@
                 </div>
             </div>
 
+            <!-- Step 3: Per-Station 311 Counter Display -->
+            <div class="info-card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-bottom: 12px;">
+                <span style="font-size: 0.82rem; color: #aaa;">Station 311 Complaints:</span>
+                <span id="panel-311-count" style="font-size: 1.15rem; font-weight: 700; color: #00e676;">0</span>
+            </div>
+
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Exceedance CSV Log</button>
 
@@ -693,7 +699,7 @@
         return res.json();
     }
 
-    // --- STATIONS DATA ---
+    // --- STEP 2: STATIONS DATA WITH PER-STATION 311 COUNT ---
     const METER_STATIONS = [
         {
             id: "meter-01",
@@ -704,6 +710,7 @@
             currentDba: 64.2,
             hourlyExceedances: 0,
             todayExceedances: 0,
+            reportCount311: 0,
             isLiveSupabase: true
         },
         {
@@ -715,6 +722,7 @@
             currentDba: 88.2,
             hourlyExceedances: 4,
             todayExceedances: 14,
+            reportCount311: 0,
             isLiveSupabase: true
         },
         {
@@ -726,6 +734,7 @@
             currentDba: 76.4,
             hourlyExceedances: 1,
             todayExceedances: 5,
+            reportCount311: 0,
             isLiveSupabase: false
         },
         {
@@ -737,6 +746,7 @@
             currentDba: 71.8,
             hourlyExceedances: 0,
             todayExceedances: 2,
+            reportCount311: 0,
             isLiveSupabase: false
         }
     ];
@@ -1336,17 +1346,41 @@
         return { dateMap, labels };
     }
 
-    // --- FETCH REAL DATA & 311 STATS FROM SUPABASE FOR ALL STATIONS ---
+    // --- STEP 2: FETCH REAL DATA & GROUPED 311 STATS FROM SUPABASE ---
     async function fetchLiveMeters() {
         try {
             const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
             const startOfToday = new Date();
             startOfToday.setHours(0, 0, 0, 0);
 
+            // Grouped 311 reports count query
+            let countsByStation = {};
+            try {
+                const rpcData = await fetchSupabase("rpc/get_311_counts_by_station", "");
+                if (Array.isArray(rpcData)) {
+                    rpcData.forEach(item => { countsByStation[item.station_id] = item.total_reports; });
+                } else {
+                    throw new Error("RPC endpoint unavailable");
+                }
+            } catch (e) {
+                // Fallback: Aggregate directly from pending_reports table
+                const rawReports = await fetchSupabase("pending_reports", "select=station_id");
+                if (Array.isArray(rawReports)) {
+                    countsByStation = rawReports.reduce((acc, report) => {
+                        if (report.station_id) {
+                            acc[report.station_id] = (acc[report.station_id] || 0) + 1;
+                        }
+                        return acc;
+                    }, {});
+                }
+            }
+
             for (const station of METER_STATIONS) {
+                station.reportCount311 = countsByStation[station.id] || 0;
+
                 if (!station.isLiveSupabase) continue;
 
-                // Query live sound level for specific station
+                // Query live sound level for specific station from noise_logs
                 const data = await fetchSupabase("noise_logs", `select=*&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
                 
                 if (Array.isArray(data) && data.length > 0) {
@@ -1378,11 +1412,13 @@
                         document.getElementById('panel-db').innerText = liveDba.toFixed(1);
                         document.getElementById('panel-hourly').innerText = hourlyCount;
                         document.getElementById('panel-today').innerText = todayCount;
+                        const countEl = document.getElementById('panel-311-count');
+                        if (countEl) countEl.innerText = station.reportCount311;
                     }
                 }
             }
 
-            // Fetch Aggregate 311 Reports Count across all stations
+            // Fetch Aggregate 311 Reports Count across all stations for map overlay
             const statsData = await fetchSupabase("report_stats", "select=total_submitted");
             if (Array.isArray(statsData) && statsData.length > 0) {
                 const total311 = statsData.reduce((sum, item) => sum + (Number(item.total_submitted) || 0), 0);
@@ -1393,6 +1429,7 @@
         }
     }
 
+    // --- STEP 4: openDetailPanel() ---
     async function openDetailPanel(station) {
         closeInfoPanel(); // Close educational info drawer if active
         activeMarkerObj = station;
@@ -1404,6 +1441,12 @@
         document.getElementById('panel-db').innerText = station.currentDba.toFixed(1);
         document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
         document.getElementById('panel-today').innerText = station.todayExceedances;
+
+        // Update station-specific 311 counter UI
+        const countEl = document.getElementById('panel-311-count');
+        if (countEl) {
+            countEl.innerText = station.reportCount311 || 0;
+        }
 
         const detailPanel = document.getElementById('detail-panel');
         detailPanel.scrollTop = 0;
@@ -1593,7 +1636,7 @@
         }, 4500);
     }
 
-    // --- TRIGGER 311 REPORT VIA SUPABASE QUEUE ---
+    // --- STEP 4: trigger311Report() ---
     async function trigger311Report() {
         const btn = document.getElementById('btn-311');
         const origText = "🚨 File 311 Noise Report";
@@ -1602,24 +1645,34 @@
         btn.disabled = true;
 
         try {
-            const targetStationId = activeMarkerObj ? activeMarkerObj.id : "meter-01";
+            const targetStation = activeMarkerObj || METER_STATIONS[0];
+            const targetStationId = targetStation.id;
 
-            // Insert pending report request into Supabase
+            // Insert pending report request into Supabase pending_reports table
             const response = await fetch(`${SUPABASE_URL}/rest/v1/pending_reports`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Prefer': 'return=minimal'
+                    'Prefer': 'return=representation'
                 },
                 body: JSON.stringify({
                     station_id: targetStationId,
-                    status: 'pending'
+                    status: 'SUBMITTED',
+                    message: `Noise complaint logged. Current level: ${targetStation.currentDba ? targetStation.currentDba.toFixed(1) + ' dBA' : 'N/A'}`,
+                    created_at: new Date().toISOString()
                 })
             });
 
             if (response.ok || response.status === 201) {
+                // Update station local report count & UI counter
+                targetStation.reportCount311 = (targetStation.reportCount311 || 0) + 1;
+                const countEl = document.getElementById('panel-311-count');
+                if (countEl) {
+                    countEl.innerText = targetStation.reportCount311;
+                }
+
                 // 1. In-app Toast Feedback
                 showToast(
                     "✅ 311 Report Request Queued!",
