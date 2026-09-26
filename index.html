@@ -107,7 +107,7 @@
             flex: 1;
             width: 100%;
             height: 100%;
-            min-height: 0; /* Prevents vertical viewport overflow */
+            min-height: 0;
             overflow: hidden;
         }
 
@@ -143,7 +143,7 @@
             flex-shrink: 0;
         }
 
-        /* Floating Dark Glass Stats Banner (Bottom of Map) */
+        /* Floating Dark Glass Stats Banner */
         .map-overlay-stats {
             position: absolute;
             bottom: 20px;
@@ -776,12 +776,11 @@
 
     // --- EDUCATIONAL MODAL DRAWER CONTROLLER ---
     function openInfoModal(topic) {
-        closePanel(); // Close station detail drawer if active
+        closePanel();
         
         const infoPanel = document.getElementById('info-panel');
         const container = document.getElementById('info-panel-content');
         
-        // Highlight active nav button
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(topic));
         if (activeBtn) activeBtn.classList.add('active');
@@ -1507,7 +1506,6 @@
             peak = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
         }
 
-        // Mock/Generated Siren Tracking Bins for visual demonstration
         sirenBins = labels.map(() => Math.floor(Math.random() * 5));
 
         if (stackedChartInstance) stackedChartInstance.destroy();
@@ -1582,7 +1580,6 @@
             }
         });
 
-        // Siren Tracking Plot Initialization
         const ctxSiren = document.getElementById('sirenTrackingChart').getContext('2d');
         sirenTrackingChartInstance = new Chart(ctxSiren, {
             type: 'bar',
@@ -1802,7 +1799,6 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Header Banner
             doc.setFillColor(26, 26, 26);
             doc.rect(0, 0, 210, 35, 'F');
             doc.setTextColor(0, 230, 118);
@@ -1812,7 +1808,6 @@
             doc.setFontSize(10);
             doc.text("Official Acoustic Evidence & Exceedance Report", 14, 26);
 
-            // Station Details Section
             doc.setTextColor(30, 30, 30);
             doc.setFontSize(14);
             doc.text("Station Summary", 14, 48);
@@ -1826,7 +1821,6 @@
             doc.text(`Exceedances (Today): ${activeMarkerObj.todayExceedances}`, 14, 93);
             doc.text(`Regulatory Limit: ${DECIBEL_THRESHOLD} dBA (DRMC Chapter 36)`, 14, 100);
 
-            // Hardware compliance block
             doc.setFillColor(245, 245, 245);
             doc.rect(14, 110, 182, 30, 'F');
             doc.setTextColor(100, 100, 100);
@@ -1835,12 +1829,10 @@
             doc.text("IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA).", 18, 124);
             doc.text("Accuracy: +/- 1.5 dBA. Data sampled at 1Hz via RS485 Modbus RTU interface.", 18, 131);
 
-            // Footer info
             doc.setTextColor(150, 150, 150);
             doc.setFontSize(8);
             doc.text(`Report Generated: ${new Date().toLocaleString()} | Mile High Noise Project Automated Network`, 14, 285);
 
-            // Save PDF document
             doc.save(`Noise_Evidence_Report_${activeMarkerObj.id}_${new Date().toISOString().slice(0, 10)}.pdf`);
             showToast("✅ PDF Report Generated", "Your downloadable evidence package has been downloaded successfully.");
         } catch (err) {
