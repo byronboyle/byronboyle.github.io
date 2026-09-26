@@ -497,7 +497,7 @@
 
         <div class="map-overlay-stats">
             <div>Active: <span class="stat-highlight" id="active-count">0</span></div>
-            <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
+            <div>Limit: <span style="color:#00e5ff; font-weight:bold;">85.0 dBA</span></div>
             <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
 
@@ -614,6 +614,7 @@
 
     const map = L.map('map').setView([39.735, -105.000], 12);
     
+    // Light Basemap (CartoDB Voyager)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
         maxZoom: 19,
         subdomains: 'abcd',
@@ -761,23 +762,30 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) { return ` ${Number(context.parsed.y).toFixed(1)} dBA`; }
+                        }
+                    },
                     annotation: {
                         annotations: {
                             thresholdLine: {
                                 type: 'line',
                                 yMin: DECIBEL_THRESHOLD,
                                 yMax: DECIBEL_THRESHOLD,
-                                borderColor: '#ff5252',
+                                borderColor: '#00e5ff',
                                 borderWidth: 1.5,
                                 borderDash: [4, 4],
                                 label: {
                                     content: 'Limit: 85 dBA',
                                     enabled: true,
                                     position: 'end',
-                                    backgroundColor: 'rgba(255, 82, 82, 0.8)',
-                                    font: { size: 10 }
+                                    backgroundColor: 'rgba(0, 229, 255, 0.85)',
+                                    color: '#000000',
+                                    font: { size: 10, weight: 'bold' }
                                 }
                             }
                         }
@@ -839,23 +847,30 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: { 
                         legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ` ${Number(context.parsed.y).toFixed(1)} dBA`; }
+                            }
+                        },
                         annotation: {
                             annotations: {
                                 thresholdLine: {
                                     type: 'line',
                                     yMin: DECIBEL_THRESHOLD,
                                     yMax: DECIBEL_THRESHOLD,
-                                    borderColor: '#ff5252',
+                                    borderColor: '#00e5ff',
                                     borderWidth: 1.5,
                                     borderDash: [4, 4],
                                     label: {
                                         content: 'Limit: 85 dBA',
                                         enabled: true,
                                         position: 'end',
-                                        backgroundColor: 'rgba(255, 82, 82, 0.8)',
-                                        font: { size: 10 }
+                                        backgroundColor: 'rgba(0, 229, 255, 0.85)',
+                                        color: '#000000',
+                                        font: { size: 10, weight: 'bold' }
                                     }
                                 }
                             }
@@ -922,8 +937,14 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: { 
                         legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ` ${Number(context.parsed.y).toFixed(1)} dBA`; }
+                            }
+                        },
                         annotation: {
                             annotations: {
                                 thresholdLine: {
@@ -937,9 +958,9 @@
                                         content: 'Limit: 85 dBA',
                                         enabled: true,
                                         position: 'end',
-                                        backgroundColor: 'rgba(0, 229, 255, 0.85)', // Cyan badge background
-                                        color: '#000000', // Dark text for crisp contrast
-                                        font: { size: 10 }
+                                        backgroundColor: 'rgba(0, 229, 255, 0.85)',
+                                        color: '#000000',
+                                        font: { size: 10, weight: 'bold' }
                                     }
                                 }
                             }
@@ -1004,23 +1025,30 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: { 
                         legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ` ${Number(context.parsed.y).toFixed(1)} dBA`; }
+                            }
+                        },
                         annotation: {
                             annotations: {
                                 thresholdLine: {
                                     type: 'line',
                                     yMin: DECIBEL_THRESHOLD,
                                     yMax: DECIBEL_THRESHOLD,
-                                    borderColor: '#ff5252',
+                                    borderColor: '#00e5ff',
                                     borderWidth: 1.5,
                                     borderDash: [4, 4],
                                     label: {
                                         content: 'Limit: 85 dBA',
                                         enabled: true,
                                         position: 'end',
-                                        backgroundColor: 'rgba(255, 82, 82, 0.8)',
-                                        font: { size: 10 }
+                                        backgroundColor: 'rgba(0, 229, 255, 0.85)',
+                                        color: '#000000',
+                                        font: { size: 10, weight: 'bold' }
                                     }
                                 }
                             }
