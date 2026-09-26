@@ -839,7 +839,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        annotation: {
+                            annotations: {
+                                thresholdLine: {
+                                    type: 'line',
+                                    yMin: DECIBEL_THRESHOLD,
+                                    yMax: DECIBEL_THRESHOLD,
+                                    borderColor: '#ff5252',
+                                    borderWidth: 1.5,
+                                    borderDash: [4, 4],
+                                    label: {
+                                        content: 'Limit: 85 dBA',
+                                        enabled: true,
+                                        position: 'end',
+                                        backgroundColor: 'rgba(255, 82, 82, 0.8)',
+                                        font: { size: 10 }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: {
                             grid: { display: false },
@@ -901,7 +922,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        annotation: {
+                            annotations: {
+                                thresholdLine: {
+                                    type: 'line',
+                                    yMin: DECIBEL_THRESHOLD,
+                                    yMax: DECIBEL_THRESHOLD,
+                                    borderColor: '#ff5252',
+                                    borderWidth: 1.5,
+                                    borderDash: [4, 4],
+                                    label: {
+                                        content: 'Limit: 85 dBA',
+                                        enabled: true,
+                                        position: 'end',
+                                        backgroundColor: 'rgba(255, 82, 82, 0.8)',
+                                        font: { size: 10 }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: {
                             grid: { display: false },
@@ -961,7 +1003,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        annotation: {
+                            annotations: {
+                                thresholdLine: {
+                                    type: 'line',
+                                    yMin: DECIBEL_THRESHOLD,
+                                    yMax: DECIBEL_THRESHOLD,
+                                    borderColor: '#ff5252',
+                                    borderWidth: 1.5,
+                                    borderDash: [4, 4],
+                                    label: {
+                                        content: 'Limit: 85 dBA',
+                                        enabled: true,
+                                        position: 'end',
+                                        backgroundColor: 'rgba(255, 82, 82, 0.8)',
+                                        font: { size: 10 }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: {
                             grid: { display: false },
