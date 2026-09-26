@@ -224,76 +224,78 @@
         .panel-header h2 { margin: 0 0 4px 0; color: #fff; font-size: 1.25rem; }
         .panel-header p { margin: 0 0 16px 0; color: #888; font-size: 0.85rem; }
 
-        /* Clickable Metric Cards & Affordance */
-        .metrics-subgrid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        /* Expandable Accordion Tiles Container */
+        .expandable-tiles-container {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
             margin-bottom: 16px;
         }
-        .metric-card {
+
+        .expandable-tile {
             background: #242424;
             border-radius: 8px;
-            padding: 10px;
             border: 1px solid #333;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .clickable-card {
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.15s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
             overflow: hidden;
+            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .clickable-card:hover {
-            transform: translateY(-2px);
-            border-color: #00e676 !important;
+        .expandable-tile:hover {
+            border-color: #00e676;
             background-color: #2a2a2a;
         }
-        .clickable-card:focus-visible {
-            outline: 2px solid #00e676;
-            outline-offset: 2px;
-            border-color: #00e676 !important;
-        }
-        .clickable-card.active {
-            border-color: #00e676 !important;
+        .expandable-tile.active {
+            border-color: #00e676;
             background: #1e2e24;
             box-shadow: 0 0 12px rgba(0, 230, 118, 0.25);
         }
-        .metric-card h4 { 
-            margin: 0 0 4px 0; 
-            color: #888; 
-            font-size: 0.68rem; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+
+        .tile-header {
+            padding: 12px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        .tile-title-group h4 {
+            margin: 0 0 2px 0;
+            color: #888;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tile-main-val {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00e676;
+        }
+
+        .tile-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .card-hint-pill {
             font-size: 0.58rem;
             background: rgba(0, 230, 118, 0.12);
             color: #00e676;
-            padding: 2px 4px;
+            padding: 2px 6px;
             border-radius: 3px;
             font-weight: 600;
-            text-transform: none;
-            letter-spacing: normal;
+            border: 1px solid rgba(0, 230, 118, 0.25);
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 2px;
-            border: 1px solid rgba(0, 230, 118, 0.25);
-            transition: all 0.2s ease;
         }
-        .clickable-card:hover .card-hint-pill {
+        .expandable-tile:hover .card-hint-pill {
             background: rgba(0, 230, 118, 0.25);
             color: #ffffff;
         }
-        .clickable-card.active .card-hint-pill {
+        .expandable-tile.active .card-hint-pill {
             background: #00e676;
             color: #000000;
             border-color: #00e676;
@@ -303,14 +305,26 @@
             color: #666;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
         }
-        .clickable-card:hover .card-arrow {
-            color: #00e676;
-        }
-        .clickable-card.active .card-arrow {
+        .expandable-tile:hover .card-arrow { color: #00e676; }
+        .expandable-tile.active .card-arrow {
             color: #00e676;
             transform: rotate(180deg);
         }
-        .metric-val { font-size: 1.3rem; font-weight: 700; color: #00e676; margin-top: 2px; }
+
+        /* Collapsible Chart Body with Smooth Height Transition */
+        .tile-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
+            padding: 0 14px;
+            background: #1c1c1c;
+            border-top: 1px solid transparent;
+        }
+        .expandable-tile.active .tile-body {
+            max-height: 240px;
+            padding: 12px 14px 16px 14px;
+            border-top-color: #333;
+        }
 
         /* Educational Module Components */
         .info-card {
@@ -472,11 +486,10 @@
                 border-left: none; 
             }
             .detail-panel.open { right: 0 !important; }
-            .metrics-subgrid { gap: 6px; }
-            .metric-card { padding: 8px 6px; }
-            .metric-val { font-size: 1.05rem; }
-            .metric-card h4 { font-size: 0.6rem; flex-direction: column; align-items: flex-start; gap: 2px; }
-            .card-hint-pill { font-size: 0.52rem; padding: 1px 3px; }
+            .tile-header { padding: 10px 12px; }
+            .tile-main-val { font-size: 1.1rem; }
+            .tile-title-group h4 { font-size: 0.6rem; }
+            .card-hint-pill { font-size: 0.52rem; padding: 1px 4px; }
             .map-overlay-legend {
                 top: 8px;
                 right: 8px;
@@ -557,56 +570,69 @@
                 <p id="panel-address">Address details...</p>
             </div>
 
-            <!-- Clarified Metrics Summary Grid with Active Toggles & Enhanced Visual Affordance -->
-            <div class="metrics-subgrid">
-                <div class="metric-card clickable-card" id="live-level-card" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle live decibel chart" onclick="toggleChart('live')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleChart('live');event.preventDefault();}" title="Click to plot live 5-minute decibel trend">
-                    <h4>
-                        <span>Live Level</span>
-                        <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                    </h4>
-                    <div class="metric-val"><span id="panel-db">0.0</span> <span style="font-size: 0.7rem; color: #888;">dBA</span></div>
+            <!-- Expandable Tiles Container for Metrics & Charts -->
+            <div class="expandable-tiles-container">
+                
+                <!-- Tile 1: Live Level -->
+                <div class="expandable-tile" id="tile-live" role="region">
+                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle live decibel chart" onclick="toggleTile('live')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('live');event.preventDefault();}" title="Click to expand/collapse live decibel trend chart">
+                        <div class="tile-title-group">
+                            <h4>Live Level</h4>
+                            <div class="tile-main-val"><span id="panel-db">0.0</span> <span style="font-size: 0.7rem; color: #888;">dBA</span></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Expand Chart</span>
+                        </div>
+                    </div>
+                    <div class="tile-body">
+                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Live 5-Minute Decibel History (1Hz)</h4>
+                        <div style="height: 140px; position: relative;">
+                            <canvas id="liveMinuteChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="metric-card clickable-card" id="hourly-card" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle past hour exceedances chart" onclick="toggleChart('hourly')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleChart('hourly');event.preventDefault();}" title="Click to plot past hour exceedances chart">
-                    <h4>
-                        <span>Past Hour</span>
-                        <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                    </h4>
-                    <div class="metric-val" id="panel-hourly" style="color: #ffb74d;">0</div>
+
+                <!-- Tile 2: Past Hour Exceedances -->
+                <div class="expandable-tile" id="tile-hourly" role="region">
+                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle past hour exceedances chart" onclick="toggleTile('hourly')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('hourly');event.preventDefault();}" title="Click to expand/collapse past hour exceedance chart">
+                        <div class="tile-title-group">
+                            <h4>Past Hour Exceedances</h4>
+                            <div class="tile-main-val" id="panel-hourly" style="color: #ffb74d;">0</div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Expand Chart</span>
+                        </div>
+                    </div>
+                    <div class="tile-body">
+                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Past Hour Exceedance Levels (w/ Threshold)</h4>
+                        <div style="height: 140px; position: relative;">
+                            <canvas id="hourlyExceedanceChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="metric-card clickable-card" id="today-card" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle today's exceedances chart" onclick="toggleChart('today')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleChart('today');event.preventDefault();}" title="Click to plot today's exceedances chart">
-                    <h4>
-                        <span>Today</span>
-                        <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                    </h4>
-                    <div class="metric-val" id="panel-today" style="color: #ff5252;">0</div>
+
+                <!-- Tile 3: Today's Exceedances -->
+                <div class="expandable-tile" id="tile-today" role="region">
+                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle today's exceedances chart" onclick="toggleTile('today')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('today');event.preventDefault();}" title="Click to expand/collapse today's exceedance chart">
+                        <div class="tile-title-group">
+                            <h4>Today's Exceedances</h4>
+                            <div class="tile-main-val" id="panel-today" style="color: #ff5252;">0</div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Expand Chart</span>
+                        </div>
+                    </div>
+                    <div class="tile-body">
+                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Today's Exceedance Levels (w/ Threshold)</h4>
+                        <div style="height: 140px; position: relative;">
+                            <canvas id="todayExceedanceChart"></canvas>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Dynamic Real-Time Live Decibel Chart (Hidden by Default) -->
-            <div class="chart-container" id="live-chart-container" style="display: none;">
-                <h4>Live 5-Minute Decibel History (1Hz Sampling)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="liveMinuteChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Past Hour Exceedance Level Chart (Hidden by Default) -->
-            <div class="chart-container" id="hourly-chart-container" style="display: none;">
-                <h4>Past Hour Exceedances (Time & Level)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="hourlyExceedanceChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Today's Exceedance Level Chart (Hidden by Default) -->
-            <div class="chart-container" id="today-chart-container" style="display: none;">
-                <h4>Today's Exceedances (Time & Level)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="todayExceedanceChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Siren Tracking Plot (Added Feature) -->
+            <!-- Siren Tracking Plot -->
             <div class="chart-container" id="siren-chart-container">
                 <h4>🚨 Siren Tracking & Impulse Bin (Frequency Analysis)</h4>
                 <div style="height: 150px; position: relative;">
@@ -998,50 +1024,35 @@
         }
     }
 
-    async function toggleChart(type) {
-        const liveC = document.getElementById('live-chart-container');
-        const hourlyC = document.getElementById('hourly-chart-container');
-        const todayC = document.getElementById('today-chart-container');
+    async function toggleTile(type) {
+        const tile = document.getElementById(`tile-${type}`);
+        const isActive = tile.classList.contains('active');
         const detailPanel = document.getElementById('detail-panel');
 
-        const liveCard = document.getElementById('live-level-card');
-        const hourlyCard = document.getElementById('hourly-card');
-        const todayCard = document.getElementById('today-card');
+        // Toggle active state
+        tile.classList.toggle('active', !isActive);
+        tile.setAttribute('aria-expanded', !isActive ? 'true' : 'false');
 
-        if (type === 'live') {
-            const isHidden = liveC.style.display === 'none' || liveC.style.display === '';
-            liveC.style.display = isHidden ? 'block' : 'none';
-            liveCard.classList.toggle('active', isHidden);
-            liveCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            if (isHidden) {
+        if (!isActive) {
+            // Opening tile and rendering respective chart
+            if (type === 'live') {
                 await preloadLiveHistory();
                 initLiveChart();
-                detailPanel.scrollTo({ top: liveC.offsetTop - 20, behavior: 'smooth' });
-            } else if (liveMinuteChartInstance) {
+            } else if (type === 'hourly') {
+                await renderHourlyExceedanceChart();
+            } else if (type === 'today') {
+                await renderTodayExceedanceChart();
+            }
+            detailPanel.scrollTo({ top: tile.offsetTop - 20, behavior: 'smooth' });
+        } else {
+            // Destroy chart instance on close to free memory
+            if (type === 'live' && liveMinuteChartInstance) {
                 liveMinuteChartInstance.destroy();
                 liveMinuteChartInstance = null;
-            }
-        } else if (type === 'hourly') {
-            const isHidden = hourlyC.style.display === 'none' || hourlyC.style.display === '';
-            hourlyC.style.display = isHidden ? 'block' : 'none';
-            hourlyCard.classList.toggle('active', isHidden);
-            hourlyCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            if (isHidden) {
-                await renderHourlyExceedanceChart();
-                detailPanel.scrollTo({ top: hourlyC.offsetTop - 20, behavior: 'smooth' });
-            } else if (hourlyChartInstance) {
+            } else if (type === 'hourly' && hourlyChartInstance) {
                 hourlyChartInstance.destroy();
                 hourlyChartInstance = null;
-            }
-        } else if (type === 'today') {
-            const isHidden = todayC.style.display === 'none' || todayC.style.display === '';
-            todayC.style.display = isHidden ? 'block' : 'none';
-            todayCard.classList.toggle('active', isHidden);
-            todayCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            if (isHidden) {
-                await renderTodayExceedanceChart();
-                detailPanel.scrollTo({ top: todayC.offsetTop - 20, behavior: 'smooth' });
-            } else if (todayChartInstance) {
+            } else if (type === 'today' && todayChartInstance) {
                 todayChartInstance.destroy();
                 todayChartInstance = null;
             }
@@ -1420,15 +1431,12 @@
         if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
         if (sirenTrackingChartInstance) { sirenTrackingChartInstance.destroy(); sirenTrackingChartInstance = null; }
 
-        document.getElementById('live-chart-container').style.display = 'none';
-        document.getElementById('hourly-chart-container').style.display = 'none';
-        document.getElementById('today-chart-container').style.display = 'none';
-
-        ['live-level-card', 'hourly-card', 'today-card'].forEach(id => {
-            const card = document.getElementById(id);
-            if (card) {
-                card.classList.remove('active');
-                card.setAttribute('aria-expanded', 'false');
+        // Collapse all tiles on station switch
+        ['live', 'hourly', 'today'].forEach(type => {
+            const tile = document.getElementById(`tile-${type}`);
+            if (tile) {
+                tile.classList.remove('active');
+                tile.setAttribute('aria-expanded', 'false');
             }
         });
 
