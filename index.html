@@ -592,6 +592,11 @@
     const markersMap = new Map();
     const METER_STATIONS = [];
 
+    // Chart instances
+    let liveMinuteChartInstance = null;
+    let hourlyExceedanceChartInstance = null;
+    let todayExceedanceChartInstance = null;
+
     const map = L.map('map').setView([39.735, -105.000], 12);
     
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
@@ -618,6 +623,18 @@
         document.getElementById('panel-311-count').innerText = station.reportCount311 || 0;
         
         document.getElementById('detail-panel').classList.add('open');
+
+        // Reset chart containers and instances when opening a new station
+        document.getElementById('live-chart-container').style.display = 'none';
+        document.getElementById('hourly-chart-container').style.display = 'none';
+        document.getElementById('today-chart-container').style.display = 'none';
+        
+        document.querySelectorAll('.clickable-card').forEach(c => c.classList.remove('active'));
+
+        // Pre-populate live history array with current reading if empty
+        if (liveDbHistory.length === 0 && station.currentDba > 0) {
+            updateLiveHistory(station.currentDba);
+        }
     }
 
     function closePanel() {
@@ -646,26 +663,240 @@
         infoPanel.classList.add('open');
     }
 
-    function toggleChart(type) {
+    async function toggleChart(type) {
         const containers = {
             'live': 'live-chart-container',
             'hourly': 'hourly-chart-container',
             'today': 'today-chart-container'
         };
 
+        const cards = {
+            'live': 'live-level-card',
+            'hourly': 'hourly-card',
+            'today': 'today-card'
+        };
+
         const targetId = containers[type];
         if (!targetId) return;
 
         const targetEl = document.getElementById(targetId);
+        const targetCard = document.getElementById(cards[type]);
         const isHidden = targetEl.style.display === 'none';
         
+        // Hide all containers & remove active states
         Object.values(containers).forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         });
+        Object.values(cards).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('active');
+                el.setAttribute('aria-expanded', 'false');
+            }
+        });
 
         if (isHidden) {
             targetEl.style.display = 'block';
+            if (targetCard) {
+                targetCard.classList.add('active');
+                targetCard.setAttribute('aria-expanded', 'true');
+            }
+
+            // Render chart data on open
+            if (type === 'live') {
+                renderLiveChart();
+            } else if (type === 'hourly') {
+                await renderHourlyExceedanceChart();
+            } else if (type === 'today') {
+                await renderTodayExceedanceChart();
+            }
+        }
+    }
+
+    function renderLiveChart() {
+        const ctx = document.getElementById('liveMinuteChart');
+        if (!ctx) return;
+
+        if (liveMinuteChartInstance) {
+            liveMinuteChartInstance.destroy();
+        }
+
+        liveMinuteChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [...liveTimeLabels],
+                datasets: [{
+                    label: 'Live dBA',
+                    data: [...liveDbHistory],
+                    borderColor: '#00e676',
+                    backgroundColor: 'rgba(0, 230, 118, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    annotation: {
+                        annotations: {
+                            thresholdLine: {
+                                type: 'line',
+                                yMin: DECIBEL_THRESHOLD,
+                                yMax: DECIBEL_THRESHOLD,
+                                borderColor: '#ff5252',
+                                borderWidth: 1.5,
+                                borderDash: [4, 4],
+                                label: {
+                                    content: 'Limit: 85 dBA',
+                                    enabled: true,
+                                    position: 'end',
+                                    backgroundColor: 'rgba(255, 82, 82, 0.8)',
+                                    font: { size: 10 }
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 6 }
+                    },
+                    y: {
+                        min: 40,
+                        max: 110,
+                        grid: { color: 'rgba(255,255,255,0.08)' },
+                        ticks: { color: '#888', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    async function renderHourlyExceedanceChart() {
+        const ctx = document.getElementById('hourlyExceedanceChart');
+        if (!ctx || !activeMarkerObj) return;
+
+        try {
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+            const logs = await fetchSupabase(
+                "noise_logs",
+                `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&order=timestamp.asc`
+            );
+
+            const chartLabels = [];
+            const chartData = [];
+
+            if (Array.isArray(logs)) {
+                logs.forEach(l => {
+                    const t = new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    chartLabels.push(t);
+                    chartData.push(Number(l.dba));
+                });
+            }
+
+            if (hourlyExceedanceChartInstance) {
+                hourlyExceedanceChartInstance.destroy();
+            }
+
+            hourlyExceedanceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels.length ? chartLabels : ['No Exceedances'],
+                    datasets: [{
+                        label: 'Exceedance dBA',
+                        data: chartData.length ? chartData : [0],
+                        backgroundColor: '#ffb74d',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 9 } }
+                        },
+                        y: {
+                            min: 80,
+                            max: 115,
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            ticks: { color: '#888', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Error rendering hourly chart:", err);
+        }
+    }
+
+    async function renderTodayExceedanceChart() {
+        const ctx = document.getElementById('todayExceedanceChart');
+        if (!ctx || !activeMarkerObj) return;
+
+        try {
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+
+            const logs = await fetchSupabase(
+                "noise_logs",
+                `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&order=timestamp.asc`
+            );
+
+            const chartLabels = [];
+            const chartData = [];
+
+            if (Array.isArray(logs)) {
+                logs.forEach(l => {
+                    const t = new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    chartLabels.push(t);
+                    chartData.push(Number(l.dba));
+                });
+            }
+
+            if (todayExceedanceChartInstance) {
+                todayExceedanceChartInstance.destroy();
+            }
+
+            todayExceedanceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels.length ? chartLabels : ['No Exceedances Today'],
+                    datasets: [{
+                        label: 'Exceedance dBA',
+                        data: chartData.length ? chartData : [0],
+                        backgroundColor: '#ff5252',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 8 }
+                        },
+                        y: {
+                            min: 80,
+                            max: 115,
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            ticks: { color: '#888', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Error rendering today chart:", err);
         }
     }
 
@@ -677,6 +908,13 @@
         if (liveDbHistory.length > MAX_LIVE_POINTS) {
             liveDbHistory.shift();
             liveTimeLabels.shift();
+        }
+
+        // Live update chart if currently open and active
+        if (liveMinuteChartInstance && document.getElementById('live-chart-container').style.display !== 'none') {
+            liveMinuteChartInstance.data.labels = [...liveTimeLabels];
+            liveMinuteChartInstance.data.datasets[0].data = [...liveDbHistory];
+            liveMinuteChartInstance.update('none');
         }
     }
 
@@ -915,14 +1153,12 @@
 
     async function loadStationsFromSupabase() {
         try {
-            // Updated query parameter to filter for active stations
             const stationsData = await fetchSupabase("stations", "select=*&is_active=eq.true&order=id.asc");
             if (Array.isArray(stationsData) && stationsData.length > 0) {
                 stationsData.forEach(remoteStation => {
                     const stId = remoteStation.id || remoteStation.station_id;
                     if (stId === undefined || stId === null) return;
 
-                    // Support both 'latitude'/'longitude' from Supabase schema and fallback 'lat'/'lng'
                     const stationLat = parseFloat(remoteStation.latitude ?? remoteStation.lat ?? 39.7392);
                     const stationLng = parseFloat(remoteStation.longitude ?? remoteStation.lng ?? -104.9903);
 
@@ -1011,11 +1247,9 @@
                         updateLiveHistory(liveDba);
                     }
 
-                    // Query traffic exceedances ONLY (Excludes sirens for 311 enforcement)
                     const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                    // Query siren exceedances separately
                     const sirenData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true`);
                     const hourlySirenCount = Array.isArray(sirenData) ? sirenData.length : 0;
 
@@ -1027,7 +1261,6 @@
                     station.hourlySirenExceedances = hourlySirenCount;
                     station.todayExceedances = todayCount;
                 } else {
-                    // Reset to zero for stations without active Raspberry Pi units/logs
                     station.currentDba = 0.0;
                     station.hourlyExceedances = 0;
                     station.hourlySirenExceedances = 0;
