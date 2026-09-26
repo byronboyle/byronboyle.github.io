@@ -1180,7 +1180,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`);
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&order=timestamp.asc`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -1263,7 +1263,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`);
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&order=timestamp.asc&limit=1000`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1345,7 +1345,7 @@
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOf24h}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`);
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOf24h}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc&limit=1000`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1481,13 +1481,16 @@
                         updateLiveHistory(liveDba);
                     }
 
-                    const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    // Revision 1: Past Hour Exceedances (Non-Sirens)
+                    const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    // Revision 2: Today's Exceedances (Non-Sirens)
+                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
-                    const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOf24h}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    // Revision 3: 24-Hour Sirens Exceedances
+                    const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOf24h}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true`);
                     const sirensCount = Array.isArray(sirensData) ? sirensData.length : 0;
 
                     station.currentDba = liveDba;
@@ -1580,9 +1583,10 @@
                 startDate.setDate(startDate.getDate() - 13);
                 startDate.setHours(0, 0, 0, 0);
 
+                // Revision 4: 14-Day Time-of-Day Chart exclude sirens
                 const exceedLogs = await fetchSupabase(
                     "noise_logs", 
-                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`
+                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&limit=5000`
                 );
 
                 if (Array.isArray(exceedLogs)) {
