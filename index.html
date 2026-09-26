@@ -250,6 +250,15 @@
             background: #1e2e24;
             box-shadow: 0 0 12px rgba(0, 230, 118, 0.25);
         }
+        /* Special active styling for Siren Card */
+        #siren-card.active {
+            background: #192734;
+            box-shadow: 0 0 12px rgba(41, 182, 246, 0.25);
+            border-color: #29b6f6;
+        }
+        #siren-card:hover {
+            border-color: #29b6f6;
+        }
 
         .tile-header {
             padding: 12px 14px;
@@ -293,8 +302,17 @@
             align-items: center;
             gap: 2px;
         }
+        #siren-card .card-hint-pill {
+            background: rgba(41, 182, 246, 0.12);
+            color: #29b6f6;
+            border: 1px solid rgba(41, 182, 246, 0.25);
+        }
         .expandable-tile:hover .card-hint-pill {
             background: rgba(0, 230, 118, 0.25);
+            color: #ffffff;
+        }
+        #siren-card:hover .card-hint-pill {
+            background: rgba(41, 182, 246, 0.25);
             color: #ffffff;
         }
         .expandable-tile.active .card-hint-pill {
@@ -302,14 +320,24 @@
             color: #000000;
             border-color: #00e676;
         }
+        #siren-card.active .card-hint-pill {
+            background: #29b6f6;
+            color: #000000;
+            border-color: #29b6f6;
+        }
         .card-arrow {
             font-size: 0.65rem;
             color: #666;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
         }
         .expandable-tile:hover .card-arrow { color: #00e676; }
+        #siren-card:hover .card-arrow { color: #29b6f6; }
         .expandable-tile.active .card-arrow {
             color: #00e676;
+            transform: rotate(180deg);
+        }
+        #siren-card.active .card-arrow {
+            color: #29b6f6;
             transform: rotate(180deg);
         }
 
@@ -632,21 +660,21 @@
                     </div>
                 </div>
 
-                <!-- Tile 4: 24-Hour Sirens Exceedances -->
-                <div class="expandable-tile" id="tile-sirens-24h" role="region">
-                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle 24-hour siren exceedances chart" onclick="toggleTile('sirens-24h')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('sirens-24h');event.preventDefault();}" title="Click to expand/collapse 24-hour siren exceedance chart">
+                <!-- Tile 4: Dedicated Emergency Sirens Card (Past Hour) -->
+                <div class="expandable-tile metric-card clickable-card" id="siren-card" role="region">
+                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle emergency siren exceedances chart" onclick="toggleTile('sirens')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('sirens');event.preventDefault();}" title="Click to expand/collapse emergency siren exceedance chart">
                         <div class="tile-title-group">
-                            <h4>Sirens (24HR)</h4>
-                            <div class="tile-main-val" id="panel-sirens-24h" style="color: #00bcd4;">0</div>
+                            <h4>Sirens (Past Hour)</h4>
+                            <div class="tile-main-val" id="panel-sirens" style="color: #29b6f6;">0</div>
                         </div>
                         <div class="tile-meta">
                             <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
                         </div>
                     </div>
                     <div class="tile-body">
-                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">24-Hour Siren Exceedances (Time & Level)</h4>
+                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Emergency Siren Exceedances (Time & Level)</h4>
                         <div style="height: 140px; position: relative;">
-                            <canvas id="sirens24hChart"></canvas>
+                            <canvas id="sirenExceedanceChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -754,7 +782,7 @@
             currentDba: 64.2,
             hourlyExceedances: 0,
             todayExceedances: 0,
-            sirens24hCount: 0,
+            sirensCount: 0,
             isLiveSupabase: true
         },
         {
@@ -766,7 +794,7 @@
             currentDba: 88.2,
             hourlyExceedances: 4,
             todayExceedances: 14,
-            sirens24hCount: 2,
+            sirensCount: 2,
             isLiveSupabase: true
         },
         {
@@ -778,7 +806,7 @@
             currentDba: 76.4,
             hourlyExceedances: 1,
             todayExceedances: 5,
-            sirens24hCount: 1,
+            sirensCount: 1,
             isLiveSupabase: false
         },
         {
@@ -790,7 +818,7 @@
             currentDba: 71.8,
             hourlyExceedances: 0,
             todayExceedances: 2,
-            sirens24hCount: 0,
+            sirensCount: 0,
             isLiveSupabase: false
         }
     ];
@@ -810,7 +838,7 @@
     let liveMinuteChartInstance = null;
     let hourlyChartInstance = null;
     let todayChartInstance = null;
-    let sirens24hChartInstance = null;
+    let sirenChartInstance = null;
 
     // Real-Time 5-Minute Buffer (300 points @ 1Hz)
     const MAX_LIVE_POINTS = 300;
@@ -1042,7 +1070,8 @@
     }
 
     async function toggleTile(type) {
-        const tile = document.getElementById(`tile-${type}`);
+        const tileId = type === 'sirens' ? 'siren-card' : `tile-${type}`;
+        const tile = document.getElementById(tileId);
         const isActive = tile.classList.contains('active');
         const detailPanel = document.getElementById('detail-panel');
 
@@ -1059,8 +1088,8 @@
                 await renderHourlyExceedanceChart();
             } else if (type === 'today') {
                 await renderTodayExceedanceChart();
-            } else if (type === 'sirens-24h') {
-                await renderSirens24hChart();
+            } else if (type === 'sirens') {
+                await renderSirenExceedanceChart();
             }
             detailPanel.scrollTo({ top: tile.offsetTop - 20, behavior: 'smooth' });
         } else {
@@ -1074,9 +1103,9 @@
             } else if (type === 'today' && todayChartInstance) {
                 todayChartInstance.destroy();
                 todayChartInstance = null;
-            } else if (type === 'sirens-24h' && sirens24hChartInstance) {
-                sirens24hChartInstance.destroy();
-                sirens24hChartInstance = null;
+            } else if (type === 'sirens' && sirenChartInstance) {
+                sirenChartInstance.destroy();
+                sirenChartInstance = null;
             }
         }
     }
@@ -1338,14 +1367,14 @@
         });
     }
 
-    async function renderSirens24hChart() {
+    async function renderSirenExceedanceChart() {
         if (!activeMarkerObj) return;
-        const startOf24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         let chartData = [];
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOf24h}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc&limit=1000`);
+                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc&limit=1000`);
                 if (Array.isArray(logs)) {
                     chartData = logs.map(l => ({
                         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1355,10 +1384,10 @@
             } catch(e) { console.error(e); }
         } else {
             const now = Date.now();
-            const count = activeMarkerObj.sirens24hCount || 0;
+            const count = activeMarkerObj.sirensCount || 0;
             for (let i = 0; i < count; i++) {
                 chartData.push({
-                    time: new Date(now - (i + 1) * 3 * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    time: new Date(now - (i + 1) * 5 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     dba: Number((Math.random() * 8 + 88.0).toFixed(1))
                 });
             }
@@ -1371,20 +1400,20 @@
         const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
         const yMax = Math.max(Math.ceil(maxVal + 2), 95);
 
-        if (sirens24hChartInstance) {
-            sirens24hChartInstance.destroy();
-            sirens24hChartInstance = null;
+        if (sirenChartInstance) {
+            sirenChartInstance.destroy();
+            sirenChartInstance = null;
         }
 
-        const ctx = document.getElementById('sirens24hChart').getContext('2d');
-        sirens24hChartInstance = new Chart(ctx, {
+        const ctx = document.getElementById('sirenExceedanceChart').getContext('2d');
+        sirenChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'Siren Exceedance (dBA)',
                     data: values,
-                    backgroundColor: '#00bcd4',
+                    backgroundColor: '#29b6f6',
                     borderRadius: 4
                 }]
             },
@@ -1467,7 +1496,6 @@
             const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
             const startOfToday = new Date();
             startOfToday.setHours(0, 0, 0, 0);
-            const startOf24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
             for (const station of METER_STATIONS) {
                 if (!station.isLiveSupabase) continue;
@@ -1481,22 +1509,22 @@
                         updateLiveHistory(liveDba);
                     }
 
-                    // Revision 1: Past Hour Exceedances (Non-Sirens)
+                    // Revision 1: Non-Siren Past Hour Exceedances (&is_siren=eq.false)
                     const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                    // Revision 2: Today's Exceedances (Non-Sirens)
+                    // Revision 1: Non-Siren Today's Exceedances (&is_siren=eq.false)
                     const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
-                    // Revision 3: 24-Hour Sirens Exceedances
-                    const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOf24h}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true`);
+                    // Revision 1 & 2: Siren Past Hour Exceedances (&is_siren=eq.true)
+                    const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true`);
                     const sirensCount = Array.isArray(sirensData) ? sirensData.length : 0;
 
                     station.currentDba = liveDba;
                     station.hourlyExceedances = hourlyCount;
                     station.todayExceedances = todayCount;
-                    station.sirens24hCount = sirensCount;
+                    station.sirensCount = sirensCount;
 
                     const marker = markersMap.get(station.id);
                     if (marker) {
@@ -1507,7 +1535,7 @@
                         document.getElementById('panel-db').innerText = liveDba.toFixed(1);
                         document.getElementById('panel-hourly').innerText = hourlyCount;
                         document.getElementById('panel-today').innerText = todayCount;
-                        document.getElementById('panel-sirens-24h').innerText = sirensCount;
+                        document.getElementById('panel-sirens').innerText = sirensCount;
                     }
                 }
             }
@@ -1533,7 +1561,7 @@
         document.getElementById('panel-db').innerText = station.currentDba.toFixed(1);
         document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
         document.getElementById('panel-today').innerText = station.todayExceedances;
-        document.getElementById('panel-sirens-24h').innerText = station.sirens24hCount || 0;
+        document.getElementById('panel-sirens').innerText = station.sirensCount || 0;
 
         const detailPanel = document.getElementById('detail-panel');
         detailPanel.scrollTop = 0;
@@ -1544,11 +1572,12 @@
         if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
         if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
         if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
-        if (sirens24hChartInstance) { sirens24hChartInstance.destroy(); sirens24hChartInstance = null; }
+        if (sirenChartInstance) { sirenChartInstance.destroy(); sirenChartInstance = null; }
 
         // Collapse all tiles on station switch
-        ['live', 'hourly', 'today', 'sirens-24h'].forEach(type => {
-            const tile = document.getElementById(`tile-${type}`);
+        ['live', 'hourly', 'today', 'sirens'].forEach(type => {
+            const tileId = type === 'sirens' ? 'siren-card' : `tile-${type}`;
+            const tile = document.getElementById(tileId);
             if (tile) {
                 tile.classList.remove('active');
                 tile.setAttribute('aria-expanded', 'false');
@@ -1563,7 +1592,7 @@
         if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
         if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
         if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
-        if (sirens24hChartInstance) { sirens24hChartInstance.destroy(); sirens24hChartInstance = null; }
+        if (sirenChartInstance) { sirenChartInstance.destroy(); sirenChartInstance = null; }
         if (stackedChartInstance) { stackedChartInstance.destroy(); stackedChartInstance = null; }
         if (peakChartInstance) { peakChartInstance.destroy(); peakChartInstance = null; }
         activeMarkerObj = null;
@@ -1583,10 +1612,10 @@
                 startDate.setDate(startDate.getDate() - 13);
                 startDate.setHours(0, 0, 0, 0);
 
-                // Revision 4: 14-Day Time-of-Day Chart exclude sirens
+                // Revision 4: 14-Day Time-of-Day Chart automatically filters out sirens (!l.is_siren)
                 const exceedLogs = await fetchSupabase(
                     "noise_logs", 
-                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&limit=5000`
+                    `select=timestamp,dba,is_siren&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&limit=5000`
                 );
 
                 if (Array.isArray(exceedLogs)) {
@@ -1782,7 +1811,7 @@
         }
     }
 
-    // --- EXCEEDANCE LOG CSV EXPORT GENERATOR ---
+    // --- EXCEEDANCE LOG CSV EXPORT GENERATOR (Includes Is Siren Column) ---
     async function exportStationCSV() {
         if (!activeMarkerObj) return;
 
@@ -1791,7 +1820,7 @@
         btn.innerText = "⏳ Exporting Exceedances...";
         btn.disabled = true;
 
-        let rows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Raw ISO Timestamp"]];
+        let rows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Is Siren", "Raw ISO Timestamp"]];
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
@@ -1802,7 +1831,7 @@
                 while (keepFetching) {
                     const logs = await fetchSupabase(
                         "noise_logs", 
-                        `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`
+                        `select=timestamp,dba,is_siren&station_id=eq.${activeMarkerObj.id}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`
                     );
                     
                     if (Array.isArray(logs) && logs.length > 0) {
@@ -1811,6 +1840,7 @@
                             const dt = new Date(log.timestamp);
                             const dateStr = dt.toLocaleDateString('en-US');
                             const timeStr = dt.toLocaleTimeString('en-US');
+                            const isSirenVal = log.is_siren ? 'true' : 'false';
 
                             rows.push([
                                 dateStr,
@@ -1819,6 +1849,7 @@
                                 `"${activeMarkerObj.name}"`,
                                 dba.toFixed(1),
                                 DECIBEL_THRESHOLD,
+                                isSirenVal,
                                 log.timestamp
                             ]);
                         });
@@ -1837,6 +1868,7 @@
             for (let i = 0; i < 8; i++) {
                 const sampleDate = new Date(now.getTime() - i * 180 * 60 * 1000);
                 const dba = parseFloat((Math.random() * 10 + 85.5).toFixed(1));
+                const isSirenVal = i % 3 === 0 ? 'true' : 'false';
                 rows.push([
                     sampleDate.toLocaleDateString('en-US'),
                     sampleDate.toLocaleTimeString('en-US'),
@@ -1844,6 +1876,7 @@
                     `"${activeMarkerObj.name}"`,
                     dba.toFixed(1),
                     DECIBEL_THRESHOLD,
+                    isSirenVal,
                     sampleDate.toISOString()
                 ]);
             }
@@ -1872,7 +1905,7 @@
         btn.disabled = false;
     }
 
-    // --- PDF REPORT GENERATOR (jsPDF) ---
+    // --- PDF REPORT GENERATOR (jsPDF - Excludes Sirens from Traffic Statistics) ---
     async function generatePDFReport() {
         if (!activeMarkerObj) return;
 
@@ -1892,20 +1925,20 @@
             doc.text("MILE HIGH NOISE PROJECT", 14, 18);
             doc.setTextColor(220, 220, 220);
             doc.setFontSize(10);
-            doc.text("Official Acoustic Evidence & Exceedance Report", 14, 26);
+            doc.text("Official Acoustic Evidence & Compliance Report", 14, 26);
 
             doc.setTextColor(30, 30, 30);
             doc.setFontSize(14);
-            doc.text("Station Summary", 14, 48);
+            doc.text("Station Summary (Vehicle Traffic Filtered)", 14, 48);
 
             doc.setFontSize(10);
             doc.text(`Station Name: ${activeMarkerObj.name}`, 14, 58);
             doc.text(`Location Address: ${activeMarkerObj.address}`, 14, 65);
             doc.text(`Coordinates: ${activeMarkerObj.lat}, ${activeMarkerObj.lng}`, 14, 72);
             doc.text(`Current Reading: ${activeMarkerObj.currentDba.toFixed(1)} dBA`, 14, 79);
-            doc.text(`Exceedances (Past Hour): ${activeMarkerObj.hourlyExceedances}`, 14, 86);
-            doc.text(`Exceedances (Today): ${activeMarkerObj.todayExceedances}`, 14, 93);
-            doc.text(`Exceedances (Sirens 24H): ${activeMarkerObj.sirens24hCount || 0}`, 14, 100);
+            doc.text(`Vehicle Exceedances (Past Hour): ${activeMarkerObj.hourlyExceedances} (Sirens Filtered Out)`, 14, 86);
+            doc.text(`Vehicle Exceedances (Today): ${activeMarkerObj.todayExceedances} (Sirens Filtered Out)`, 14, 93);
+            doc.text(`Emergency Sirens (Past Hour): ${activeMarkerObj.sirensCount || 0}`, 14, 100);
             doc.text(`Regulatory Limit: ${DECIBEL_THRESHOLD} dBA (DRMC Chapter 36)`, 14, 107);
 
             doc.setFillColor(245, 245, 245);
@@ -1914,7 +1947,7 @@
             doc.setFontSize(8.5);
             doc.text("Hardware & Compliance Certification:", 18, 122);
             doc.text("IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA).", 18, 129);
-            doc.text("Accuracy: +/- 1.5 dBA. Data sampled at 1Hz via RS485 Modbus RTU interface.", 18, 136);
+            doc.text("Accuracy: +/- 1.5 dBA. Data sampled at 1Hz via RS485 Modbus RTU interface. Sirens excluded from ordinance reporting.", 18, 136);
 
             doc.setTextColor(150, 150, 150);
             doc.setFontSize(8);
