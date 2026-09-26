@@ -369,7 +369,6 @@
             font-size: 0.8rem;
         }
 
-        /* Chart Skeleton & Loading Overlay */
         .chart-loader {
             position: absolute;
             top: 36px;
@@ -510,7 +509,6 @@
             line-height: 1.4;
         }
 
-        /* Calculator Styling */
         .calc-box {
             display: flex;
             flex-direction: column;
@@ -699,7 +697,7 @@
                 </div>
             </div>
 
-            <!-- Chart Skeleton Loading States Included inside Containers -->
+            <!-- Chart Containers -->
             <div class="chart-container" id="live-chart-container" style="display: none;">
                 <h4>Live 5-Minute Decibel History (1Hz Sampling)</h4>
                 <div id="live-chart-loader" class="chart-loader" style="display: none;">Fetching acoustic stream...</div>
@@ -1350,7 +1348,6 @@
             frequencySpectrumChartInstance.destroy();
         }
 
-        // Frequency bins distribution mockup based on hardware acoustic spectrum analysis
         frequencySpectrumChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -1439,7 +1436,6 @@
     function renderCouncilDistricts() {
         if (districtLayer) map.removeLayer(districtLayer);
 
-        // Denver Council District Polygon Overlay Sample
         const denverDistrictsGeoJSON = {
             "type": "FeatureCollection",
             "features": [
@@ -1722,7 +1718,6 @@
         return res.json();
     }
 
-    // Local Storage Caching Strategy
     function loadCachedStations() {
         const cached = localStorage.getItem('METER_STATIONS_CACHE');
         if (cached) {
@@ -1754,7 +1749,7 @@
     }
 
     async function loadStationsFromSupabase() {
-        loadCachedStations(); // Immediate offline render
+        loadCachedStations();
 
         try {
             const stationsData = await fetchSupabase("stations", "select=*&is_active=eq.true&order=id.asc");
@@ -1891,7 +1886,6 @@
         }
     }
 
-    // Initialize Supabase Realtime WebSockets Listener
     function initSupabaseRealtime() {
         if (window.supabase && window.supabase.createClient) {
             try {
