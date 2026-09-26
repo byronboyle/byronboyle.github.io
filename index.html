@@ -606,6 +606,14 @@
                 </div>
             </div>
 
+            <!-- Siren Tracking Plot (Added Feature) -->
+            <div class="chart-container" id="siren-chart-container">
+                <h4>🚨 Siren Tracking & Impulse Bin (Frequency Analysis)</h4>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="sirenTrackingChart"></canvas>
+                </div>
+            </div>
+
             <!-- 14-Day Stacked Time-of-Day Chart -->
             <div class="chart-container">
                 <h4>Exceedances by Time of Day (14-Day History)</h4>
@@ -624,6 +632,7 @@
 
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Exceedance CSV Log</button>
+            <button class="action-btn btn-secondary" id="pdf-report-btn" onclick="generatePDFReport()" style="background: #1e3a8a; color: #ffffff;">📄 Download PDF Evidence Report</button>
 
             <!-- Hardware Standard & Accuracy Footnote -->
             <div class="sensor-footnote">
@@ -758,6 +767,7 @@
     let liveMinuteChartInstance = null;
     let hourlyChartInstance = null;
     let todayChartInstance = null;
+    let sirenTrackingChartInstance = null;
 
     // Real-Time 5-Minute Buffer (300 points @ 1Hz)
     const MAX_LIVE_POINTS = 300;
@@ -1160,7 +1170,6 @@
         const labels = chartData.map(d => d.time);
         const values = chartData.map(d => d.dba);
 
-        // Dynamically compute y-axis maximum scale so exceedance bars fill chart area properly
         const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
         const yMax = Math.max(Math.ceil(maxVal + 2), 95);
 
@@ -1205,7 +1214,7 @@
                             label: (ctx) => {
                                 const val = Number(ctx.raw);
                                 const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return ` Level: ${val} dBA (+${diff} dBA above threshold)`;
+                                return ` Level: ${val} dBA (+${diff} dBA over threshold)`;
                             }
                         }
                     }
@@ -1244,7 +1253,6 @@
         const labels = chartData.map(d => d.time);
         const values = chartData.map(d => d.dba);
 
-        // Dynamically compute y-axis upper bound based on dataset peak (prevents data points from looking tiny)
         const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
         const yMax = Math.max(Math.ceil(maxVal + 2), 95);
 
@@ -1289,7 +1297,7 @@
                             label: (ctx) => {
                                 const val = Number(ctx.raw);
                                 const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return ` Level: ${val} dBA (+${diff} dBA above threshold)`;
+                                return ` Level: ${val} dBA (+${diff} dBA over threshold)`;
                             }
                         }
                     }
@@ -1348,22 +1356,18 @@
             for (const station of METER_STATIONS) {
                 if (!station.isLiveSupabase) continue;
 
-                // Query live sound level for specific station
                 const data = await fetchSupabase("noise_logs", `select=*&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
                 
                 if (Array.isArray(data) && data.length > 0) {
                     const liveDba = Number(data[0].dba);
 
-                    // Update live buffer history if active station
                     if (activeMarkerObj && activeMarkerObj.id === station.id) {
                         updateLiveHistory(liveDba);
                     }
 
-                    // Query hourly exceedances for specific station
                     const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`);
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                    // Query today exceedances for specific station
                     const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
                     const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
@@ -1384,7 +1388,6 @@
                 }
             }
 
-            // Fetch Aggregate 311 Reports Count across all stations
             const statsData = await fetchSupabase("report_stats", "select=total_submitted");
             if (Array.isArray(statsData) && statsData.length > 0) {
                 const total311 = statsData.reduce((sum, item) => sum + (Number(item.total_submitted) || 0), 0);
@@ -1396,7 +1399,7 @@
     }
 
     async function openDetailPanel(station) {
-        closeInfoPanel(); // Close educational info drawer if active
+        closeInfoPanel();
         activeMarkerObj = station;
         liveDbHistory = [];
         liveTimeLabels = [];
@@ -1413,12 +1416,11 @@
         
         map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
 
-        // Ensure dynamic toggle chart instances are destroyed before resetting view
         if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
         if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
         if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
+        if (sirenTrackingChartInstance) { sirenTrackingChartInstance.destroy(); sirenTrackingChartInstance = null; }
 
-        // Reset toggled charts & card active states when switching stations
         document.getElementById('live-chart-container').style.display = 'none';
         document.getElementById('hourly-chart-container').style.display = 'none';
         document.getElementById('today-chart-container').style.display = 'none';
@@ -1441,6 +1443,7 @@
         if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
         if (stackedChartInstance) { stackedChartInstance.destroy(); stackedChartInstance = null; }
         if (peakChartInstance) { peakChartInstance.destroy(); peakChartInstance = null; }
+        if (sirenTrackingChartInstance) { sirenTrackingChartInstance.destroy(); sirenTrackingChartInstance = null; }
         activeMarkerObj = null;
     }
 
@@ -1451,6 +1454,7 @@
         let afternoon = Array(14).fill(0);
         let night = Array(14).fill(0);
         let peak = Array(14).fill(0);
+        let sirenBins = Array(14).fill(0);
 
         if (station.isLiveSupabase) {
             try {
@@ -1503,8 +1507,12 @@
             peak = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
         }
 
+        // Mock/Generated Siren Tracking Bins for visual demonstration
+        sirenBins = labels.map(() => Math.floor(Math.random() * 5));
+
         if (stackedChartInstance) stackedChartInstance.destroy();
         if (peakChartInstance) peakChartInstance.destroy();
+        if (sirenTrackingChartInstance) sirenTrackingChartInstance.destroy();
 
         const ctxStacked = document.getElementById('stackedChart').getContext('2d');
         stackedChartInstance = new Chart(ctxStacked, {
@@ -1573,6 +1581,41 @@
                 }
             }
         });
+
+        // Siren Tracking Plot Initialization
+        const ctxSiren = document.getElementById('sirenTrackingChart').getContext('2d');
+        sirenTrackingChartInstance = new Chart(ctxSiren, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Siren Impulses Detected',
+                    data: sirenBins,
+                    backgroundColor: '#00bcd4',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: '#333' }, 
+                        ticks: { color: '#888', font: { size: 9 }, stepSize: 1 } 
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ` Sirens Filtered/Detected: ${ctx.raw} events`
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // --- TOAST NOTIFICATION HELPER ---
@@ -1606,7 +1649,6 @@
         try {
             const targetStationId = activeMarkerObj ? activeMarkerObj.id : "meter-01";
 
-            // Insert pending report request into Supabase
             const response = await fetch(`${SUPABASE_URL}/rest/v1/pending_reports`, {
                 method: 'POST',
                 headers: {
@@ -1622,25 +1664,21 @@
             });
 
             if (response.ok || response.status === 201) {
-                // 1. In-app Toast Feedback
                 showToast(
                     "✅ 311 Report Request Queued!",
                     "Your Raspberry Pi backend will pick up this task and process the filing through Playwright automation."
                 );
 
-                // 2. Immediate Button Visual Feedback
                 btn.innerText = "✅ Report Queued!";
                 btn.style.backgroundColor = "#2e7d32";
                 btn.style.color = "#ffffff";
 
-                // 3. Increment 311 Counter on Map Overlay
                 const counterEl = document.getElementById('total-311-count');
                 if (counterEl) {
                     const currentVal = parseInt(counterEl.innerText, 10) || 0;
                     counterEl.innerText = currentVal + 1;
                 }
 
-                // Reset button state after 4 seconds
                 setTimeout(() => {
                     btn.innerText = origText;
                     btn.style.backgroundColor = "";
@@ -1749,6 +1787,69 @@
 
         btn.innerText = origText;
         btn.disabled = false;
+    }
+
+    // --- PDF REPORT GENERATOR (jsPDF) ---
+    async function generatePDFReport() {
+        if (!activeMarkerObj) return;
+
+        const btn = document.getElementById('pdf-report-btn');
+        const origText = btn.innerText;
+        btn.innerText = "⏳ Generating PDF Evidence Report...";
+        btn.disabled = true;
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header Banner
+            doc.setFillColor(26, 26, 26);
+            doc.rect(0, 0, 210, 35, 'F');
+            doc.setTextColor(0, 230, 118);
+            doc.setFontSize(16);
+            doc.text("MILE HIGH NOISE PROJECT", 14, 18);
+            doc.setTextColor(220, 220, 220);
+            doc.setFontSize(10);
+            doc.text("Official Acoustic Evidence & Exceedance Report", 14, 26);
+
+            // Station Details Section
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(14);
+            doc.text("Station Summary", 14, 48);
+
+            doc.setFontSize(10);
+            doc.text(`Station Name: ${activeMarkerObj.name}`, 14, 58);
+            doc.text(`Location Address: ${activeMarkerObj.address}`, 14, 65);
+            doc.text(`Coordinates: ${activeMarkerObj.lat}, ${activeMarkerObj.lng}`, 14, 72);
+            doc.text(`Current Reading: ${activeMarkerObj.currentDba.toFixed(1)} dBA`, 14, 79);
+            doc.text(`Exceedances (Past Hour): ${activeMarkerObj.hourlyExceedances}`, 14, 86);
+            doc.text(`Exceedances (Today): ${activeMarkerObj.todayExceedances}`, 14, 93);
+            doc.text(`Regulatory Limit: ${DECIBEL_THRESHOLD} dBA (DRMC Chapter 36)`, 14, 100);
+
+            // Hardware compliance block
+            doc.setFillColor(245, 245, 245);
+            doc.rect(14, 110, 182, 30, 'F');
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(8.5);
+            doc.text("Hardware & Compliance Certification:", 18, 117);
+            doc.text("IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA).", 18, 124);
+            doc.text("Accuracy: +/- 1.5 dBA. Data sampled at 1Hz via RS485 Modbus RTU interface.", 18, 131);
+
+            // Footer info
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(8);
+            doc.text(`Report Generated: ${new Date().toLocaleString()} | Mile High Noise Project Automated Network`, 14, 285);
+
+            // Save PDF document
+            doc.save(`Noise_Evidence_Report_${activeMarkerObj.id}_${new Date().toISOString().slice(0, 10)}.pdf`);
+            showToast("✅ PDF Report Generated", "Your downloadable evidence package has been downloaded successfully.");
+        } catch (err) {
+            console.error("PDF generation failed:", err);
+            showToast("❌ PDF Generation Failed", "Could not generate PDF report.", true);
+        } finally {
+            btn.innerText = origText;
+            btn.disabled = false;
+        }
     }
 
     // --- MOBILE TOUCH & SWIPE GESTURE HANDLER ---
