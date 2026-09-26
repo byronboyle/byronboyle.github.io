@@ -915,26 +915,31 @@
 
     async function loadStationsFromSupabase() {
         try {
-            const stationsData = await fetchSupabase("stations", "select=*&order=id.asc");
+            // Updated query parameter to filter for active stations
+            const stationsData = await fetchSupabase("stations", "select=*&is_active=eq.true&order=id.asc");
             if (Array.isArray(stationsData) && stationsData.length > 0) {
                 stationsData.forEach(remoteStation => {
                     const stId = remoteStation.id || remoteStation.station_id;
                     if (stId === undefined || stId === null) return;
+
+                    // Support both 'latitude'/'longitude' from Supabase schema and fallback 'lat'/'lng'
+                    const stationLat = parseFloat(remoteStation.latitude ?? remoteStation.lat ?? 39.7392);
+                    const stationLng = parseFloat(remoteStation.longitude ?? remoteStation.lng ?? -104.9903);
 
                     let existingStation = METER_STATIONS.find(s => String(s.id) === String(stId));
                     
                     if (existingStation) {
                         existingStation.name = remoteStation.name || remoteStation.station_name || existingStation.name;
                         existingStation.address = remoteStation.location_address || remoteStation.address || existingStation.address;
-                        if (remoteStation.lat) existingStation.lat = parseFloat(remoteStation.lat);
-                        if (remoteStation.lng) existingStation.lng = parseFloat(remoteStation.lng);
+                        existingStation.lat = stationLat;
+                        existingStation.lng = stationLng;
                     } else {
                         const newStation = {
                             id: stId,
                             name: remoteStation.name || remoteStation.station_name || `Station ${stId}`,
                             address: remoteStation.location_address || remoteStation.address || "Denver, CO",
-                            lat: parseFloat(remoteStation.lat) || 39.7392,
-                            lng: parseFloat(remoteStation.lng) || -104.9903,
+                            lat: stationLat,
+                            lng: stationLng,
                             currentDba: 0.0,
                             hourlyExceedances: 0,
                             todayExceedances: 0,
