@@ -219,7 +219,7 @@
 
         .metrics-subgrid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 16px;
         }
@@ -537,6 +537,13 @@
                     </h4>
                     <div class="metric-val" id="panel-today" style="color: #ff5252;">0</div>
                 </div>
+                <div class="metric-card clickable-card" id="siren-card" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle siren exceedances chart" onclick="toggleChart('siren')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleChart('siren');event.preventDefault();}" title="Click to plot past hour emergency siren exceedances">
+                    <h4>
+                        <span>Sirens (1Hr)</span>
+                        <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
+                    </h4>
+                    <div class="metric-val" id="panel-sirens" style="color: #29b6f6;">0</div>
+                </div>
             </div>
 
             <div class="chart-container" id="live-chart-container" style="display: none;">
@@ -557,6 +564,13 @@
                 <h4>Today's Exceedances (Time & Level)</h4>
                 <div style="height: 150px; position: relative;">
                     <canvas id="todayExceedanceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container" id="siren-chart-container" style="display: none;">
+                <h4>Past Hour Siren Exceedances (Time & Level)</h4>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="sirenExceedanceChart"></canvas>
                 </div>
             </div>
 
@@ -596,6 +610,7 @@
     let liveMinuteChartInstance = null;
     let hourlyExceedanceChartInstance = null;
     let todayExceedanceChartInstance = null;
+    let sirenExceedanceChartInstance = null;
 
     const map = L.map('map').setView([39.735, -105.000], 12);
     
@@ -620,6 +635,7 @@
         document.getElementById('panel-db').innerText = Number(station.currentDba).toFixed(1);
         document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
         document.getElementById('panel-today').innerText = station.todayExceedances;
+        document.getElementById('panel-sirens').innerText = station.hourlySirenExceedances;
         document.getElementById('panel-311-count').innerText = station.reportCount311 || 0;
         
         document.getElementById('detail-panel').classList.add('open');
@@ -628,6 +644,7 @@
         document.getElementById('live-chart-container').style.display = 'none';
         document.getElementById('hourly-chart-container').style.display = 'none';
         document.getElementById('today-chart-container').style.display = 'none';
+        document.getElementById('siren-chart-container').style.display = 'none';
         
         document.querySelectorAll('.clickable-card').forEach(c => c.classList.remove('active'));
 
@@ -667,13 +684,15 @@
         const containers = {
             'live': 'live-chart-container',
             'hourly': 'hourly-chart-container',
-            'today': 'today-chart-container'
+            'today': 'today-chart-container',
+            'siren': 'siren-chart-container'
         };
 
         const cards = {
             'live': 'live-level-card',
             'hourly': 'hourly-card',
-            'today': 'today-card'
+            'today': 'today-card',
+            'siren': 'siren-card'
         };
 
         const targetId = containers[type];
@@ -710,6 +729,8 @@
                 await renderHourlyExceedanceChart();
             } else if (type === 'today') {
                 await renderTodayExceedanceChart();
+            } else if (type === 'siren') {
+                await renderSirenExceedanceChart();
             }
         }
     }
@@ -897,6 +918,66 @@
             });
         } catch (err) {
             console.error("Error rendering today chart:", err);
+        }
+    }
+
+    async function renderSirenExceedanceChart() {
+        const ctx = document.getElementById('sirenExceedanceChart');
+        if (!ctx || !activeMarkerObj) return;
+
+        try {
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+            const logs = await fetchSupabase(
+                "noise_logs",
+                `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc`
+            );
+
+            const chartLabels = [];
+            const chartData = [];
+
+            if (Array.isArray(logs)) {
+                logs.forEach(l => {
+                    const t = new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    chartLabels.push(t);
+                    chartData.push(Number(l.dba));
+                });
+            }
+
+            if (sirenExceedanceChartInstance) {
+                sirenExceedanceChartInstance.destroy();
+            }
+
+            sirenExceedanceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels.length ? chartLabels : ['No Siren Exceedances'],
+                    datasets: [{
+                        label: 'Siren Exceedance dBA',
+                        data: chartData.length ? chartData : [0],
+                        backgroundColor: '#29b6f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 9 } }
+                        },
+                        y: {
+                            min: 80,
+                            max: 125,
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            ticks: { color: '#888', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Error rendering siren chart:", err);
         }
     }
 
@@ -1276,6 +1357,7 @@
                     document.getElementById('panel-db').innerText = Number(station.currentDba).toFixed(1);
                     document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
                     document.getElementById('panel-today').innerText = station.todayExceedances;
+                    document.getElementById('panel-sirens').innerText = station.hourlySirenExceedances;
                     const countEl = document.getElementById('panel-311-count');
                     if (countEl) countEl.innerText = station.reportCount311;
                 }
