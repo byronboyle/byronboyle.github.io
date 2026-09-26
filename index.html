@@ -877,7 +877,7 @@
         const badgeClass = getBadgeClass(exceedances);
         return L.divIcon({
             className: 'custom-aqi-icon',
-            html: `<div class="aqi-marker-badge ${badgeClass}">${dba.toFixed(1)} dBA</div>`,
+            html: `<div class="aqi-marker-badge ${badgeClass}">${Number(dba).toFixed(1)} dBA</div>`,
             iconSize: [80, 28],
             iconAnchor: [40, 14]
         });
@@ -915,11 +915,13 @@
 
     async function loadStationsFromSupabase() {
         try {
-            const stationsData = await fetchSupabase("stations", "select=*");
+            const stationsData = await fetchSupabase("stations", "select=*&order=id.asc");
             if (Array.isArray(stationsData) && stationsData.length > 0) {
                 stationsData.forEach(remoteStation => {
-                    const stId = remoteStation.station_id || remoteStation.id;
-                    let existingStation = METER_STATIONS.find(s => s.id === stId);
+                    const stId = remoteStation.id || remoteStation.station_id;
+                    if (stId === undefined || stId === null) return;
+
+                    let existingStation = METER_STATIONS.find(s => String(s.id) === String(stId));
                     
                     if (existingStation) {
                         existingStation.name = remoteStation.name || remoteStation.station_name || existingStation.name;
@@ -929,7 +931,7 @@
                     } else {
                         const newStation = {
                             id: stId,
-                            name: remoteStation.name || remoteStation.station_name || "Noise Monitoring Station",
+                            name: remoteStation.name || remoteStation.station_name || `Station ${stId}`,
                             address: remoteStation.location_address || remoteStation.address || "Denver, CO",
                             lat: parseFloat(remoteStation.lat) || 39.7392,
                             lng: parseFloat(remoteStation.lng) || -104.9903,
@@ -972,7 +974,7 @@
             try {
                 const rpcData = await fetchSupabase("rpc/get_311_counts_by_station", "");
                 if (Array.isArray(rpcData)) {
-                    rpcData.forEach(item => { countsByStation[item.station_id] = item.total_reports; });
+                    rpcData.forEach(item => { countsByStation[String(item.station_id)] = item.total_reports; });
                 } else {
                     throw new Error("RPC endpoint unavailable");
                 }
@@ -981,7 +983,8 @@
                 if (Array.isArray(rawReports)) {
                     countsByStation = rawReports.reduce((acc, report) => {
                         if (report.station_id) {
-                            acc[report.station_id] = (acc[report.station_id] || 0) + 1;
+                            const sid = String(report.station_id);
+                            acc[sid] = (acc[sid] || 0) + 1;
                         }
                         return acc;
                     }, {});
@@ -989,16 +992,17 @@
             }
 
             for (const station of METER_STATIONS) {
-                station.reportCount311 = countsByStation[station.id] || 0;
+                const stKey = String(station.id);
+                station.reportCount311 = countsByStation[stKey] || 0;
 
                 if (!station.isLiveSupabase) continue;
 
                 const data = await fetchSupabase("noise_logs", `select=*&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
                 
                 if (Array.isArray(data) && data.length > 0) {
-                    const liveDba = Number(data[0].dba);
+                    const liveDba = Number(data[0].dba) || 0.0;
 
-                    if (activeMarkerObj && activeMarkerObj.id === station.id) {
+                    if (activeMarkerObj && String(activeMarkerObj.id) === stKey) {
                         updateLiveHistory(liveDba);
                     }
 
@@ -1017,19 +1021,25 @@
                     station.hourlyExceedances = hourlyCount;
                     station.hourlySirenExceedances = hourlySirenCount;
                     station.todayExceedances = todayCount;
+                } else {
+                    // Reset to zero for stations without active Raspberry Pi units/logs
+                    station.currentDba = 0.0;
+                    station.hourlyExceedances = 0;
+                    station.hourlySirenExceedances = 0;
+                    station.todayExceedances = 0;
+                }
 
-                    const marker = markersMap.get(station.id);
-                    if (marker) {
-                        marker.setIcon(createBadgeIcon(liveDba, hourlyCount));
-                    }
+                const marker = markersMap.get(station.id);
+                if (marker) {
+                    marker.setIcon(createBadgeIcon(station.currentDba, station.hourlyExceedances));
+                }
 
-                    if (activeMarkerObj && activeMarkerObj.id === station.id) {
-                        document.getElementById('panel-db').innerText = liveDba.toFixed(1);
-                        document.getElementById('panel-hourly').innerText = hourlyCount;
-                        document.getElementById('panel-today').innerText = todayCount;
-                        const countEl = document.getElementById('panel-311-count');
-                        if (countEl) countEl.innerText = station.reportCount311;
-                    }
+                if (activeMarkerObj && String(activeMarkerObj.id) === stKey) {
+                    document.getElementById('panel-db').innerText = Number(station.currentDba).toFixed(1);
+                    document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
+                    document.getElementById('panel-today').innerText = station.todayExceedances;
+                    const countEl = document.getElementById('panel-311-count');
+                    if (countEl) countEl.innerText = station.reportCount311;
                 }
             }
 
