@@ -35,7 +35,6 @@
             max-width: 100vw;
         }
 
-        /* Navigation Bar - Fixed Flex Header */
         .navbar {
             min-height: 56px;
             background: #1a1a1a;
@@ -99,13 +98,12 @@
 
         .stat-highlight { color: #00e676; font-weight: 700; }
 
-        /* Main Container & Framed Map */
         .main-container {
             position: relative;
             flex: 1;
             width: 100%;
             height: 100%;
-            min-height: 0; /* Prevents vertical viewport overflow */
+            min-height: 0;
             overflow: hidden;
         }
 
@@ -115,7 +113,6 @@
             background: #e5e5e5;
         }
 
-        /* Floating Dark Glass Legend */
         .map-overlay-legend {
             position: absolute;
             top: 16px;
@@ -141,7 +138,6 @@
             flex-shrink: 0;
         }
 
-        /* Floating Dark Glass Stats Banner (Bottom of Map) */
         .map-overlay-stats {
             position: absolute;
             bottom: 20px;
@@ -161,7 +157,6 @@
             max-width: calc(100vw - 32px);
         }
 
-        /* Marker Badges */
         .aqi-marker-badge {
             display: flex;
             align-items: center;
@@ -181,12 +176,10 @@
             z-index: 1000 !important;
         }
 
-        /* Status Colors */
         .badge-green { background-color: #00e676; color: #000; }
         .badge-yellow { background-color: #ffeb3b; color: #000; }
         .badge-red { background-color: #ff5252; color: #fff; }
 
-        /* Slide-out Drawer Panel */
         .detail-panel {
             position: absolute;
             top: 0;
@@ -222,7 +215,6 @@
         .panel-header h2 { margin: 0 0 4px 0; color: #fff; font-size: 1.25rem; }
         .panel-header p { margin: 0 0 16px 0; color: #888; font-size: 0.85rem; }
 
-        /* Clickable Metric Cards & Affordance */
         .metrics-subgrid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -310,7 +302,6 @@
         }
         .metric-val { font-size: 1.3rem; font-weight: 700; color: #00e676; margin-top: 2px; }
 
-        /* Educational Module Components */
         .info-card {
             background: #242424;
             border: 1px solid #333;
@@ -330,29 +321,7 @@
             margin: 0 0 8px 0;
         }
         .info-card ul { padding-left: 18px; margin: 0 0 8px 0; }
-        .comparison-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            background: #181818;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #2a2a2a;
-            margin: 10px 0;
-        }
-        .comp-item { text-align: center; font-size: 0.78rem; }
-        .comp-val { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
 
-        .calc-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin: 12px 0;
-        }
-        .calc-input-group label { font-size: 0.8rem; color: #aaa; }
-        .calc-slider { width: 100%; accent-color: #00e676; cursor: pointer; }
-
-        /* Chart Sections */
         .chart-container {
             background: #242424;
             border: 1px solid #333;
@@ -368,7 +337,6 @@
             font-size: 0.8rem;
         }
 
-        /* Buttons & Footnote */
         .action-btn {
             width: 100%;
             padding: 12px;
@@ -401,7 +369,6 @@
             flex-shrink: 0;
         }
 
-        /* Toast Notification Overlay */
         .toast-notification {
             position: fixed;
             top: 20px;
@@ -442,7 +409,6 @@
             line-height: 1.4;
         }
 
-        /* Responsive Mobile Layout & Viewport Overflow Fixes */
         @media (max-width: 600px) {
             .navbar {
                 padding: 6px 10px;
@@ -507,7 +473,6 @@
             <span class="tagline">Mapping illegal high-decibel vehicle noise across Denver</span>
         </div>
         
-        <!-- Navigation Buttons -->
         <div class="nav-links">
             <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
             <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
@@ -519,7 +484,6 @@
     </div>
 
     <div class="main-container">
-        <!-- Floating Map Legend Overlay -->
         <div class="map-overlay-legend">
             <div class="legend-title">Exceedances (Last Hour)</div>
             <div class="legend-scale">
@@ -529,25 +493,19 @@
             </div>
         </div>
 
-        <!-- Floating Map Bottom Stats Overlay -->
         <div class="map-overlay-stats">
-            <div>Active: <span class="stat-highlight" id="active-count">4</span></div>
+            <div>Active: <span class="stat-highlight" id="active-count">0</span></div>
             <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
             <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
 
-        <!-- Fullscreen Light Map Canvas -->
         <div id="map"></div>
 
-        <!-- Educational Info Slide-out Panel -->
         <div class="detail-panel" id="info-panel">
             <button class="close-btn" onclick="closeInfoPanel()">&times;</button>
-            <div id="info-panel-content">
-                <!-- Dynamic Content injected via JavaScript -->
-            </div>
+            <div id="info-panel-content"></div>
         </div>
 
-        <!-- Site Specific Detail Drawer -->
         <div class="detail-panel" id="detail-panel">
             <button class="close-btn" onclick="closePanel()">&times;</button>
             <div class="panel-header">
@@ -555,7 +513,6 @@
                 <p id="panel-address">Address details...</p>
             </div>
 
-            <!-- Clarified Metrics Summary Grid with Active Toggles & Enhanced Visual Affordance -->
             <div class="metrics-subgrid">
                 <div class="metric-card clickable-card" id="live-level-card" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle live decibel chart" onclick="toggleChart('live')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleChart('live');event.preventDefault();}" title="Click to plot live 5-minute decibel trend">
                     <h4>
@@ -580,7 +537,6 @@
                 </div>
             </div>
 
-            <!-- Dynamic Real-Time Live Decibel Chart (Hidden by Default) -->
             <div class="chart-container" id="live-chart-container" style="display: none;">
                 <h4>Live 5-Minute Decibel History (1Hz Sampling)</h4>
                 <div style="height: 150px; position: relative;">
@@ -588,7 +544,6 @@
                 </div>
             </div>
 
-            <!-- Past Hour Exceedance Level Chart (Hidden by Default) -->
             <div class="chart-container" id="hourly-chart-container" style="display: none;">
                 <h4>Past Hour Exceedances (Time & Level)</h4>
                 <div style="height: 150px; position: relative;">
@@ -596,7 +551,6 @@
                 </div>
             </div>
 
-            <!-- Today's Exceedance Level Chart (Hidden by Default) -->
             <div class="chart-container" id="today-chart-container" style="display: none;">
                 <h4>Today's Exceedances (Time & Level)</h4>
                 <div style="height: 150px; position: relative;">
@@ -604,23 +558,6 @@
                 </div>
             </div>
 
-            <!-- 14-Day Stacked Time-of-Day Chart -->
-            <div class="chart-container">
-                <h4>Exceedances by Time of Day (14-Day History)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="stackedChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 14-Day Peak dBA Line Chart -->
-            <div class="chart-container">
-                <h4>Highest Peak dBA Reading (14-Day History)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="peakChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Step 3: Per-Station 311 Counter Display -->
             <div class="info-card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-bottom: 12px;">
                 <span style="font-size: 0.82rem; color: #aaa;">Station 311 Complaints:</span>
                 <span id="panel-311-count" style="font-size: 1.15rem; font-weight: 700; color: #00e676;">0</span>
@@ -629,7 +566,6 @@
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Exceedance CSV Log</button>
 
-            <!-- Hardware Standard & Accuracy Footnote -->
             <div class="sensor-footnote">
                 <strong>Hardware Standard & Compliance:</strong><br>
                 IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA). Accuracy: ±1.5 dBA (Slow Response Mode). Measurements recorded 50 ft from center lane of travel. Data collected via RS485 Modbus RTU at 1Hz sampling frequency.
@@ -638,120 +574,21 @@
     </div>
 
     <script>
-    // Explicitly register Chart.js Annotation Plugin UMD module
     if (window['chartjs-plugin-annotation']) {
         Chart.register(window['chartjs-plugin-annotation']);
     }
 
-    // --- DYNAMIC RUNTIME CONFIGURATION ---
     let SUPABASE_URL = "https://canlnrismlirrnfqpqmv.supabase.co";
     let SUPABASE_ANON_KEY = "sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p";
     const DECIBEL_THRESHOLD = 85.0;
 
-    // Shared Threshold Annotation Object for Chart.js (High Contrast Yellow)
-    const thresholdAnnotation = {
-        type: 'line',
-        yMin: DECIBEL_THRESHOLD,
-        yMax: DECIBEL_THRESHOLD,
-        borderColor: '#ffeb3b',
-        borderWidth: 2,
-        borderDash: [5, 5],
-        label: {
-            display: true,
-            content: '85 dBA Threshold',
-            position: 'start',
-            backgroundColor: 'rgba(255, 235, 59, 0.9)',
-            color: '#000000',
-            font: { size: 9, weight: 'bold' },
-            padding: 3
-        }
-    };
+    let activeMarkerObj = null;
+    const MAX_LIVE_POINTS = 300;
+    let liveDbHistory = [];
+    let liveTimeLabels = [];
+    const markersMap = new Map();
+    const METER_STATIONS = [];
 
-    // Fetch key dynamically from backend persistent config endpoint to avoid hardcoding credentials
-    async function loadRuntimeConfig() {
-        try {
-            const res = await fetch('/api/config');
-            if (res.ok) {
-                const config = await res.json();
-                if (config.SUPABASE_URL) SUPABASE_URL = config.SUPABASE_URL;
-                if (config.SUPABASE_ANON_KEY) SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
-            }
-        } catch (err) {
-            console.warn("Could not fetch backend persistent config, using dynamic fallbacks.", err);
-        }
-    }
-
-    // Unified Supabase REST API Query Helper
-    async function fetchSupabase(table, queryParams = "") {
-        if (!SUPABASE_ANON_KEY) {
-            await loadRuntimeConfig();
-        }
-        
-        const url = `${SUPABASE_URL}/rest/v1/${table}${queryParams ? '?' + queryParams : ''}`;
-        const headers = { "Content-Type": "application/json" };
-        
-        if (SUPABASE_ANON_KEY) {
-            headers["apikey"] = SUPABASE_ANON_KEY;
-            headers["Authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
-        }
-
-        const res = await fetch(url, { headers });
-        return res.json();
-    }
-
-    // --- STEP 2: STATIONS DATA WITH PER-STATION 311 COUNT ---
-    const METER_STATIONS = [
-        {
-            id: "meter-01",
-            name: "Federal Blvd Monitor",
-            address: "3265 Federal Blvd, Denver, CO 80211",
-            lat: 39.76285,
-            lng: -105.02506,
-            currentDba: 64.2,
-            hourlyExceedances: 0,
-            todayExceedances: 0,
-            reportCount311: 0,
-            isLiveSupabase: true
-        },
-        {
-            id: "meter-02",
-            name: "W Colfax & Sheridan",
-            address: "5300 W Colfax Ave, Denver, CO 80214",
-            lat: 39.7400,
-            lng: -105.0531,
-            currentDba: 88.2,
-            hourlyExceedances: 4,
-            todayExceedances: 14,
-            reportCount311: 0,
-            isLiveSupabase: true
-        },
-        {
-            id: "meter-03",
-            name: "RiNo Arts District",
-            address: "2901 Blake St, Denver, CO 80205",
-            lat: 39.7635,
-            lng: -104.9785,
-            currentDba: 76.4,
-            hourlyExceedances: 1,
-            todayExceedances: 5,
-            reportCount311: 0,
-            isLiveSupabase: false
-        },
-        {
-            id: "meter-04",
-            name: "S Broadway & Evans",
-            address: "2090 S Broadway, Denver, CO 80210",
-            lat: 39.6785,
-            lng: -104.9878,
-            currentDba: 71.8,
-            hourlyExceedances: 0,
-            todayExceedances: 2,
-            reportCount311: 0,
-            isLiveSupabase: false
-        }
-    ];
-
-    // --- LEAFLET MAP INITIALIZATION ---
     const map = L.map('map').setView([39.735, -105.000], 12);
     
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
@@ -760,550 +597,148 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
 
-    let activeMarkerObj = null;
-    let stackedChartInstance = null;
-    let peakChartInstance = null;
-    let liveMinuteChartInstance = null;
-    let hourlyChartInstance = null;
-    let todayChartInstance = null;
+    function showToast(title, message) {
+        const toast = document.getElementById('toast-notification');
+        document.getElementById('toast-title').innerText = title;
+        document.getElementById('toast-message').innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
 
-    // Real-Time 5-Minute Buffer (300 points @ 1Hz)
-    const MAX_LIVE_POINTS = 300;
-    let liveDbHistory = [];
-    let liveTimeLabels = [];
-
-    // --- EDUCATIONAL MODAL DRAWER CONTROLLER ---
-    function openInfoModal(topic) {
-        closePanel(); // Close station detail drawer if active
+    function openDetailPanel(station) {
+        activeMarkerObj = station;
+        document.getElementById('panel-title').innerText = station.name;
+        document.getElementById('panel-address').innerText = station.address;
+        document.getElementById('panel-db').innerText = Number(station.currentDba).toFixed(1);
+        document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
+        document.getElementById('panel-today').innerText = station.todayExceedances;
+        document.getElementById('panel-311-count').innerText = station.reportCount311 || 0;
         
-        const infoPanel = document.getElementById('info-panel');
-        const container = document.getElementById('info-panel-content');
-        
-        // Highlight active nav button
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(topic));
-        if (activeBtn) activeBtn.classList.add('active');
+        document.getElementById('detail-panel').classList.add('open');
+    }
 
-        let htmlContent = '';
-
-        switch (topic) {
-            case 'dba-dbc':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>🎛️ Acoustic Weighting: dBA vs. dBC</h2>
-                        <p>Why standard enforcement misses low-frequency noise pollution.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Understanding Frequency Weighting</h3>
-                        <p>Most municipal noise codes rely exclusively on <strong>dBA (A-weighting)</strong>. This standard was designed to mimic the human ear by heavily filtering out low and high frequencies (&lt; 1,000 Hz).</p>
-                        <p>However, modern noise disturbance is dominated by <strong>low-frequency energy</strong>—subwoofers, straight-pipe exhausts, and diesel engine rumbles that easily pass through building walls.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>A-Weighting vs C-Weighting</h3>
-                        <div class="comparison-box">
-                            <div class="comp-item">
-                                <div style="color: #ffb74d; font-weight: bold;">dBA Scale</div>
-                                <p style="font-size: 0.72rem; margin: 4px 0;">Rolls off low frequencies. Treats deep bass as almost quiet.</p>
-                                <div class="comp-val" style="color: #00e676;">68 dBA</div>
-                                <span style="font-size: 0.68rem; color: #888;">"Compliant"</span>
-                            </div>
-                            <div class="comp-item">
-                                <div style="color: #ff5252; font-weight: bold;">dBC Scale</div>
-                                <p style="font-size: 0.72rem; margin: 4px 0;">Flat frequency curve. Measures actual acoustic power output.</p>
-                                <div class="comp-val" style="color: #ff5252;">88 dBC</div>
-                                <span style="font-size: 0.68rem; color: #888;">"Disruptive"</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-card">
-                        <h3>Key Takeaway for Enforcement</h3>
-                        <p>A vehicle exhaust can easily register a legal <strong>68 dBA</strong> while generating an intrusive <strong>88 dBC</strong> low-frequency rumble. Modern acoustic monitoring networks must measure both dBA and dBC to capture real disturbance.</p>
-                    </div>
-                `;
-                break;
-
-            case 'myths':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>❓ Myths vs. Facts</h2>
-                        <p>Clearing up common misconceptions around urban sound pressure.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 1: "It's just an annoyance."</h3>
-                        <p><strong>Fact:</strong> According to the World Health Organization (WHO), chronic environmental noise is a major physiological stressor linked directly to high cortisol, hypertension, ischemic heart disease, and cognitive impairment in children.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 2: "If you don't wake up, it doesn't affect sleep."</h3>
-                        <p><strong>Fact:</strong> Even when you remain asleep, noise spikes above 45 dBA trigger micro-arousals, shifting your brain out of deep restorative REM sleep and driving daytime cardiovascular stress.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 3: "Noise is an unavoidable part of city living."</h3>
-                        <p><strong>Fact:</strong> Over 80% of urban acoustic spikes come from a small minority of illegal aftermarket modified vehicle exhausts and aggressive acceleration, not standard city traffic.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 4: "Loud pipes save lives."</h3>
-                        <p><strong>Fact:</strong> Acoustic tests demonstrate that motorcycle and aftermarket exhaust noise projects almost entirely backward behind the vehicle. Drivers ahead cannot reliably hear coming pipes due to modern car soundproofing, ambient road noise, and speed, making loud exhausts ineffective for safety while creating excessive neighborhood sound pollution.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 5: "Double-pane windows insulate against vehicle noise."</h3>
-                        <p><strong>Fact:</strong> Standard double-pane windows attenuate high-frequency ambient noise, but low-frequency exhaust rumbles and deep bass bypass window glazing easily, vibrating through window frames and wall assemblies directly into living spaces.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Myth 6: "Noise laws cannot be enforced without physical police stops."</h3>
-                        <p><strong>Fact:</strong> Automated enforcement using acoustic cameras combines calibrated directional microphone arrays with optical cameras to isolate noise spikes in multi-lane traffic, precise sound pressure readings, and vehicle license plates for automated citation.</p>
-                    </div>
-                `;
-                break;
-
-            case 'action':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>📢 Take Action & Advocacy</h2>
-                        <p>Empowering neighbors with data to drive civic enforcement.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>1. File Automated 311 Reports</h3>
-                        <p>Use our interactive map monitors to identify recurring noise exceedance corridors and file official reports directly to Denver 311.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>2. Email City Council Representatives</h3>
-                        <p>Send a pre-filled message citing Denver Revised Municipal Code (DRMC) Chapter 36 to your district representative requesting acoustic enforcement.</p>
-                        <a href="mailto:denvercouncil@denvergov.org?subject=Acoustic%20Noise%20Mitigation%20Request&body=Dear%20City%20Council,%20I%20am%20writing%20to%20request%20focused%20acoustic%20enforcement%20along%20major%20transit%20corridors..." class="action-btn btn-primary">✉️ Send Council Email Template</a>
-                    </div>
-                    <div class="info-card">
-                        <h3>3. Community Outreach</h3>
-                        <p>Download printable QR-code flyers linking neighbors directly to live real-time station metrics along your corridor.</p>
-                        <button class="action-btn btn-secondary" onclick="alert('PDF Flyer generation coming soon!')">📄 Download Station Flyer</button>
-                    </div>
-                    <div class="info-card">
-                        <h3>4. Local Noise Tracking Partner</h3>
-                        <p>Explore <a href="https://www.fixdenvernoise.org/" target="_blank" style="color: #00e676; text-decoration: underline;">Fix Denver Noise</a>, a grassroots community initiative focused on mapping, documenting, and advocating against excessive vehicle noise across Denver neighborhoods.</p>
-                    </div>
-                `;
-                break;
-
-            case 'resources':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>📚 Links & Technical Resources</h2>
-                        <p>Standards, legal codes, and open data endpoints.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Legal & Regulatory Codes</h3>
-                        <ul>
-                            <li><a href="https://library.municode.com/co/denver" target="_blank" style="color: #00e676;">Denver Revised Municipal Code Chapter 36</a> (55 dBA daytime / 50 dBA night limit)</li>
-                            <li><a href="https://www.who.int/europe/news-room/fact-sheets/item/noise" target="_blank" style="color: #00e676;">WHO Environmental Noise Guidelines</a></li>
-                        </ul>
-                    </div>
-                    <div class="info-card">
-                        <h3>Hardware Specifications</h3>
-                        <p>All network monitors utilize Class 2 IEC 61672-1 sound level sensors calibrated to ANSI S1.4 Type 2 accuracy standard (±1.5 dBA accuracy tolerance).</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Open Data API</h3>
-                        <p>Developers and researchers can access public REST endpoints for hourly noise logs and exceedance summaries.</p>
-                    </div>
-                `;
-                break;
-
-            case 'hotspots':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>🏆 Denver Noise Leaderboard</h2>
-                        <p>Monthly ranking of top exceedance corridors.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Top Daily Exceedance Intersections</h3>
-                        <div style="font-size: 0.83rem; color: #ccc;">
-                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>1. W Colfax Ave & Sheridan Blvd</span>
-                                <span style="color:#ff5252; font-weight:bold;">14/day</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>2. RiNo District (29th & Blake)</span>
-                                <span style="color:#ffb74d; font-weight:bold;">5/day</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>3. S Broadway & Evans Ave</span>
-                                <span style="color:#ffb74d; font-weight:bold;">2/day</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #333;">
-                                <span>4. Federal Blvd & 32nd Ave</span>
-                                <span style="color:#00e676; font-weight:bold;">0/day</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                break;
-
-            case 'calculator':
-                htmlContent = `
-                    <div class="panel-header">
-                        <h2>💤 Sleep Disruption Risk Calculator</h2>
-                        <p>Estimate night-time health impacts based on local noise spikes.</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>Calculate Estimated Sleep Arousal</h3>
-                        <div class="calc-input-group">
-                            <label>Night Spikes (&gt;75 dBA) per hour: <strong id="spike-val" style="color: #00e676;">3</strong></label>
-                            <input type="range" class="calc-slider" id="spike-slider" min="0" max="15" value="3" oninput="updateSleepCalc(this.value)">
-                        </div>
-                        <div class="comparison-box" style="margin-top: 14px;">
-                            <div class="comp-item">
-                                <div>Sleep Arousal Risk</div>
-                                <div class="comp-val" id="calc-arousal" style="color:#ffb74d;">Moderate (32%)</div>
-                            </div>
-                            <div class="comp-item">
-                                <div>Cortisol Impact</div>
-                                <div class="comp-val" id="calc-stress" style="color:#ffb74d;">Elevated</div>
-                            </div>
-                        </div>
-                        <p style="font-size:0.75rem; color:#888; margin-top:8px;">Calculated using World Health Organization Night Noise Guidelines models for urban residences.</p>
-                    </div>
-                `;
-                break;
-
-            default:
-                htmlContent = `<p>Select a topic from the navigation bar.</p>`;
-        }
-
-        container.innerHTML = htmlContent;
-        infoPanel.scrollTop = 0;
-        infoPanel.classList.add('open');
+    function closePanel() {
+        document.getElementById('detail-panel').classList.remove('open');
+        activeMarkerObj = null;
     }
 
     function closeInfoPanel() {
         document.getElementById('info-panel').classList.remove('open');
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     }
 
-    function updateSleepCalc(val) {
-        document.getElementById('spike-val').innerText = val;
-        const arousal = document.getElementById('calc-arousal');
-        const stress = document.getElementById('calc-stress');
+    function openInfoModal(topic) {
+        const infoPanel = document.getElementById('info-panel');
+        const content = document.getElementById('info-panel-content');
+        
+        const topics = {
+            'dba-dbc': '<h3>dBA vs dBC Weighting</h3><p><strong>dBA (A-weighting):</strong> Emphasizes frequencies audible to human ears (500 Hz - 10 kHz). Standard for traffic & noise ordinances.</p><p><strong>dBC (C-weighting):</strong> Measures low-frequency bass & rumble (e.g., modified exhausts, subwoofers).</p>',
+            'myths': '<h3>Myths & Facts</h3><p><strong>Myth:</strong> "Loud pipes save lives."</p><p><strong>Fact:</strong> Multi-state crash studies show acoustic directionality prevents drivers ahead from hearing rearward exhaust noise in time to react.</p>',
+            'action': '<h3>Take Action</h3><p>Log exceedances using this dashboard and submit requests directly to Denver 311 to advocate for targeted traffic & acoustic camera enforcement.</p>',
+            'resources': '<h3>Resources</h3><p>• Denver Noise Ordinance (Sec. 36-6)<br>• IEC 61672-1 Sound Level Meter Standards<br>• CDC Noise & Hearing Loss Guidelines</p>',
+            'hotspots': '<h3>Hotspot Corridors</h3><p>High violation corridors identified across Denver: W Colfax Ave, Federal Blvd, Speer Blvd, and Alameda Ave.</p>',
+            'calculator': '<h3>Sleep & Health Risk</h3><p>Nighttime noise spikes above 85 dBA trigger elevated cortisol, cardiovascular stress, and severe sleep disruption.</p>'
+        };
 
-        if (val == 0) {
-            arousal.innerText = "Low (5%)"; arousal.style.color = "#00e676";
-            stress.innerText = "Normal"; stress.style.color = "#00e676";
-        } else if (val <= 3) {
-            arousal.innerText = "Moderate (32%)"; arousal.style.color = "#ffb74d";
-            stress.innerText = "Elevated"; stress.style.color = "#ffb74d";
-        } else if (val <= 7) {
-            arousal.innerText = "High (64%)"; arousal.style.color = "#ff9100";
-            stress.innerText = "High"; stress.style.color = "#ff9100";
-        } else {
-            arousal.innerText = "Severe (88%+)"; arousal.style.color = "#ff5252";
-            stress.innerText = "Critical"; stress.style.color = "#ff5252";
-        }
+        content.innerHTML = topics[topic] || '<h3>Information</h3><p>Details unavailable.</p>';
+        infoPanel.classList.add('open');
     }
 
-    async function toggleChart(type) {
-        const liveC = document.getElementById('live-chart-container');
-        const hourlyC = document.getElementById('hourly-chart-container');
-        const todayC = document.getElementById('today-chart-container');
-        const detailPanel = document.getElementById('detail-panel');
+    function toggleChart(type) {
+        const containers = {
+            'live': 'live-chart-container',
+            'hourly': 'hourly-chart-container',
+            'today': 'today-chart-container'
+        };
 
-        const liveCard = document.getElementById('live-level-card');
-        const hourlyCard = document.getElementById('hourly-card');
-        const todayCard = document.getElementById('today-card');
+        const targetId = containers[type];
+        if (!targetId) return;
 
-        if (type === 'live') {
-            const isHidden = liveC.style.display === 'none' || liveC.style.display === '';
-            liveC.style.display = isHidden ? 'block' : 'none';
-            liveCard.classList.toggle('active', isHidden);
-            liveCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            if (isHidden) {
-                await preloadLiveHistory();
-                initLiveChart();
-                detailPanel.scrollTo({ top: liveC.offsetTop - 20, behavior: 'smooth' });
-            } else if (liveMinuteChartInstance) {
-                liveMinuteChartInstance.destroy();
-                liveMinuteChartInstance = null;
-            }
-        } else if (type === 'hourly') {
-            const isHidden = hourlyC.style.display === 'none' || hourlyC.style.display === '';
-            hourlyC.style.display = isHidden ? 'block' : 'none';
-            hourlyCard.classList.toggle('active', isHidden);
-            hourlyCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            if (isHidden) {
-                await renderHourlyExceedanceChart();
-                detailPanel.scrollTo({ top: hourlyC.offsetTop - 20, behavior: 'smooth' });
-            } else if (hourlyChartInstance) {
-                hourlyChartInstance.destroy();
-                hourlyChartInstance = null;
-            }
-        } else if (type === 'today') {
-            const isHidden = todayC.style.display === 'none' || todayC.style.display === '';
-            todayC.style.display = isHidden ? 'block' : 'none';
-            todayCard.classList.toggle('active', isHidden);
-            todayCard.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            if (isHidden) {
-                await renderTodayExceedanceChart();
-                detailPanel.scrollTo({ top: todayC.offsetTop - 20, behavior: 'smooth' });
-            } else if (todayChartInstance) {
-                todayChartInstance.destroy();
-                todayChartInstance = null;
-            }
-        }
-    }
+        const targetEl = document.getElementById(targetId);
+        const isHidden = targetEl.style.display === 'none';
+        
+        Object.values(containers).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
 
-    async function preloadLiveHistory() {
-        if (!activeMarkerObj || !activeMarkerObj.isLiveSupabase) return;
-        try {
-            const data = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&order=timestamp.desc&limit=300`);
-            if (data && data.length > 0) {
-                const sorted = data.reverse();
-                liveDbHistory = sorted.map(d => Number(d.dba));
-                liveTimeLabels = sorted.map(d => new Date(d.timestamp).toTimeString().split(' ')[0]);
-            }
-        } catch (err) {
-            console.error("Error preloading live history:", err);
+        if (isHidden) {
+            targetEl.style.display = 'block';
         }
     }
 
     function updateLiveHistory(dba) {
-        const now = new Date();
-        const timeStr = now.toTimeString().split(' ')[0];
-
+        const now = new Date().toLocaleTimeString();
         liveDbHistory.push(dba);
-        liveTimeLabels.push(timeStr);
+        liveTimeLabels.push(now);
 
         if (liveDbHistory.length > MAX_LIVE_POINTS) {
             liveDbHistory.shift();
             liveTimeLabels.shift();
         }
+    }
 
-        if (liveMinuteChartInstance) {
-            liveMinuteChartInstance.update('none');
+    async function trigger311Report() {
+        if (!activeMarkerObj) {
+            showToast("Selection Required", "Please select a monitoring station first.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/submit-311', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    station_id: activeMarkerObj.id,
+                    location_address: activeMarkerObj.address,
+                    db_level: activeMarkerObj.currentDba,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                showToast("Report Filed", result.message || "311 report submitted successfully.");
+            } else {
+                showToast("Submission Error", result.error || "Failed to submit 311 report.");
+            }
+        } catch (err) {
+            showToast("Network Error", "Unable to connect to submission backend.");
+            console.error("311 Report submission error:", err);
         }
     }
 
-    function initLiveChart() {
-        const ctxLive = document.getElementById('liveMinuteChart').getContext('2d');
-        
-        if (liveMinuteChartInstance) {
-            liveMinuteChartInstance.destroy();
-            liveMinuteChartInstance = null;
+    async function exportStationCSV() {
+        if (!activeMarkerObj) {
+            showToast("Selection Required", "Please select a monitoring station first.");
+            return;
         }
 
-        liveMinuteChartInstance = new Chart(ctxLive, {
-            type: 'line',
-            data: {
-                labels: liveTimeLabels,
-                datasets: [{
-                    label: 'dBA Level',
-                    data: liveDbHistory,
-                    borderColor: '#00e676',
-                    borderWidth: 2,
-                    backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                    fill: true,
-                    pointRadius: 0,
-                    tension: 0.2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 6 } 
-                    },
-                    y: { 
-                        min: 40, 
-                        suggestedMax: 110, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
-                },
-                plugins: { 
-                    legend: { display: false },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return val >= DECIBEL_THRESHOLD 
-                                    ? ` Level: ${val} dBA (+${diff} dBA over threshold)`
-                                    : ` Level: ${val} dBA (${Math.abs(diff)} dBA below threshold)`;
-                            }
-                        }
-                    }
-                }
+        try {
+            const logs = await fetchSupabase("noise_logs", `select=timestamp,dba,frequency_peak_hz,is_siren&station_id=eq.${activeMarkerObj.id}&order=timestamp.desc&limit=1000`);
+            if (!Array.isArray(logs) || logs.length === 0) {
+                showToast("No Data", "No noise log records found for this station.");
+                return;
             }
-        });
-    }
 
-    async function renderHourlyExceedanceChart() {
-        if (!activeMarkerObj) return;
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        let chartData = [];
+            const csvRows = [["Timestamp", "dBA Level", "Peak Frequency (Hz)", "Is Siren"]];
+            logs.forEach(row => {
+                csvRows.push([row.timestamp, row.dba, row.frequency_peak_hz || 'N/A', row.is_siren ? 'true' : 'false']);
+            });
 
-        if (activeMarkerObj.isLiveSupabase) {
-            try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc`);
-                if (Array.isArray(logs)) {
-                    chartData = logs.map(l => ({
-                        time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                        dba: Number(l.dba)
-                    }));
-                }
-            } catch(e) { console.error(e); }
-        } else {
-            const now = Date.now();
-            for (let i = 0; i < activeMarkerObj.hourlyExceedances; i++) {
-                chartData.push({
-                    time: new Date(now - (i + 1) * 10 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: Number((Math.random() * 10 + 85.5).toFixed(1))
-                });
-            }
-            chartData.reverse();
+            const csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${activeMarkerObj.id}_exceedance_log.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("CSV Exported", "Station log downloaded successfully.");
+        } catch (err) {
+            showToast("Export Error", "Failed to fetch log data for CSV export.");
+            console.error("CSV Export error:", err);
         }
-
-        const labels = chartData.map(d => d.time);
-        const values = chartData.map(d => d.dba);
-
-        // Dynamically compute y-axis maximum scale so exceedance bars fill chart area properly
-        const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
-        const yMax = Math.max(Math.ceil(maxVal + 2), 95);
-
-        if (hourlyChartInstance) {
-            hourlyChartInstance.destroy();
-            hourlyChartInstance = null;
-        }
-
-        const ctx = document.getElementById('hourlyExceedanceChart').getContext('2d');
-        hourlyChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Exceedance (dBA)',
-                    data: values,
-                    backgroundColor: '#ffb74d',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { 
-                        min: 80, 
-                        suggestedMax: yMax, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return ` Level: ${val} dBA (+${diff} dBA above threshold)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    async function renderTodayExceedanceChart() {
-        if (!activeMarkerObj) return;
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        let chartData = [];
-
-        if (activeMarkerObj.isLiveSupabase) {
-            try {
-                const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.asc&limit=1000`);
-                if (Array.isArray(logs)) {
-                    chartData = logs.map(l => ({
-                        time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        dba: Number(l.dba)
-                    }));
-                }
-            } catch(e) { console.error(e); }
-        } else {
-            const now = Date.now();
-            for (let i = 0; i < Math.min(activeMarkerObj.todayExceedances, 15); i++) {
-                chartData.push({
-                    time: new Date(now - (i + 1) * 45 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: Number((Math.random() * 12 + 85.5).toFixed(1))
-                });
-            }
-            chartData.reverse();
-        }
-
-        const labels = chartData.map(d => d.time);
-        const values = chartData.map(d => d.dba);
-
-        // Dynamically compute y-axis upper bound based on dataset peak (prevents data points from looking tiny)
-        const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
-        const yMax = Math.max(Math.ceil(maxVal + 2), 95);
-
-        if (todayChartInstance) {
-            todayChartInstance.destroy();
-            todayChartInstance = null;
-        }
-
-        const ctx = document.getElementById('todayExceedanceChart').getContext('2d');
-        todayChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Exceedance (dBA)',
-                    data: values,
-                    backgroundColor: '#ff5252',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { 
-                        min: 80, 
-                        suggestedMax: yMax, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return ` Level: ${val} dBA (+${diff} dBA above threshold)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
     }
 
     function getBadgeClass(exceedances) {
@@ -1322,38 +757,91 @@
         });
     }
 
-    const markersMap = new Map();
-    METER_STATIONS.forEach(station => {
-        const marker = L.marker([station.lat, station.lng], {
-            icon: createBadgeIcon(station.currentDba, station.hourlyExceedances)
-        }).addTo(map);
-
-        marker.on('click', () => openDetailPanel(station));
-        markersMap.set(station.id, marker);
-    });
-
-    function generate14DayLabels() {
-        const dateMap = new Map();
-        const labels = [];
-        for (let i = 13; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            const dateKey = d.toLocaleDateString('en-CA');
-            const label = (d.getMonth() + 1) + '/' + d.getDate();
-            labels.push(label);
-            dateMap.set(dateKey, labels.length - 1);
+    async function loadRuntimeConfig() {
+        try {
+            const res = await fetch('/api/config');
+            if (res.ok) {
+                const config = await res.json();
+                if (config.SUPABASE_URL) SUPABASE_URL = config.SUPABASE_URL;
+                if (config.SUPABASE_ANON_KEY) SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+            }
+        } catch (err) {
+            console.warn("Could not fetch backend persistent config, using fallbacks.", err);
         }
-        return { dateMap, labels };
     }
 
-    // --- STEP 2: FETCH REAL DATA & GROUPED 311 STATS FROM SUPABASE ---
+    async function fetchSupabase(table, queryParams = "") {
+        if (!SUPABASE_ANON_KEY) {
+            await loadRuntimeConfig();
+        }
+        
+        const url = `${SUPABASE_URL}/rest/v1/${table}${queryParams ? '?' + queryParams : ''}`;
+        const headers = { "Content-Type": "application/json" };
+        
+        if (SUPABASE_ANON_KEY) {
+            headers["apikey"] = SUPABASE_ANON_KEY;
+            headers["Authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
+        }
+
+        const res = await fetch(url, { headers });
+        return res.json();
+    }
+
+    async function loadStationsFromSupabase() {
+        try {
+            const stationsData = await fetchSupabase("stations", "select=*");
+            if (Array.isArray(stationsData) && stationsData.length > 0) {
+                stationsData.forEach(remoteStation => {
+                    const stId = remoteStation.station_id || remoteStation.id;
+                    let existingStation = METER_STATIONS.find(s => s.id === stId);
+                    
+                    if (existingStation) {
+                        existingStation.name = remoteStation.name || remoteStation.station_name || existingStation.name;
+                        existingStation.address = remoteStation.location_address || remoteStation.address || existingStation.address;
+                        if (remoteStation.lat) existingStation.lat = parseFloat(remoteStation.lat);
+                        if (remoteStation.lng) existingStation.lng = parseFloat(remoteStation.lng);
+                    } else {
+                        const newStation = {
+                            id: stId,
+                            name: remoteStation.name || remoteStation.station_name || "Noise Monitoring Station",
+                            address: remoteStation.location_address || remoteStation.address || "Denver, CO",
+                            lat: parseFloat(remoteStation.lat) || 39.7392,
+                            lng: parseFloat(remoteStation.lng) || -104.9903,
+                            currentDba: 0.0,
+                            hourlyExceedances: 0,
+                            todayExceedances: 0,
+                            hourlySirenExceedances: 0,
+                            reportCount311: 0,
+                            isLiveSupabase: true
+                        };
+                        METER_STATIONS.push(newStation);
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn("Could not load dynamic station metadata from Supabase.", err);
+        }
+
+        METER_STATIONS.forEach(station => {
+            if (!markersMap.has(station.id)) {
+                const marker = L.marker([station.lat, station.lng], {
+                    icon: createBadgeIcon(station.currentDba, station.hourlyExceedances)
+                }).addTo(map);
+
+                marker.on('click', () => openDetailPanel(station));
+                markersMap.set(station.id, marker);
+            }
+        });
+
+        document.getElementById('active-count').innerText = METER_STATIONS.length;
+    }
+
     async function fetchLiveMeters() {
         try {
             const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
             const startOfToday = new Date();
             startOfToday.setHours(0, 0, 0, 0);
 
-            // Grouped 311 reports count query
             let countsByStation = {};
             try {
                 const rpcData = await fetchSupabase("rpc/get_311_counts_by_station", "");
@@ -1363,7 +851,6 @@
                     throw new Error("RPC endpoint unavailable");
                 }
             } catch (e) {
-                // Fallback: Aggregate directly from pending_reports table
                 const rawReports = await fetchSupabase("pending_reports", "select=station_id");
                 if (Array.isArray(rawReports)) {
                     countsByStation = rawReports.reduce((acc, report) => {
@@ -1380,27 +867,29 @@
 
                 if (!station.isLiveSupabase) continue;
 
-                // Query live sound level for specific station from noise_logs
                 const data = await fetchSupabase("noise_logs", `select=*&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
                 
                 if (Array.isArray(data) && data.length > 0) {
                     const liveDba = Number(data[0].dba);
 
-                    // Update live buffer history if active station
                     if (activeMarkerObj && activeMarkerObj.id === station.id) {
                         updateLiveHistory(liveDba);
                     }
 
-                    // Query hourly exceedances for specific station
-                    const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    // Query traffic exceedances ONLY (Excludes sirens for 311 enforcement)
+                    const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                    // Query today exceedances for specific station
-                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}`);
+                    // Query siren exceedances separately
+                    const sirenData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true`);
+                    const hourlySirenCount = Array.isArray(sirenData) ? sirenData.length : 0;
+
+                    const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
                     station.currentDba = liveDba;
                     station.hourlyExceedances = hourlyCount;
+                    station.hourlySirenExceedances = hourlySirenCount;
                     station.todayExceedances = todayCount;
 
                     const marker = markersMap.get(station.id);
@@ -1418,7 +907,6 @@
                 }
             }
 
-            // Fetch Aggregate 311 Reports Count across all stations for map overlay
             const statsData = await fetchSupabase("report_stats", "select=total_submitted");
             if (Array.isArray(statsData) && statsData.length > 0) {
                 const total311 = statsData.reduce((sum, item) => sum + (Number(item.total_submitted) || 0), 0);
@@ -1429,408 +917,9 @@
         }
     }
 
-    // --- STEP 4: openDetailPanel() ---
-    async function openDetailPanel(station) {
-        closeInfoPanel(); // Close educational info drawer if active
-        activeMarkerObj = station;
-        liveDbHistory = [];
-        liveTimeLabels = [];
-
-        document.getElementById('panel-title').innerText = station.name;
-        document.getElementById('panel-address').innerText = station.address;
-        document.getElementById('panel-db').innerText = station.currentDba.toFixed(1);
-        document.getElementById('panel-hourly').innerText = station.hourlyExceedances;
-        document.getElementById('panel-today').innerText = station.todayExceedances;
-
-        // Update station-specific 311 counter UI
-        const countEl = document.getElementById('panel-311-count');
-        if (countEl) {
-            countEl.innerText = station.reportCount311 || 0;
-        }
-
-        const detailPanel = document.getElementById('detail-panel');
-        detailPanel.scrollTop = 0;
-        detailPanel.classList.add('open');
-        
-        map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
-
-        // Ensure dynamic toggle chart instances are destroyed before resetting view
-        if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
-        if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
-        if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
-
-        // Reset toggled charts & card active states when switching stations
-        document.getElementById('live-chart-container').style.display = 'none';
-        document.getElementById('hourly-chart-container').style.display = 'none';
-        document.getElementById('today-chart-container').style.display = 'none';
-
-        ['live-level-card', 'hourly-card', 'today-card'].forEach(id => {
-            const card = document.getElementById(id);
-            if (card) {
-                card.classList.remove('active');
-                card.setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        await renderStationCharts(station);
-    }
-
-    function closePanel() {
-        document.getElementById('detail-panel').classList.remove('open');
-        if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
-        if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
-        if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
-        if (stackedChartInstance) { stackedChartInstance.destroy(); stackedChartInstance = null; }
-        if (peakChartInstance) { peakChartInstance.destroy(); peakChartInstance = null; }
-        activeMarkerObj = null;
-    }
-
-    async function renderStationCharts(station) {
-        const { dateMap, labels } = generate14DayLabels();
-
-        let morning = Array(14).fill(0);
-        let afternoon = Array(14).fill(0);
-        let night = Array(14).fill(0);
-        let peak = Array(14).fill(0);
-
-        if (station.isLiveSupabase) {
-            try {
-                const startDate = new Date();
-                startDate.setDate(startDate.getDate() - 13);
-                startDate.setHours(0, 0, 0, 0);
-
-                const exceedLogs = await fetchSupabase(
-                    "noise_logs", 
-                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&limit=5000`
-                );
-
-                if (Array.isArray(exceedLogs)) {
-                    exceedLogs.forEach(log => {
-                        const dt = new Date(log.timestamp);
-                        const dateKey = dt.toLocaleDateString('en-CA');
-                        if (dateMap.has(dateKey)) {
-                            const idx = dateMap.get(dateKey);
-                            const hour = dt.getHours();
-                            if (hour >= 6 && hour < 12) morning[idx]++;
-                            else if (hour >= 12 && hour < 18) afternoon[idx]++;
-                            else night[idx]++;
-                        }
-                    });
-                }
-
-                const peakLogs = await fetchSupabase(
-                    "noise_logs", 
-                    `select=timestamp,dba&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`
-                );
-
-                if (Array.isArray(peakLogs)) {
-                    peakLogs.forEach(log => {
-                        const dt = new Date(log.timestamp);
-                        const dateKey = dt.toLocaleDateString('en-CA');
-                        if (dateMap.has(dateKey)) {
-                            const idx = dateMap.get(dateKey);
-                            const dba = Number(log.dba);
-                            if (dba > peak[idx]) peak[idx] = dba;
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error("Error fetching Supabase 14-day history:", e);
-            }
-        } else {
-            morning = [0, 1, 0, 2, 0, 1, 0, 0, 1, 2, 0, 1, 0, station.hourlyExceedances > 0 ? 1 : 0];
-            afternoon = [1, 2, 1, 0, 3, 1, 2, 0, 1, 1, 2, 0, 1, 2];
-            night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
-            peak = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
-        }
-
-        if (stackedChartInstance) stackedChartInstance.destroy();
-        if (peakChartInstance) peakChartInstance.destroy();
-
-        const ctxStacked = document.getElementById('stackedChart').getContext('2d');
-        stackedChartInstance = new Chart(ctxStacked, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Morning (6a–12p)', data: morning, backgroundColor: '#42a5f5' },
-                    { label: 'Afternoon (12p–6p)', data: afternoon, backgroundColor: '#ffb74d' },
-                    { label: 'Night (6p–6a)', data: night, backgroundColor: '#ef5350' }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { stacked: true, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { stacked: true, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
-                },
-                plugins: { 
-                    legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 8.5 } } } 
-                }
-            }
-        });
-
-        const ctxPeak = document.getElementById('peakChart').getContext('2d');
-        peakChartInstance = new Chart(ctxPeak, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Peak dBA',
-                    data: peak,
-                    borderColor: '#00e676',
-                    backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { min: 40, suggestedMax: 120, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
-                },
-                plugins: { 
-                    legend: { display: false },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return val >= DECIBEL_THRESHOLD 
-                                    ? ` Peak: ${val} dBA (+${diff} dBA over threshold)`
-                                    : ` Peak: ${val} dBA (${Math.abs(diff)} dBA below threshold)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // --- TOAST NOTIFICATION HELPER ---
-    function showToast(title, message, isError = false) {
-        const toast = document.getElementById('toast-notification');
-        const toastTitle = document.getElementById('toast-title');
-        const toastMessage = document.getElementById('toast-message');
-
-        if (!toast) return;
-
-        toastTitle.innerText = title;
-        toastTitle.style.color = isError ? '#ff5252' : '#00e676';
-        toast.style.borderColor = isError ? '#ff5252' : '#00e676';
-        toastMessage.innerText = message;
-
-        toast.classList.add('show');
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4500);
-    }
-
-    // --- STEP 4: trigger311Report() ---
-    async function trigger311Report() {
-        const btn = document.getElementById('btn-311');
-        const origText = "🚨 File 311 Noise Report";
-        
-        btn.innerText = "⏳ Requesting 311 Report...";
-        btn.disabled = true;
-
-        try {
-            const targetStation = activeMarkerObj || METER_STATIONS[0];
-            const targetStationId = targetStation.id;
-
-            // Insert pending report request into Supabase pending_reports table
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/pending_reports`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Prefer': 'return=representation'
-                },
-                body: JSON.stringify({
-                    station_id: targetStationId,
-                    status: 'SUBMITTED',
-                    message: `Noise complaint logged. Current level: ${targetStation.currentDba ? targetStation.currentDba.toFixed(1) + ' dBA' : 'N/A'}`,
-                    created_at: new Date().toISOString()
-                })
-            });
-
-            if (response.ok || response.status === 201) {
-                // Update station local report count & UI counter
-                targetStation.reportCount311 = (targetStation.reportCount311 || 0) + 1;
-                const countEl = document.getElementById('panel-311-count');
-                if (countEl) {
-                    countEl.innerText = targetStation.reportCount311;
-                }
-
-                // 1. In-app Toast Feedback
-                showToast(
-                    "✅ 311 Report Request Queued!",
-                    "Your Raspberry Pi backend will pick up this task and process the filing through Playwright automation."
-                );
-
-                // 2. Immediate Button Visual Feedback
-                btn.innerText = "✅ Report Queued!";
-                btn.style.backgroundColor = "#2e7d32";
-                btn.style.color = "#ffffff";
-
-                // 3. Increment 311 Counter on Map Overlay
-                const counterEl = document.getElementById('total-311-count');
-                if (counterEl) {
-                    const currentVal = parseInt(counterEl.innerText, 10) || 0;
-                    counterEl.innerText = currentVal + 1;
-                }
-
-                // Reset button state after 4 seconds
-                setTimeout(() => {
-                    btn.innerText = origText;
-                    btn.style.backgroundColor = "";
-                    btn.style.color = "";
-                    btn.disabled = false;
-                }, 4000);
-
-            } else {
-                showToast("⚠️ Submission Failed", "Failed to submit report request to Supabase queue.", true);
-                btn.innerText = origText;
-                btn.disabled = false;
-            }
-        } catch (err) {
-            console.error("Failed to insert pending report trigger:", err);
-            showToast("❌ Connection Error", "Could not connect to Supabase database server.", true);
-            btn.innerText = origText;
-            btn.disabled = false;
-        }
-    }
-
-    // --- EXCEEDANCE LOG CSV EXPORT GENERATOR ---
-    async function exportStationCSV() {
-        if (!activeMarkerObj) return;
-
-        const btn = document.getElementById('export-btn');
-        const origText = btn.innerText;
-        btn.innerText = "⏳ Exporting Exceedances...";
-        btn.disabled = true;
-
-        let rows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Raw ISO Timestamp"]];
-
-        if (activeMarkerObj.isLiveSupabase) {
-            try {
-                let keepFetching = true;
-                let offset = 0;
-                const fetchLimit = 1000;
-
-                while (keepFetching) {
-                    const logs = await fetchSupabase(
-                        "noise_logs", 
-                        `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&dba=gte.${DECIBEL_THRESHOLD}&order=timestamp.desc&limit=${fetchLimit}&offset=${offset}`
-                    );
-                    
-                    if (Array.isArray(logs) && logs.length > 0) {
-                        logs.forEach(log => {
-                            const dba = Number(log.dba);
-                            const dt = new Date(log.timestamp);
-                            const dateStr = dt.toLocaleDateString('en-US');
-                            const timeStr = dt.toLocaleTimeString('en-US');
-
-                            rows.push([
-                                dateStr,
-                                timeStr,
-                                activeMarkerObj.id,
-                                `"${activeMarkerObj.name}"`,
-                                dba.toFixed(1),
-                                DECIBEL_THRESHOLD,
-                                log.timestamp
-                            ]);
-                        });
-                        
-                        offset += fetchLimit;
-                        if (logs.length < fetchLimit) keepFetching = false;
-                    } else {
-                        keepFetching = false;
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to fetch exceedance logs for CSV export:", err);
-            }
-        } else {
-            const now = new Date();
-            for (let i = 0; i < 8; i++) {
-                const sampleDate = new Date(now.getTime() - i * 180 * 60 * 1000);
-                const dba = parseFloat((Math.random() * 10 + 85.5).toFixed(1));
-                rows.push([
-                    sampleDate.toLocaleDateString('en-US'),
-                    sampleDate.toLocaleTimeString('en-US'),
-                    activeMarkerObj.id,
-                    `"${activeMarkerObj.name}"`,
-                    dba.toFixed(1),
-                    DECIBEL_THRESHOLD,
-                    sampleDate.toISOString()
-                ]);
-            }
-        }
-
-        if (rows.length === 1) {
-            showToast("ℹ️ No Exceedances Found", `No noise exceedances (> ${DECIBEL_THRESHOLD} dBA) recorded for ${activeMarkerObj.name}.`, true);
-            btn.innerText = origText;
-            btn.disabled = false;
-            return;
-        }
-
-        const csvString = rows.map(row => row.join(",")).join("\n");
-        const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `${activeMarkerObj.id}_exceedance_log_${new Date().toISOString().slice(0, 10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        btn.innerText = origText;
-        btn.disabled = false;
-    }
-
-    // --- MOBILE TOUCH & SWIPE GESTURE HANDLER ---
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    document.querySelectorAll('.detail-panel').forEach(panel => {
-        panel.addEventListener('touchstart', (e) => {
-            if (e.target.closest('canvas, input, button, a')) return;
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-
-        panel.addEventListener('touchend', (e) => {
-            if (e.target.closest('canvas, input, button, a')) return;
-            const touchEndX = e.changedTouches[0].screenX;
-            const touchEndY = e.changedTouches[0].screenY;
-
-            const diffX = touchEndX - touchStartX;
-            const diffY = touchEndY - touchStartY;
-
-            if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-                closePanel();
-                closeInfoPanel();
-            }
-        }, { passive: true });
-    });
-
-    // App Initialization & Live Timers
     async function startApp() {
         await loadRuntimeConfig();
+        await loadStationsFromSupabase();
         fetchLiveMeters();
         setInterval(fetchLiveMeters, 5000);
     }
