@@ -549,7 +549,7 @@
     <div class="navbar">
         <div class="navbar-brand">
             <span class="brand-title">🔊 Mile High Noise Project</span>
-            <span class="tagline">Mapping illegal and excessive vehicle noise across Denver</span>
+            <span class="tagline">Mapping illegal high-decibel vehicle noise across Denver</span>
         </div>
         
         <!-- Navigation Buttons -->
@@ -1812,7 +1812,7 @@
     }
 
     // --- EXCEEDANCE LOG CSV EXPORT GENERATOR (Includes Is Siren Column) ---
-   async function exportStationCSV() {
+    async function exportStationCSV() {
         if (!activeMarkerObj) return;
 
         const btn = document.getElementById('export-btn');
@@ -1820,12 +1820,7 @@
         btn.innerText = "⏳ Exporting Exceedances...";
         btn.disabled = true;
 
-        // Separate header arrays for vehicle traffic vs emergency sirens
-        let vehicleRows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Exceedance Type", "Raw ISO Timestamp"]];
-        let sirenRows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Exceedance Type", "Raw ISO Timestamp"]];
-
-        let vehicleCount = 0;
-        let sirenCount = 0;
+        let rows = [["Date", "Time (Local)", "Station ID", "Station Name", "dBA Level", "City Threshold (dBA)", "Is Siren", "Raw ISO Timestamp"]];
 
         if (activeMarkerObj.isLiveSupabase) {
             try {
@@ -1845,24 +1840,18 @@
                             const dt = new Date(log.timestamp);
                             const dateStr = dt.toLocaleDateString('en-US');
                             const timeStr = dt.toLocaleTimeString('en-US');
-                            const rowData = [
+                            const isSirenVal = log.is_siren ? 'true' : 'false';
+
+                            rows.push([
                                 dateStr,
                                 timeStr,
                                 activeMarkerObj.id,
                                 `"${activeMarkerObj.name}"`,
                                 dba.toFixed(1),
                                 DECIBEL_THRESHOLD,
-                                log.is_siren ? 'Emergency Siren' : 'Vehicle Traffic',
+                                isSirenVal,
                                 log.timestamp
-                            ];
-
-                            if (log.is_siren) {
-                                sirenRows.push(rowData);
-                                sirenCount++;
-                            } else {
-                                vehicleRows.push(rowData);
-                                vehicleCount++;
-                            }
+                            ]);
                         });
                         
                         offset += fetchLimit;
@@ -1875,61 +1864,42 @@
                 console.error("Failed to fetch exceedance logs for CSV export:", err);
             }
         } else {
-            // Mock data fallback if running offline
             const now = new Date();
             for (let i = 0; i < 8; i++) {
                 const sampleDate = new Date(now.getTime() - i * 180 * 60 * 1000);
                 const dba = parseFloat((Math.random() * 10 + 85.5).toFixed(1));
-                const isSiren = i % 3 === 0;
-                const rowData = [
+                const isSirenVal = i % 3 === 0 ? 'true' : 'false';
+                rows.push([
                     sampleDate.toLocaleDateString('en-US'),
                     sampleDate.toLocaleTimeString('en-US'),
                     activeMarkerObj.id,
                     `"${activeMarkerObj.name}"`,
                     dba.toFixed(1),
                     DECIBEL_THRESHOLD,
-                    isSiren ? 'Emergency Siren' : 'Vehicle Traffic',
+                    isSirenVal,
                     sampleDate.toISOString()
-                ];
-
-                if (isSiren) {
-                    sirenRows.push(rowData);
-                    sirenCount++;
-                } else {
-                    vehicleRows.push(rowData);
-                    vehicleCount++;
-                }
+                ]);
             }
         }
 
-        // Helper function to trigger browser CSV download
-        function downloadCSV(rowsArray, filename) {
-            if (rowsArray.length <= 1) return;
-            const csvString = rowsArray.map(row => row.join(",")).join("\n");
-            const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", filename);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-     if (vehicleCount === 0 && sirenCount === 0) {
+        if (rows.length === 1) {
             showToast("ℹ️ No Exceedances Found", `No noise exceedances (> ${DECIBEL_THRESHOLD} dBA) recorded for ${activeMarkerObj.name}.`, true);
-        } else {
-            // Trigger separate downloads
-            if (vehicleCount > 0) {
-                downloadCSV(vehicleRows, `${activeMarkerObj.id}_vehicle_exceedances_${new Date().toISOString().slice(0, 10)}.csv`);
-            }
-            if (sirenCount > 0) {
-                downloadCSV(sirenRows, `${activeMarkerObj.id}_siren_exceedances_${new Date().toISOString().slice(0, 10)}.csv`);
-            }
-            // Informative toast showing counts and types
-            showToast("✅ CSV Logs Exported Separately", `Vehicle Traffic: ${vehicleCount} | Emergency Sirens: ${sirenCount}`);
+            btn.innerText = origText;
+            btn.disabled = false;
+            return;
         }
+
+        const csvString = rows.map(row => row.join(",")).join("\n");
+        const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `${activeMarkerObj.id}_exceedance_log_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
 
         btn.innerText = origText;
         btn.disabled = false;
@@ -1939,75 +1909,59 @@
     async function generatePDFReport() {
         if (!activeMarkerObj) return;
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const btn = document.getElementById('pdf-report-btn');
+        const origText = btn.innerText;
+        btn.innerText = "⏳ Generating PDF Evidence Report...";
+        btn.disabled = true;
 
-        let margin = 20;
-        let yPos = 25;
-        let lineHeight = 8;
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-        // Header Title
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.setTextColor(34, 139, 34);
-        doc.text("MILE HIGH NOISE PROJECT", margin, yPos);
-        yPos += 7;
+            doc.setFillColor(26, 26, 26);
+            doc.rect(0, 0, 210, 35, 'F');
+            doc.setTextColor(0, 230, 118);
+            doc.setFontSize(16);
+            doc.text("MILE HIGH NOISE PROJECT", 14, 18);
+            doc.setTextColor(220, 220, 220);
+            doc.setFontSize(10);
+            doc.text("Official Acoustic Evidence & Compliance Report", 14, 26);
 
-        doc.setFontSize(10);
-        doc.setTextColor(100, 100, 100);
-        doc.text("Official Acoustic Evidence & Exceedance Report", margin, yPos);
-        yPos += 15;
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(14);
+            doc.text("Station Summary (Vehicle Traffic Filtered)", 14, 48);
 
-        // Station Summary Section Header
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text("Station Summary", margin, yPos);
-        yPos += 10;
+            doc.setFontSize(10);
+            doc.text(`Station Name: ${activeMarkerObj.name}`, 14, 58);
+            doc.text(`Location Address: ${activeMarkerObj.address}`, 14, 65);
+            doc.text(`Coordinates: ${activeMarkerObj.lat}, ${activeMarkerObj.lng}`, 14, 72);
+            doc.text(`Current Reading: ${activeMarkerObj.currentDba.toFixed(1)} dBA`, 14, 79);
+            doc.text(`Vehicle Exceedances (Past Hour): ${activeMarkerObj.hourlyExceedances} (Sirens Filtered Out)`, 14, 86);
+            doc.text(`Vehicle Exceedances (Today): ${activeMarkerObj.todayExceedances} (Sirens Filtered Out)`, 14, 93);
+            doc.text(`Emergency Sirens (Past Hour): ${activeMarkerObj.sirensCount || 0}`, 14, 100);
+            doc.text(`Regulatory Limit: ${DECIBEL_THRESHOLD} dBA (DRMC Chapter 36)`, 14, 107);
 
-        // Station Details & Metrics
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(50, 50, 50);
+            doc.setFillColor(245, 245, 245);
+            doc.rect(14, 115, 182, 30, 'F');
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(8.5);
+            doc.text("Hardware & Compliance Certification:", 18, 122);
+            doc.text("IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA).", 18, 129);
+            doc.text("Accuracy: +/- 1.5 dBA. Data sampled at 1Hz via RS485 Modbus RTU interface. Sirens excluded from ordinance reporting.", 18, 136);
 
-        doc.text(`Station Name: ${activeMarkerObj.name}`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Location Address: ${activeMarkerObj.address || "3265 Federal Blvd, Denver, CO 80211"}`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Coordinates: ${activeMarkerObj.lat}, ${activeMarkerObj.lng}`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Current Reading: ${activeMarkerObj.currentDba || "64.6"} dBA`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Vehicle Traffic Exceedances (Past Hour): ${window.vehicleCountPastHour || 2}`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Vehicle Traffic Exceedances (Today): ${window.vehicleCountToday || 2}`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Emergency Siren Detections (Past 24H): ${window.sirenCount24h || 0}`, margin, yPos);
-        yPos += lineHeight;
-        doc.text(`Regulatory Limit / Threshold: 85 dBA (Benchmark: NYC DEP Acoustic Enforcement Standard)`, margin, yPos);
-        yPos += 14;
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(8);
+            doc.text(`Report Generated: ${new Date().toLocaleString()} | Mile High Noise Project Automated Network`, 14, 285);
 
-        // Hardware & Compliance Certification Box Area
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        doc.text("Hardware & Compliance Certification:", margin, yPos);
-        yPos += 6;
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(100, 100, 100);
-        doc.text("IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor. Frequency Weighting: A-Weighting (dBA).", margin, yPos);
-        yPos += 5;
-        doc.text("Accuracy: +/- 1.5 dBA. Data sampled at 1Hz via RS485 Modbus RTU interface.", margin, yPos);
-        yPos += 8;
-
-        // Methodological Note
-        doc.text("*Note: Exceedance totals strictly isolate illegal vehicle traffic and exclude verified emergency sirens", margin, yPos);
-        yPos += 5;
-        doc.text("pursuant to municipal acoustic tracking guidelines and standardized noise camera protocols.", margin, yPos);
-
-        // Save PDF
-        doc.save(`Noise_Evidence_Report_${activeMarkerObj.id}_${new Date().toISOString().slice(0, 10)}.pdf`);
+            doc.save(`Noise_Evidence_Report_${activeMarkerObj.id}_${new Date().toISOString().slice(0, 10)}.pdf`);
+            showToast("✅ PDF Report Generated", "Your downloadable evidence package has been downloaded successfully.");
+        } catch (err) {
+            console.error("PDF generation failed:", err);
+            showToast("❌ PDF Generation Failed", "Could not generate PDF report.", true);
+        } finally {
+            btn.innerText = origText;
+            btn.disabled = false;
+        }
     }
 
     // --- MOBILE TOUCH & SWIPE GESTURE HANDLER ---
@@ -2025,16 +1979,25 @@
             if (e.target.closest('canvas, input, button, a')) return;
             const touchEndX = e.changedTouches[0].screenX;
             const touchEndY = e.changedTouches[0].screenY;
+
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            // Swipe right to close panel
-            if (diffX > 70 && Math.abs(diffY) < 50) {
+            if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
                 closePanel();
                 closeInfoPanel();
             }
         }, { passive: true });
     });
+
+    // App Initialization & Live Timers
+    async function startApp() {
+        await loadRuntimeConfig();
+        fetchLiveMeters();
+        setInterval(fetchLiveMeters, 5000);
+    }
+
+    startApp();
     </script>
 </body>
 </html>
