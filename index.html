@@ -1917,7 +1917,7 @@
             URL.revokeObjectURL(url);
         }
 
-        if (vehicleCount === 0 && sirenCount === 0) {
+     if (vehicleCount === 0 && sirenCount === 0) {
             showToast("ℹ️ No Exceedances Found", `No noise exceedances (> ${DECIBEL_THRESHOLD} dBA) recorded for ${activeMarkerObj.name}.`, true);
         } else {
             // Trigger separate downloads
@@ -1934,10 +1934,9 @@
         btn.innerText = origText;
         btn.disabled = false;
     }
-    }
 
     // --- PDF REPORT GENERATOR (jsPDF - Excludes Sirens from Traffic Statistics) ---
-   async function generatePDFReport() {
+    async function generatePDFReport() {
         if (!activeMarkerObj) return;
 
         const { jsPDF } = window.jspdf;
@@ -1950,7 +1949,7 @@
         // Header Title
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
-        doc.setTextColor(34, 139, 34); // Green accent matching theme
+        doc.setTextColor(34, 139, 34);
         doc.text("MILE HIGH NOISE PROJECT", margin, yPos);
         yPos += 7;
 
@@ -1979,16 +1978,12 @@
         yPos += lineHeight;
         doc.text(`Current Reading: ${activeMarkerObj.currentDba || "64.6"} dBA`, margin, yPos);
         yPos += lineHeight;
-
-        // Explicitly separated counts (Excluding sirens from traffic violations)
         doc.text(`Vehicle Traffic Exceedances (Past Hour): ${window.vehicleCountPastHour || 2}`, margin, yPos);
         yPos += lineHeight;
         doc.text(`Vehicle Traffic Exceedances (Today): ${window.vehicleCountToday || 2}`, margin, yPos);
         yPos += lineHeight;
         doc.text(`Emergency Siren Detections (Past 24H): ${window.sirenCount24h || 0}`, margin, yPos);
         yPos += lineHeight;
-
-        // Threshold & Citation Line
         doc.text(`Regulatory Limit / Threshold: 85 dBA (Benchmark: NYC DEP Acoustic Enforcement Standard)`, margin, yPos);
         yPos += 14;
 
@@ -2030,25 +2025,16 @@
             if (e.target.closest('canvas, input, button, a')) return;
             const touchEndX = e.changedTouches[0].screenX;
             const touchEndY = e.changedTouches[0].screenY;
-
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+            // Swipe right to close panel
+            if (diffX > 70 && Math.abs(diffY) < 50) {
                 closePanel();
                 closeInfoPanel();
             }
         }, { passive: true });
     });
-
-    // App Initialization & Live Timers
-    async function startApp() {
-        await loadRuntimeConfig();
-        fetchLiveMeters();
-        setInterval(fetchLiveMeters, 5000);
-    }
-
-    startApp();
     </script>
 </body>
 </html>
