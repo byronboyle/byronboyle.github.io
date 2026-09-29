@@ -745,7 +745,7 @@
         return res.json();
     }
 
-    // --- STATIONS DATA (All stations support dBC & automated Supabase detection) ---
+    // --- STATIONS DATA ---
     const METER_STATIONS = [
         {
             id: "meter-01",
@@ -1107,7 +1107,6 @@
             console.warn("Could not load live history from Supabase, using mock series:", err);
         }
 
-        // Fallback simulated history if station lacks live database records
         liveDbHistory = [];
         liveDbcHistory = [];
         liveTimeLabels = [];
@@ -1499,16 +1498,16 @@
         return 'badge-red';
     }
 
-    // --- UNIVERSAL DUAL-METRIC BADGE (Shows dBA & dBC for all stations) ---
+    // --- DUAL-METRIC MAP MARKER BADGE ---
     function createBadgeIcon(station) {
         const dba = station.currentDba;
-        const dbc = station.currentDbc || (dba + 14.5);
+        const dbc = station.currentDbc || (dba + 14.2);
         const exceedances = station.hourlyExceedances || 0;
         const badgeClass = getBadgeClass(exceedances);
 
         return L.divIcon({
             className: 'custom-aqi-icon',
-            html: `<div class="aqi-marker-badge ${badgeClass}" style="display:flex; align-items:center; gap:4px; padding:3px 8px;"><span>${dba.toFixed(1)} dBA</span><span style="font-size:0.68rem; background:rgba(0,0,0,0.25); color:#29b6f6; padding:1px 4px; border-radius:3px;">${dbc.toFixed(1)} dBC</span></div>`,
+            html: `<div class="aqi-marker-badge ${badgeClass}" style="display:flex; align-items:center; justify-content:center; gap:4px; padding:3px 6px;"><span>${dba.toFixed(1)} dBA</span><span style="font-size:0.68rem; opacity:0.85; background:rgba(0,0,0,0.25); padding:1px 3px; border-radius:3px;">${dbc.toFixed(1)} dBC</span></div>`,
             iconSize: [128, 28],
             iconAnchor: [64, 14]
         });
@@ -1965,7 +1964,7 @@
 
         btn.innerText = origText;
         btn.disabled = false;
-        showToast("📥 CSV Export Complete", `Downloaded exceedance logs for ${activeMarkerObj.name}.`);
+        showToast("📥 CSV Export Complete", `Successfully downloaded exceedance log for ${activeMarkerObj.name}.`);
     }
 
     async function generatePDFReport() {
@@ -1978,58 +1977,76 @@
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
+            
             doc.setFillColor(26, 26, 26);
             doc.rect(0, 0, 210, 297, 'F');
 
             doc.setTextColor(0, 230, 118);
             doc.setFontSize(18);
-            doc.text("Mile High Noise Project - Evidence Report", 14, 22);
-
+            doc.text("MILE HIGH NOISE PROJECT", 20, 25);
+            
             doc.setTextColor(200, 200, 200);
-            doc.setFontSize(11);
-            doc.text(`Station: ${activeMarkerObj.name} (${activeMarkerObj.id})`, 14, 32);
-            doc.text(`Address: ${activeMarkerObj.address}`, 14, 39);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 46);
+            doc.setFontSize(10);
+            doc.text("Official Acoustic Evidence & Exceedance Report", 20, 32);
 
             doc.setDrawColor(50, 50, 50);
-            doc.line(14, 52, 196, 52);
+            doc.line(20, 38, 190, 38);
 
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(14);
-            doc.text("Current Acoustic Metrics", 14, 62);
-
+            doc.setFontSize(12);
+            doc.text(`Station: ${activeMarkerObj.name}`, 20, 48);
             doc.setFontSize(10);
-            doc.setTextColor(180, 180, 180);
-            doc.text(`• Current dBA Level (Legal Baseline): ${activeMarkerObj.currentDba.toFixed(1)} dBA`, 18, 72);
-            doc.text(`• Current dBC Level (Low-Frequency): ${(activeMarkerObj.currentDbc || (activeMarkerObj.currentDba + 14.2)).toFixed(1)} dBC`, 18, 80);
-            doc.text(`• Past Hour Exceedances (>85 dBA): ${activeMarkerObj.hourlyExceedances || 0}`, 18, 88);
-            doc.text(`• Today's Total Exceedances: ${activeMarkerObj.todayExceedances || 0}`, 18, 96);
-            doc.text(`• Emergency Sirens (Past Hour): ${activeMarkerObj.sirensCount || 0}`, 18, 104);
+            doc.setTextColor(170, 170, 170);
+            doc.text(`Address: ${activeMarkerObj.address}`, 20, 55);
+            doc.text(`Coordinates: ${activeMarkerObj.lat}, ${activeMarkerObj.lng}`, 20, 62);
+            doc.text(`Report Generated: ${new Date().toLocaleString()}`, 20, 69);
 
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(14);
-            doc.text("Hardware Standard & Compliance", 14, 120);
-            doc.setFontSize(9);
-            doc.setTextColor(150, 150, 150);
-            doc.text("IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor Standard.", 14, 128);
-            doc.text("Dual Metric Frequency Weighting: A-Weighting (dBA) & C-Weighting (dBC).", 14, 135);
-            doc.text("Accuracy: ±1.5 dBA. Sampling frequency: 1Hz via RS485 Modbus RTU.", 14, 142);
+            doc.setFillColor(36, 36, 36);
+            doc.roundedRect(20, 78, 170, 35, 3, 3, 'F');
 
-            doc.save(`noise_evidence_report_${activeMarkerObj.id}_${new Date().toISOString().split('T')[0]}.pdf`);
-            showToast("📄 PDF Evidence Report Generated", `Successfully downloaded PDF report for ${activeMarkerObj.name}.`);
+            doc.setTextColor(0, 230, 118);
+            doc.setFontSize(11);
+            doc.text("CURRENT METRICS & DUAL-WEIGHTING ANALYSIS", 28, 88);
+
+            doc.setTextColor(220, 220, 220);
+            doc.setFontSize(10);
+            doc.text(`Live dBA Level: ${activeMarkerObj.currentDba.toFixed(1)} dBA (Limit: 85.0 dBA)`, 28, 97);
+            doc.text(`Live dBC Level: ${(activeMarkerObj.currentDbc || (activeMarkerObj.currentDba + 14.2)).toFixed(1)} dBC`, 28, 105);
+
+            doc.setFillColor(36, 36, 36);
+            doc.roundedRect(20, 120, 170, 45, 3, 3, 'F');
+
+            doc.setTextColor(255, 183, 77);
+            doc.setFontSize(11);
+            doc.text("EXCEEDANCE SUMMARY", 28, 130);
+
+            doc.setTextColor(220, 220, 220);
+            doc.setFontSize(10);
+            doc.text(`Past Hour Exceedances: ${activeMarkerObj.hourlyExceedances || 0}`, 28, 140);
+            doc.text(`Today Total Exceedances: ${activeMarkerObj.todayExceedances || 0}`, 28, 148);
+            doc.text(`Emergency Sirens (Past Hour): ${activeMarkerObj.sirensCount || 0}`, 28, 156);
+
+            doc.setTextColor(130, 130, 130);
+            doc.setFontSize(8.5);
+            doc.text("Hardware Standard: IEC 61672-1 Class 2 / ANSI S1.4 Type 2 Acoustic Sensor.", 20, 180);
+            doc.text("Measurements recorded 50 ft from center lane of travel at 1Hz sampling frequency.", 20, 186);
+            doc.text("Mile High Noise Project - Denver, Colorado | https://byronboyle.github.io/", 20, 192);
+
+            doc.save(`Noise_Evidence_Report_${activeMarkerObj.id}_${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast("📄 PDF Generated", `Successfully downloaded evidence report for ${activeMarkerObj.name}.`);
         } catch (err) {
             console.error("PDF generation failed:", err);
-            showToast("❌ PDF Generation Error", "Could not generate PDF report.", true);
+            showToast("❌ PDF Error", "Could not generate PDF evidence report.", true);
         } finally {
             btn.innerText = origText;
             btn.disabled = false;
         }
     }
 
+    // Initialize & Start Interval Polling
     loadRuntimeConfig().then(() => {
         fetchLiveMeters();
-        setInterval(fetchLiveMeters, 3000);
+        setInterval(fetchLiveMeters, 5000);
     });
     </script>
 </body>
