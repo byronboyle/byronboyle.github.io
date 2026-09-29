@@ -349,7 +349,7 @@
             border-top: 1px solid transparent;
         }
         .expandable-tile.active .tile-body {
-            max-height: 270px;
+            max-height: 300px;
             padding: 12px 14px 16px 14px;
             border-top-color: #333;
         }
@@ -401,13 +401,35 @@
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 16px;
-            height: 200px;
             flex-shrink: 0;
         }
         .chart-container h4 {
             margin: 0 0 8px 0;
             color: #ccc;
             font-size: 0.8rem;
+        }
+
+        /* Horizontally Scrollable Chart Wrapper Utility */
+        .chart-scroll-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #242424;
+        }
+        .chart-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .chart-scroll-wrapper::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 3px;
+        }
+        .chart-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+        .chart-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #00e676;
         }
 
         .action-btn {
@@ -602,8 +624,10 @@
                     </div>
                     <div class="tile-body">
                         <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Live 5-Min dBA & dBC History (w/ Blind Spot Fill)</h4>
-                        <div style="height: 155px; position: relative;">
-                            <canvas id="liveMinuteChart"></canvas>
+                        <div class="chart-scroll-wrapper">
+                            <div style="min-width: 580px; height: 155px; position: relative;">
+                                <canvas id="liveMinuteChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -620,8 +644,10 @@
                     </div>
                     <div class="tile-body">
                         <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Past Hour Exceedance Levels (w/ Threshold)</h4>
-                        <div style="height: 140px; position: relative;">
-                            <canvas id="hourlyExceedanceChart"></canvas>
+                        <div class="chart-scroll-wrapper">
+                            <div style="min-width: 520px; height: 140px; position: relative;">
+                                <canvas id="hourlyExceedanceChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -638,8 +664,10 @@
                     </div>
                     <div class="tile-body">
                         <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Past 24 Hours Exceedance Levels (w/ Threshold)</h4>
-                        <div style="height: 140px; position: relative;">
-                            <canvas id="todayExceedanceChart"></canvas>
+                        <div class="chart-scroll-wrapper">
+                            <div style="min-width: 520px; height: 140px; position: relative;">
+                                <canvas id="todayExceedanceChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -656,8 +684,10 @@
                     </div>
                     <div class="tile-body">
                         <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Emergency Siren Exceedances (Time & Level)</h4>
-                        <div style="height: 140px; position: relative;">
-                            <canvas id="sirenExceedanceChart"></canvas>
+                        <div class="chart-scroll-wrapper">
+                            <div style="min-width: 520px; height: 140px; position: relative;">
+                                <canvas id="sirenExceedanceChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -666,15 +696,19 @@
 
             <div class="chart-container">
                 <h4>Exceedances by Time of Day (14-Day History)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="stackedChart"></canvas>
+                <div class="chart-scroll-wrapper">
+                    <div style="min-width: 550px; height: 150px; position: relative;">
+                        <canvas id="stackedChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             <div class="chart-container">
                 <h4>Highest Peak dBA Reading (14-Day History)</h4>
-                <div style="height: 150px; position: relative;">
-                    <canvas id="peakChart"></canvas>
+                <div class="chart-scroll-wrapper">
+                    <div style="min-width: 550px; height: 150px; position: relative;">
+                        <canvas id="peakChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -1311,7 +1345,7 @@
                 scales: {
                     x: { 
                         grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 6 } 
+                        ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 12 } 
                     },
                     y: { 
                         min: 40, 
@@ -1721,7 +1755,6 @@
                         station.todayExceedances = todayCount;
                         station.sirensCount = sirensCount;
                     } else {
-                        // Fallback jitter simulation if no live remote log returned
                         station.currentDba = Number((station.currentDba + (Math.random() * 2 - 1)).toFixed(1));
                         station.currentDbc = Number((station.currentDba + 14.2).toFixed(1));
                         if (activeMarkerObj && activeMarkerObj.id === station.id) {
@@ -2095,39 +2128,19 @@
 
         doc.setTextColor(0, 230, 118);
         doc.setFontSize(11);
-        doc.text("LIVE METRICS & EXCEEDANCE SUMMARY", 18, 84);
-        
+        doc.text("EXCEEDANCE SUMMARY", 20, 86);
+
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(10);
-        doc.text(`Current dBA Level: ${activeMarkerObj.currentDba.toFixed(1)} dBA (Legal Baseline: 85.0 dBA)`, 18, 93);
-        doc.text(`Current dBC Level: ${(activeMarkerObj.currentDbc || (activeMarkerObj.currentDba + 14.2)).toFixed(1)} dBC`, 18, 100);
-        doc.text(`Past Hour Exceedances: ${activeMarkerObj.hourlyExceedances || 0} | Past 24h: ${activeMarkerObj.todayExceedances || 0}`, 18, 107);
-
-        doc.setFillColor(36, 36, 36);
-        doc.roundedRect(14, 118, 182, 50, 3, 3, 'F');
-        doc.setTextColor(41, 182, 246);
-        doc.setFontSize(11);
-        doc.text("REGULATORY COMPLIANCE & BLIND SPOT ANALYSIS", 18, 126);
-        
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(9.5);
-        doc.text("• Dual-metric frequency weighting captures low-frequency exhaust surges missed by dBA.", 18, 135);
-        doc.text("• Readings recorded in accordance with Denver Revised Municipal Code Chapter 36.", 18, 143);
-        doc.text("• Certified evidentiary log suitable for municipal review and community advocacy.", 18, 151);
-
-        doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-        doc.text("Mile High Noise Project • Open Community Acoustic Monitoring Initiative", 14, 285);
+        doc.text(`Past Hour Exceedances: ${activeMarkerObj.hourlyExceedances || 0}`, 20, 96);
+        doc.text(`Past 24 Hours Exceedances: ${activeMarkerObj.todayExceedances || 0}`, 110, 96);
 
         doc.save(`${activeMarkerObj.id}_evidence_report.pdf`);
         showToast("PDF Downloaded", "Official PDF Evidence Report generated successfully.");
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
-        await loadRuntimeConfig();
-        await fetchLiveMeters();
-        setInterval(fetchLiveMeters, 10000);
-    });
+    setInterval(fetchLiveMeters, 5000);
+    fetchLiveMeters();
     </script>
 </body>
 </html>
