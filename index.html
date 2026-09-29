@@ -1509,15 +1509,15 @@
                         updateLiveHistory(liveDba);
                     }
 
-                    // Revision 1: Non-Siren Past Hour Exceedances (&is_siren=eq.false)
+                    // Non-Siren Past Hour Exceedances (&is_siren=eq.false)
                     const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
 
-                    // Revision 1: Non-Siren Today's Exceedances (&is_siren=eq.false)
+                    // Non-Siren Today's Exceedances (&is_siren=eq.false)
                     const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false`);
                     const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
-                    // Revision 1 & 2: Siren Past Hour Exceedances (&is_siren=eq.true)
+                    // Siren Past Hour Exceedances (&is_siren=eq.true)
                     const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true`);
                     const sirensCount = Array.isArray(sirensData) ? sirensData.length : 0;
 
@@ -1612,7 +1612,7 @@
                 startDate.setDate(startDate.getDate() - 13);
                 startDate.setHours(0, 0, 0, 0);
 
-                // Revision 4: 14-Day Time-of-Day Chart automatically filters out sirens (!l.is_siren)
+                // 14-Day Time-of-Day Chart automatically filters out sirens (!l.is_siren)
                 const exceedLogs = await fetchSupabase(
                     "noise_logs", 
                     `select=timestamp,dba,is_siren&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&limit=5000`
