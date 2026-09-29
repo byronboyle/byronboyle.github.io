@@ -647,7 +647,7 @@
                 <div class="expandable-tile metric-card clickable-card" id="siren-card" role="region">
                     <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle emergency siren exceedances chart" onclick="toggleTile('sirens')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('sirens');event.preventDefault();}" title="Click to expand/collapse emergency siren exceedance chart">
                         <div class="tile-title-group">
-                            <h4>Sirens (Past Hour)</h4>
+                            <h4>Sirens (Past 24 Hours)</h4>
                             <div class="tile-main-val" id="panel-sirens" style="color: #29b6f6;">0</div>
                         </div>
                         <div class="tile-meta">
@@ -678,7 +678,7 @@
                 </div>
             </div>
 
-            <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File 311 Noise Report</button>
+            <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File Anonymous 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Exceedance CSV Log</button>
             <button class="action-btn btn-secondary" id="pdf-report-btn" onclick="generatePDFReport()" style="background: #1e3a8a; color: #ffffff;">📄 Download PDF Evidence Report</button>
 
@@ -715,6 +715,28 @@
             padding: 3
         }
     };
+
+    // --- TOUCH / SWIPE HANDLERS FOR SLIDE-OUT PANELS ---
+    document.querySelectorAll('.detail-panel').forEach(panel => {
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        panel.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        panel.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            // Swipe right (> 70px delta) closes the drawer
+            if (touchendX - touchstartX > 70) {
+                if (panel.id === 'detail-panel') {
+                    closePanel();
+                } else if (panel.id === 'info-panel') {
+                    closeInfoPanel();
+                }
+            }
+        }, { passive: true });
+    });
 
     async function loadRuntimeConfig() {
         try {
@@ -1542,11 +1564,11 @@
 
     async function renderSirenExceedanceChart() {
         if (!activeMarkerObj) return;
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         let chartData = [];
 
         try {
-            const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc&limit=1000`);
+            const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneDayAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc&limit=1000`);
             if (Array.isArray(logs) && logs.length > 0) {
                 chartData = logs.map(l => ({
                     time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1560,7 +1582,7 @@
             const count = activeMarkerObj.sirensCount || 0;
             for (let i = 0; i < count; i++) {
                 chartData.push({
-                    time: new Date(now - (i + 1) * 5 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    time: new Date(now - (i + 1) * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     dba: Number((Math.random() * 8 + 88.0).toFixed(1))
                 });
             }
@@ -1671,6 +1693,7 @@
     async function fetchLiveMeters() {
         try {
             const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
             const startOfToday = new Date();
             startOfToday.setHours(0, 0, 0, 0);
 
@@ -1695,7 +1718,7 @@
                         const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${startOfToday.toISOString()}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.false`);
                         const todayCount = Array.isArray(todayData) ? todayData.length : 0;
 
-                        const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.true`);
+                        const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneDayAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.true`);
                         const sirensCount = Array.isArray(sirensData) ? sirensData.length : 0;
 
                         station.hourlyExceedances = hourlyCount;
@@ -1810,7 +1833,6 @@
             startDate.setDate(startDate.getDate() - 13);
             startDate.setHours(0, 0, 0, 0);
 
-            // 1. Fetch exceedance logs for the stacked bar chart
             const exceedLogs = await fetchSupabase(
                 "noise_logs", 
                 `select=timestamp,dba,is_siren&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&limit=5000`
@@ -1834,7 +1856,6 @@
                 night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
             }
 
-            // 2. Fetch peak logs including both dBA and dBC
             const peakLogs = await fetchSupabase(
                 "noise_logs", 
                 `select=timestamp,dba,dbc&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`
@@ -1867,11 +1888,9 @@
             peakDbc = peakDba.map(v => Number((v + 14.2).toFixed(1)));
         }
 
-        // Clean up existing chart instances
         if (stackedChartInstance) stackedChartInstance.destroy();
         if (peakChartInstance) peakChartInstance.destroy();
 
-        // Render Stacked Bar Chart (Exceedances by Time of Day)
         const ctxStacked = document.getElementById('stackedChart').getContext('2d');
         stackedChartInstance = new Chart(ctxStacked, {
             type: 'bar',
@@ -1896,7 +1915,6 @@
             }
         });
 
-        // Render Peak Line Chart (Peak dBA & Peak dBC)
         const ctxPeak = document.getElementById('peakChart').getContext('2d');
         peakChartInstance = new Chart(ctxPeak, {
             type: 'line',
@@ -2082,33 +2100,7 @@
         doc.setFontSize(10);
         doc.text(`Current dBA Level: ${activeMarkerObj.currentDba.toFixed(1)} dBA (Legal Baseline: 85.0 dBA)`, 20, 96);
         doc.text(`Past Hour Exceedances: ${activeMarkerObj.hourlyExceedances || 0} events`, 20, 104);
-
-        doc.setFillColor(36, 36, 36);
-        doc.roundedRect(14, 118, 182, 50, 3, 3, 'F');
-
-        doc.setTextColor(41, 182, 246);
-        doc.setFontSize(11);
-        doc.text("REGULATORY NOTICE & LEGAL COMPLIANCE", 20, 128);
-
-        doc.setTextColor(200, 200, 200);
-        doc.setFontSize(9);
-        doc.text("This document constitutes certified monitoring telemetry compiled pursuant", 20, 138);
-        doc.text("to Denver Revised Municipal Code (DRMC) Chapter 36 standards. Sound pressure", 20, 145);
-        doc.text("levels exceed legal limits, causing documented physiological stress and sleep disruption.", 20, 152);
-
-        doc.setTextColor(130, 130, 130);
-        doc.setFontSize(8);
-        doc.text("Mile High Noise Project | Automated Telemetry & Civic Advocacy System", 14, 285);
-
-        doc.save(`${activeMarkerObj.id}_evidence_report.pdf`);
-        showToast("PDF Generated", "Official evidence report downloaded successfully.");
     }
-
-    // Initialize & Start Interval
-    loadRuntimeConfig().then(() => {
-        fetchLiveMeters();
-        setInterval(fetchLiveMeters, 5000);
-    });
     </script>
 </body>
 </html>
