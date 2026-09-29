@@ -551,6 +551,7 @@
             <button class="nav-btn" onclick="openInfoModal('resources')">Resources</button>
             <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
             <button class="nav-btn" onclick="openInfoModal('calculator')">Sleep Risk</button>
+            <button class="nav-btn" onclick="openInfoModal('contact')">Contact</button>
         </div>
     </div>
 
@@ -1020,6 +1021,93 @@
                 `;
                 break;
 
+            case 'contact':
+                htmlContent = `
+                    <div class="panel-header">
+                        <h2>✉️ Contact the Mile High Noise Project</h2>
+                        <p>Get in touch, volunteer, or report recurring neighborhood noise.</p>
+                    </div>
+                    <div class="info-card" style="background: #192734; border: 1px solid #29b6f6;">
+                        <p style="font-size: 0.8rem; color: #cbd5e1; margin: 0;">
+                            <em>Note:</em> The Mile High Noise Project is an all-volunteer organization. We appreciate your patience and will respond as soon as possible. If you haven't yet, please also file an official report using our map monitors or check our <a href="#" onclick="openInfoModal('action'); return false;" style="color: #29b6f6; text-decoration: underline;">Take Action</a> page.
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <form id="contact-project-form" onsubmit="submitProjectContact(event)">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">First Name *</label>
+                                    <input type="text" id="contact-fname" required style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Last Name *</label>
+                                    <input type="text" id="contact-lname" required style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">E-mail *</label>
+                                <input type="email" id="contact-email" required style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Your Address or Nearest Intersection *</label>
+                                <input type="text" id="contact-user-address" required placeholder="e.g., W Colfax Ave & Sheridan Blvd" style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Address / Location of Noise Source (if known) *</label>
+                                <input type="text" id="contact-source-address" required placeholder="e.g., Federal Blvd corridor" style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Neighborhood</label>
+                                    <input type="text" id="contact-neighborhood" placeholder="e.g., West Colfax / RiNo" style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Denver District / Ward</label>
+                                    <input type="text" id="contact-district" placeholder="e.g., District 1" style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Subject</label>
+                                <input type="text" id="contact-subject" placeholder="Brief subject..." style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">Question or Comment</label>
+                                <textarea id="contact-comment" rows="4" placeholder="Type your message here..." style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem; resize: vertical;"></textarea>
+                            </div>
+                            <div style="margin-bottom: 12px; font-size: 0.8rem; color: #ccc;">
+                                <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="contact-share" style="margin-top: 3px; accent-color: #00e676;">
+                                    <span>You can share my message with the Denver Mayor / City Council / Media / State Lawmakers</span>
+                                </label>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 4px;">How did you hear about the Mile High Noise Project?</label>
+                                <input type="text" id="contact-source-ref" style="width: 100%; padding: 8px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                            <div style="margin-bottom: 12px; font-size: 0.8rem; color: #ccc;">
+                                <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="contact-newsletter" style="margin-top: 3px; accent-color: #00e676;">
+                                    <span>Please add me to your e-mail newsletter list</span>
+                                </label>
+                            </div>
+                            <div style="margin-bottom: 14px; font-size: 0.8rem; color: #ccc;">
+                                <span style="font-size: 0.75rem; color: #aaa; display: block; margin-bottom: 6px;">I would like to volunteer to help with (select all that apply):</span>
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 6px; padding-left: 4px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Vehicle noise" class="vol-cb" style="accent-color: #00e676;"> Vehicle noise advocacy</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Residential noise" class="vol-cb" style="accent-color: #00e676;"> Residential / neighborhood noise</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Commercial noise" class="vol-cb" style="accent-color: #00e676;"> Commercial / venue noise</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Fundraising / communications" class="vol-cb" style="accent-color: #00e676;"> Fundraising / communications</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Legal advice / services" class="vol-cb" style="accent-color: #00e676;"> Legal advice / services</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Health / child-development expertise" class="vol-cb" style="accent-color: #00e676;"> Health / child-development expertise</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer;"><input type="checkbox" value="Donation / materials" class="vol-cb" style="accent-color: #00e676;"> A donation (including in-kind materials/services)</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="action-btn btn-primary" id="submit-contact-btn">✉️ Submit Message</button>
+                        </form>
+                    </div>
+                `;
+                break;
+
             default:
                 htmlContent = `<p>Select a topic from the navigation bar.</p>`;
         }
@@ -1032,6 +1120,20 @@
     function closeInfoPanel() {
         document.getElementById('info-panel').classList.remove('open');
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    }
+
+    function submitProjectContact(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submit-contact-btn');
+        btn.innerText = "⏳ Submitting Message...";
+        btn.disabled = true;
+        setTimeout(() => {
+            showToast("Message Sent", "Thank you for contacting the Mile High Noise Project. Your message has been recorded.");
+            closeInfoPanel();
+            document.getElementById('contact-project-form').reset();
+            btn.innerText = "✉️ Submit Message";
+            btn.disabled = false;
+        }, 1000);
     }
 
     function updateSleepCalc(val) {
