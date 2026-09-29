@@ -1409,8 +1409,7 @@ async function renderHourlyExceedanceChart() {
                         ticks: { color: '#888', font: { size: 9 } } 
                     }
                 },
-                },
-                plugins: {
+                 plugins: {
                     legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa' } },
                     annotation: {
                         annotations: {
@@ -1859,7 +1858,6 @@ function createBadgeIcon(station) {
             }
         }
     });
-}
 
         const ctxPeak = document.getElementById('peakChart').getContext('2d');
         peakChartInstance = new Chart(ctxPeak, {
@@ -2156,5 +2154,4 @@ function createBadgeIcon(station) {
     });
     </script>
 </body>
-</html>
 </html>
