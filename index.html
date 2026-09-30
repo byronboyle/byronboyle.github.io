@@ -504,6 +504,92 @@
             line-height: 1.4;
         }
 
+        /* ---- Station panel v2 ---- */
+        [hidden] { display: none !important; }
+        .badge-muted { background-color: #5f6368; color: #e8eaed; }
+        .badge-demo { border-style: dashed; border-color: #9aa0a6; }
+        .lf-pip {
+            position: absolute; top: -9px; right: -9px;
+            background: #29b6f6; color: #00131f;
+            font-size: 0.62rem; font-weight: 800; line-height: 1.2;
+            padding: 1px 5px; border-radius: 8px; border: 1.5px solid #1a1a1a;
+        }
+
+        .panel-banner {
+            background: #2b2410; border: 1px solid #6b5a1e; color: #ffd54f;
+            border-radius: 8px; padding: 8px 10px; margin-bottom: 12px;
+            font-size: 0.75rem; line-height: 1.4; flex-shrink: 0;
+        }
+        .panel-banner.offline { background: #232323; border-color: #444; color: #bbb; }
+
+        .live-card, .summary-card, .chart-card {
+            background: #242424; border: 1px solid #333; border-radius: 8px;
+            padding: 12px; margin-bottom: 12px; flex-shrink: 0;
+        }
+        .live-head { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+        .live-val span { font-size: 2rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+        .live-val small { font-size: 0.72rem; font-weight: 600; color: #888; margin-left: 4px; }
+        .live-a span { color: #00e676; }
+        .live-c span { color: #29b6f6; }
+        .live-flags { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .delta-pill { font-size: 0.78rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #333; color: #aaa; }
+        .delta-pill.delta-mid { background: rgba(255, 183, 77, 0.18); color: #ffb74d; }
+        .delta-pill.delta-high { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
+        .flag-chip { font-size: 0.66rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+        .live-chart { position: relative; height: 88px; margin-top: 8px; }
+        .live-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 0.66rem; color: #888; }
+        .live-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin: 0 3px 0 8px; }
+
+        .summary-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+        .summary-top h4, .chart-card h4 { margin: 0; color: #ccc; font-size: 0.8rem; }
+        .range-toggle { display: inline-flex; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+        .range-btn { background: none; border: none; color: #aaa; padding: 5px 10px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+        .range-btn:hover { color: #fff; }
+        .range-btn.active { background: #00e676; color: #000; }
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat { background: #1c1c1c; border: 1px solid #303030; border-radius: 8px; padding: 8px 6px; text-align: center; }
+        .stat-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+        .stat-label { font-size: 0.62rem; color: #999; margin-top: 2px; line-height: 1.2; }
+        .stat-a .stat-num { color: #ffb74d; }
+        .stat-lf { background: #182530; border-color: rgba(41, 182, 246, 0.5); }
+        .stat-lf .stat-num { color: #29b6f6; }
+        .stat-s .stat-num { color: #9e9e9e; }
+        .summary-sentence { margin: 10px 0 4px; font-size: 0.8rem; color: #ddd; line-height: 1.4; }
+        .events-status { margin: 6px 0 0; font-size: 0.74rem; color: #ff8a80; }
+        .rule-note { margin: 6px 0 0; font-size: 0.68rem; color: #777; line-height: 1.4; }
+        .rule-note a { color: #29b6f6; }
+
+        .chart-help { margin: 4px 0 8px; color: #888; font-size: 0.72rem; line-height: 1.35; }
+        .chart-sub { margin: 8px 0 2px; color: #888; font-size: 0.68rem; }
+        .chart-box { position: relative; width: 100%; }
+        .siren-toggle { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.72rem; color: #aaa; cursor: pointer; }
+        .patterns > summary { cursor: pointer; color: #ccc; font-size: 0.8rem; font-weight: 600; }
+        .patterns h5 { margin: 12px 0 4px; color: #aaa; font-size: 0.72rem; font-weight: 600; }
+
+        /* ---- Step 3: heatmap + baseline ---- */
+        .heat-btn { background: none; border: none; color: #aaa; padding: 5px 8px; font-size: 0.68rem; font-weight: 600; cursor: pointer; }
+        .heat-btn:hover { color: #fff; }
+        .heat-btn.active { background: #00e676; color: #000; }
+        .hm-wrap { display: grid; grid-template-columns: 50px 1fr; gap: 6px; margin-top: 6px; }
+        .hm-days { display: grid; grid-auto-rows: 16px; gap: 2px; font-size: 0.6rem; color: #888; }
+        .hm-days span { display: flex; align-items: center; white-space: nowrap; }
+        .hm-grid { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); grid-auto-rows: 16px; gap: 2px; }
+        .hm-cell { border-radius: 2px; background: #1f1f1f; cursor: pointer; }
+        .hm-cell.night { background: #15191d; }
+        .hm-cell:hover, .hm-cell.sel { outline: 1.5px solid #fff; outline-offset: -1px; }
+        .hm-hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; margin-top: 3px; font-size: 0.58rem; color: #777; }
+        .hm-hours span { white-space: nowrap; }
+        .hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.68rem; color: #999; }
+        .hm-legend { white-space: nowrap; }
+        .hm-legend i { display: inline-block; width: 10px; height: 10px; margin-left: 3px; border-radius: 2px; vertical-align: -1px; }
+        .hm-note { margin: 6px 0 0; font-size: 0.64rem; color: #777; }
+        .baseline-note { margin: 8px 0 0; font-size: 0.7rem; color: #999; line-height: 1.4; }
+        .demo-mark { position: relative; overflow: hidden; }
+        .demo-mark::after {
+            content: 'DEMO DATA'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.8rem; color: rgba(255, 255, 255, 0.12); transform: rotate(-12deg); pointer-events: none;
+        }
+
         @media (max-width: 600px) {
             .navbar {
                 padding: 6px 10px;
@@ -590,6 +676,7 @@
         <div class="map-overlay-stats">
             <div>Active: <span class="stat-highlight" id="active-count">4</span></div>
             <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
+            <div>&Delta; rule: <span style="color:#29b6f6; font-weight:bold;">&gt; 10 dB</span></div>
             <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
 
@@ -607,113 +694,94 @@
                 <p id="panel-address">Address details...</p>
             </div>
 
-            <div class="expandable-tiles-container">
-                
-                <div class="expandable-tile" id="tile-live" role="region">
-                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle live decibel chart" onclick="toggleTile('live')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('live');event.preventDefault();}" title="Click to expand/collapse live dual-metric trend chart">
-                        <div class="tile-title-group">
-                            <h4>Live Level (Dual-Metric)</h4>
-                            <div class="tile-main-val" style="display: flex; flex-direction: column; gap: 2px;">
-                                <div><span id="panel-db">0.0</span> <span style="font-size: 0.7rem; color: #00e676;">dBA</span> <span style="font-size: 0.62rem; color: #888; font-weight: normal;">(Legal Baseline)</span></div>
-                                <div style="font-size: 0.82rem; color: #29b6f6; font-weight: 600;"><span id="panel-dbc">0.0</span> dBC <span id="panel-delta" style="font-size: 0.7rem; background: rgba(41,182,246,0.15); padding: 1px 4px; border-radius: 3px; margin-left: 4px;">&Delta; +0.0 dB</span></div>
-                            </div>
-                        </div>
-                        <div class="tile-meta">
-                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                        </div>
+            <div id="panel-banner" class="panel-banner" hidden></div>
+
+            <section class="live-card" aria-label="Current level">
+                <div class="live-head">
+                    <div class="live-val live-a"><span id="panel-db">--</span><small>dBA</small></div>
+                    <div class="live-val live-c"><span id="panel-dbc">--</span><small>dBC</small></div>
+                    <div class="live-flags">
+                        <span id="panel-delta" class="delta-pill" title="Delta = dBC minus dBA">&Delta; --</span>
+                        <span id="panel-flag" class="flag-chip" hidden></span>
                     </div>
-                    <div class="tile-body">
-                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Live 5-Min dBA & dBC History (w/ Blind Spot Fill)</h4>
-                        <div class="chart-scroll-wrapper">
-                            <div style="min-width: 580px; height: 155px; position: relative;">
-                                <canvas id="liveMinuteChart"></canvas>
-                            </div>
+                </div>
+                <div class="live-chart"><canvas id="liveMinuteChart"></canvas></div>
+                <div class="live-foot">
+                    <span id="live-status">Loading&hellip;</span>
+                    <span class="live-legend"><i style="background:#00e676"></i>dBA<i style="background:#29b6f6"></i>dBC<i style="background:#ef5350"></i>&Delta; rule met</span>
+                </div>
+            </section>
+
+            <section class="summary-card">
+                <div class="summary-top">
+                    <h4 id="summary-title">Flagged events</h4>
+                    <div class="range-toggle" role="group" aria-label="Time range">
+                        <button type="button" class="range-btn" data-range="1h" onclick="setRange('1h')">1 h</button>
+                        <button type="button" class="range-btn active" data-range="24h" onclick="setRange('24h')">24 h</button>
+                        <button type="button" class="range-btn" data-range="14d" onclick="setRange('14d')">14 d</button>
+                    </div>
+                </div>
+                <div class="summary-grid">
+                    <div class="stat stat-a"><div class="stat-num" id="sum-a">&ndash;</div><div class="stat-label">Over the dBA limit</div></div>
+                    <div class="stat stat-lf"><div class="stat-num" id="sum-lf">&ndash;</div><div class="stat-label">Caught only by the &Delta; rule</div></div>
+                    <div class="stat stat-s"><div class="stat-num" id="sum-s">&ndash;</div><div class="stat-label">Sirens (excluded)</div></div>
+                </div>
+                <p class="summary-sentence" id="summary-sentence"></p>
+                <p class="events-status" id="events-status" hidden></p>
+                <p class="rule-note" id="rule-note"></p>
+            </section>
+
+            <section class="chart-card">
+                <h4>dBA vs. dBC &mdash; every flagged event</h4>
+                <p class="chart-help" id="scatter-help"></p>
+                <div class="chart-box" style="height: 270px;"><canvas id="scatterChart"></canvas></div>
+                <p class="baseline-note" id="baseline-note"></p>
+                <label class="siren-toggle"><input type="checkbox" id="show-sirens" onchange="toggleSirens(this.checked)"> Show emergency sirens (excluded from counts)</label>
+            </section>
+
+            <section class="chart-card">
+                <h4>When events happen</h4>
+                <div class="chart-sub">dBA</div>
+                <div class="chart-box" style="height: 150px;"><canvas id="timelineChart"></canvas></div>
+                <div class="chart-sub">&Delta; (dBC &minus; dBA)</div>
+                <div class="chart-box" style="height: 96px;"><canvas id="deltaChart"></canvas></div>
+            </section>
+
+            <section class="chart-card heatmap-card" id="heatmap-card">
+                <div class="summary-top">
+                    <h4>When it happens &mdash; hour by day</h4>
+                    <div class="range-toggle" role="group" aria-label="Heatmap measure">
+                        <button type="button" class="heat-btn active" data-metric="all" onclick="setHeatMetric('all')">All</button>
+                        <button type="button" class="heat-btn" data-metric="a" onclick="setHeatMetric('a')">dBA limit</button>
+                        <button type="button" class="heat-btn" data-metric="lf" onclick="setHeatMetric('lf')">&Delta; only</button>
+                    </div>
+                </div>
+                <p class="chart-help" id="heatmap-sentence"></p>
+                <p class="events-status" id="heatmap-status" hidden></p>
+                <div class="hm-wrap">
+                    <div class="hm-days" id="hm-days"></div>
+                    <div>
+                        <div class="hm-grid" id="hm-grid"></div>
+                        <div class="hm-hours">
+                            <span style="grid-column: 1 / span 4">12a</span><span style="grid-column: 7 / span 4">6a</span><span style="grid-column: 13 / span 4">12p</span><span style="grid-column: 19 / span 4">6p</span>
                         </div>
                     </div>
                 </div>
+                <div class="hm-foot"><span id="hm-detail">Tap a square for details.</span><span class="hm-legend" id="hm-legend"></span></div>
+                <p class="hm-note">Last 14 days, station local time. Darker columns are 10 pm to 6 am.</p>
+            </section>
 
-                <div class="expandable-tile" id="tile-hourly" role="region">
-                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle past hour exceedances chart" onclick="toggleTile('hourly')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('hourly');event.preventDefault();}" title="Click to expand/collapse past hour exceedance chart">
-                        <div class="tile-title-group">
-                            <h4>Past Hour</h4>
-                            <div class="tile-main-val" id="panel-hourly" style="color: #ffb74d;">0</div>
-                        </div>
-                        <div class="tile-meta">
-                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                        </div>
-                    </div>
-                    <div class="tile-body">
-                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Past Hour Exceedance Levels (w/ Threshold)</h4>
-                        <div class="chart-scroll-wrapper">
-                            <div style="min-width: 520px; height: 140px; position: relative;">
-                                <canvas id="hourlyExceedanceChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="expandable-tile" id="tile-today" role="region">
-                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle past 24 hours exceedances chart" onclick="toggleTile('today')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('today');event.preventDefault();}" title="Click to expand/collapse past 24 hours exceedance chart">
-                        <div class="tile-title-group">
-                            <h4>Past 24 Hours</h4>
-                            <div class="tile-main-val" id="panel-today" style="color: #ff5252;">0</div>
-                        </div>
-                        <div class="tile-meta">
-                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                        </div>
-                    </div>
-                    <div class="tile-body">
-                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Past 24 Hours Exceedance Levels (w/ Threshold)</h4>
-                        <div class="chart-scroll-wrapper">
-                            <div style="min-width: 520px; height: 140px; position: relative;">
-                                <canvas id="todayExceedanceChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="expandable-tile metric-card clickable-card" id="siren-card" role="region">
-                    <div class="tile-header" role="button" tabindex="0" aria-expanded="false" aria-label="Toggle emergency siren exceedances chart" onclick="toggleTile('sirens')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile('sirens');event.preventDefault();}" title="Click to expand/collapse emergency siren exceedance chart">
-                        <div class="tile-title-group">
-                            <h4>Sirens (Past 24 Hours)</h4>
-                            <div class="tile-main-val" id="panel-sirens" style="color: #29b6f6;">0</div>
-                        </div>
-                        <div class="tile-meta">
-                            <span class="card-hint-pill"><span class="card-arrow">▼</span> Plot</span>
-                        </div>
-                    </div>
-                    <div class="tile-body">
-                        <h4 style="margin: 0 0 8px 0; color: #ccc; font-size: 0.75rem;">Emergency Siren Exceedances (Time & Level)</h4>
-                        <div class="chart-scroll-wrapper">
-                            <div style="min-width: 520px; height: 140px; position: relative;">
-                                <canvas id="sirenExceedanceChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="chart-container">
-                <h4>Exceedances by Time of Day (14-Day History)</h4>
-                <div class="chart-scroll-wrapper">
-                    <div style="min-width: 550px; height: 150px; position: relative;">
-                        <canvas id="stackedChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <h4>Highest Peak dBA Reading (14-Day History)</h4>
-                <div class="chart-scroll-wrapper">
-                    <div style="min-width: 550px; height: 150px; position: relative;">
-                        <canvas id="peakChart"></canvas>
-                    </div>
-                </div>
-            </div>
+            <details class="chart-card patterns" id="patterns-details">
+                <summary>14-day patterns</summary>
+                <h5>Flagged events by time of day</h5>
+                <div class="chart-box" style="height: 150px;"><canvas id="stackedChart"></canvas></div>
+                <h5>Highest flagged dBA and dBC per day</h5>
+                <div class="chart-box" style="height: 150px;"><canvas id="peakChart"></canvas></div>
+                <p class="chart-help" id="patterns-note"></p>
+            </details>
 
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File Anonymous 311 Noise Report</button>
-            <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Exceedance CSV Log</button>
+            <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Flagged Events (CSV)</button>
             <button class="action-btn btn-secondary" id="pdf-report-btn" onclick="generatePDFReport()" style="background: #1e3a8a; color: #ffffff;">📄 Download PDF Evidence Report</button>
 
             <div class="sensor-footnote">
@@ -798,10 +866,13 @@
         }
 
         const res = await fetch(url, { headers });
+        if (!res.ok) throw new Error(`Supabase ${table} request failed (${res.status})`);
         return res.json();
     }
 
     // --- STATIONS DATA ---
+    // The reading and count values below are placeholders. They are only shown (clearly labelled as demo)
+    // for a station that has never reported; a station with real rows always uses its real data.
     const METER_STATIONS = [
         {
             id: "meter-01",
@@ -853,6 +924,9 @@
         }
     ];
 
+    // Every station starts as 'loading'; its first reading decides whether it is 'live' or a demo placeholder.
+    METER_STATIONS.forEach(s => { s.state = 'loading'; s.lastSeen = null; s.hourlyLF = 0; s.todayLF = 0; });
+
     const map = L.map('map').setView([39.735, -105.000], 12);
     
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2lpo_1_b190adfe10b09bdd0f6ee9bd', {
@@ -865,9 +939,6 @@
     let stackedChartInstance = null;
     let peakChartInstance = null;
     let liveMinuteChartInstance = null;
-    let hourlyChartInstance = null;
-    let todayChartInstance = null;
-    let sirenChartInstance = null;
 
     const MAX_LIVE_POINTS = 300;
     let liveDbHistory = [];
@@ -898,9 +969,15 @@
                         <p>Most municipal noise codes rely exclusively on <strong>dBA (A-weighting)</strong>. This standard heavily filters out low frequencies (&lt; 1,000 Hz) to mimic human ear sensitivity at moderate volumes.</p>
                         <p>However, modified vehicle exhausts, turbo-diesels, and subwoofers generate massive low-frequency energy. Calculating the <strong>Low-Frequency Delta ($\Delta = \text{dBC} - \text{dBA}$)</strong> proves when a vehicle bypasses standard dBA limits.</p>
                     </div>
+                    <div class="info-card">
+                        <h3>How this site flags a noise event</h3>
+                        <p><strong>Over the dBA limit:</strong> dBA is at or above 85. This is the test most ordinances use.</p>
+                        <p><strong>&Delta; rule:</strong> dBC is more than 10 dB higher than dBA, and either reading is at least 85. This catches bass-heavy noise that a dBA-only test can miss. The comparison uses dBA and dBC readings taken at the same instant.</p>
+                        <p style="font-size: 0.75rem; color: #94a3b8;">A dBC &minus; dBA gap of about 10 dB is a rule of thumb for spotting low-frequency-heavy noise. Check your own city's ordinance for its actual limits. Emergency sirens are detected by audio analysis and excluded from counts.</p>
+                    </div>
                     <div class="info-card" style="border: 1px solid #29b6f6; background: #192734;">
-                        <h3 style="color: #29b6f6;">🚨 Real-Time Evidentiary Sensor Comparison</h3>
-                        <p style="font-size: 0.8rem; color: #cbd5e1;">Recorded by Mile High Noise Project corridor monitor during recent pass-by:</p>
+                        <h3 style="color: #29b6f6;">🚨 Example: How a Pass-By Can Look on dBA vs. dBC</h3>
+                        <p style="font-size: 0.8rem; color: #cbd5e1;">Illustrative example only. These numbers are not a recorded measurement:</p>
                         <div class="comparison-box" style="background: #121212;">
                             <div class="comp-item">
                                 <div style="color: #00e676; font-weight: bold;">dBA Reading</div>
@@ -1211,470 +1288,798 @@
         }
     }
 
-    async function toggleTile(type) {
-        const tileId = type === 'sirens' ? 'siren-card' : `tile-${type}`;
-        const tile = document.getElementById(tileId);
-        const isActive = tile.classList.contains('active');
-        const detailPanel = document.getElementById('detail-panel');
+    // ========================================================================
+    // EVENT RULES (keep in sync with classify_event in main.py)
+    //   A     dBA >= limit
+    //   A_LF  dBA >= limit AND dBC - dBA > LF_DELTA_THRESHOLD
+    //   LF    dBA < limit, dBC - dBA > LF_DELTA_THRESHOLD, and dBA or dBC >= LF_FLOOR_DB
+    // ========================================================================
+    const LF_DELTA_THRESHOLD = 10.0;
+    const LF_FLOOR_DB = DECIBEL_THRESHOLD;
+    const CLASS_META = {
+        A:    { label: 'dBA limit only',       desc: 'Over the dBA limit',                                  color: '#ffb74d' },
+        A_LF: { label: 'dBA limit + \u0394 rule', desc: 'Over the dBA limit and the \u0394 rule',          color: '#ef5350' },
+        LF:   { label: '\u0394 rule only',      desc: 'Under the dBA limit, caught only by the \u0394 rule', color: '#29b6f6' }
+    };
+    const RANGES = {
+        '1h':  { ms: 60 * 60 * 1000,           label: 'Past hour' },
+        '24h': { ms: 24 * 60 * 60 * 1000,      label: 'Past 24 hours' },
+        '14d': { ms: 14 * 24 * 60 * 60 * 1000, label: 'Past 14 days' }
+    };
+    const STALE_AFTER_MS = 10 * 60 * 1000;
+    const EVENT_LIMIT = 5000;
+    let activeRange = '24h';
+    let showSirens = false;
+    let panelToken = 0; // bumped whenever the panel opens/closes so late async results are ignored
+    const eventsCache = new Map();
 
-        tile.classList.toggle('active', !isActive);
-        tile.setAttribute('aria-expanded', !isActive ? 'true' : 'false');
+    let scatterChartInstance = null;
+    let timelineChartInstance = null;
+    let deltaChartInstance = null;
 
-        if (!isActive) {
-            if (type === 'live') {
-                await preloadLiveHistory();
-                initLiveChart();
-            } else if (type === 'hourly') {
-                await renderHourlyExceedanceChart();
-            } else if (type === 'today') {
-                await renderTodayExceedanceChart();
-            } else if (type === 'sirens') {
-                await renderSirenExceedanceChart();
-            }
-            detailPanel.scrollTo({ top: tile.offsetTop - 20, behavior: 'smooth' });
-        } else {
-            if (type === 'live' && liveMinuteChartInstance) {
-                liveMinuteChartInstance.destroy();
-                liveMinuteChartInstance = null;
-            } else if (type === 'hourly' && hourlyChartInstance) {
-                hourlyChartInstance.destroy();
-                hourlyChartInstance = null;
-            } else if (type === 'today' && todayChartInstance) {
-                todayChartInstance.destroy();
-                todayChartInstance = null;
-            } else if (type === 'sirens' && sirenChartInstance) {
-                sirenChartInstance.destroy();
-                sirenChartInstance = null;
-            }
-        }
+    function destroyChart(chart) { if (chart) chart.destroy(); return null; }
+
+    function validDbc(v) { const n = Number(v); return n > 0 ? n : null; }
+    function meetsLfRule(dba, dbc) {
+        return dbc != null && (dbc - dba) > LF_DELTA_THRESHOLD && Math.max(dba, dbc) >= LF_FLOOR_DB;
+    }
+    function classifyEvent(dba, dbc) {
+        const over = dba >= DECIBEL_THRESHOLD;
+        const lf = meetsLfRule(dba, dbc);
+        return over && lf ? 'A_LF' : over ? 'A' : lf ? 'LF' : null;
     }
 
-    async function preloadLiveHistory() {
-        if (!activeMarkerObj) return;
-        try {
-            const data = await fetchSupabase("noise_logs", `select=timestamp,dba,dbc&station_id=eq.${activeMarkerObj.id}&order=timestamp.desc&limit=300`);
-            if (data && data.length > 0) {
-                const sorted = data.reverse();
-                liveDbHistory = sorted.map(d => Number(d.dba));
-                liveDbcHistory = sorted.map(d => d.dbc ? Number(d.dbc) : Number(d.dba) + 14.5);
-                liveTimeLabels = sorted.map(d => new Date(d.timestamp).toTimeString().split(' ')[0]);
-                return;
-            }
-        } catch (err) {
-            console.warn("Could not load live history from Supabase, using mock series:", err);
-        }
+    function fmtDateTime(ms) {
+        return new Date(ms).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+    }
+    function fmtAgo(ms) {
+        const s = Math.max(0, Math.round((Date.now() - ms) / 1000));
+        if (s < 90) return `${s}s ago`;
+        const m = Math.round(s / 60);
+        if (m < 90) return `${m} min ago`;
+        const h = Math.round(m / 60);
+        if (h < 48) return `${h} h ago`;
+        return `${Math.round(h / 24)} days ago`;
+    }
+    function fmtTick(v, rangeKey) {
+        const d = new Date(v);
+        return rangeKey === '14d'
+            ? `${d.getMonth() + 1}/${d.getDate()}`
+            : d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+    function niceTimeTicks(min, max, rangeKey) {
+        const step = { '1h': 10 * 60e3, '24h': 4 * 3600e3, '14d': 2 * 86400e3 }[rangeKey];
+        const off = new Date(min).getTimezoneOffset() * 60e3; // align to local clock time
+        const ticks = [];
+        for (let v = Math.ceil((min - off) / step) * step + off; v <= max; v += step) ticks.push(v);
+        return ticks;
+    }
 
-        liveDbHistory = [];
-        liveDbcHistory = [];
-        liveTimeLabels = [];
+    // ---- Demo placeholders (only for stations with no real data at all) ----
+    function seededRng(seed) {
+        let h = 2166136261;
+        for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+        let a = h >>> 0;
+        return () => {
+            a = (a + 0x6D2B79F5) >>> 0;
+            let t = a;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    function demoEvents(station, rangeKey) {
+        const rand = seededRng(`${station.id}|${rangeKey}`);
+        const range = RANGES[rangeKey];
+        const until = Date.now(), since = until - range.ms;
+        const base = Math.max(6, station.todayExceedances || 0);
+        const n = Math.min(400, Math.max(3, Math.round(base * range.ms / 86400e3)));
+        const between = (lo, hi) => lo + rand() * (hi - lo);
+        const round1 = x => Math.round(x * 10) / 10;
+        const events = [], sirens = [];
+        for (let i = 0; i < n; i++) {
+            const r = rand();
+            const wanted = r < 0.45 ? 'A' : r < 0.65 ? 'A_LF' : 'LF';
+            let dba, delta;
+            if (wanted === 'A') { dba = between(85, 94); delta = between(3, 9.5); }
+            else if (wanted === 'A_LF') { dba = between(85, 92); delta = between(10.5, 17); }
+            else {
+                dba = between(68, 84.5); delta = between(10.5, 22);
+                if (dba + delta < LF_FLOOR_DB) delta = LF_FLOOR_DB - dba + between(0.5, 6);
+            }
+            dba = round1(dba);
+            const dbc = round1(dba + delta);
+            const cls = classifyEvent(dba, dbc);
+            if (!cls) continue;
+            events.push({ t: Math.round(since + rand() * range.ms), dba, dbc, delta: round1(dbc - dba), cls, siren: false });
+        }
+        for (let i = 0; i < 2; i++) {
+            const dba = round1(between(86, 96)), dbc = round1(dba + between(2, 6));
+            sirens.push({ t: Math.round(since + rand() * range.ms), dba, dbc, delta: round1(dbc - dba), cls: classifyEvent(dba, dbc) || 'A', siren: true });
+        }
+        events.sort((x, y) => x.t - y.t);
+        sirens.sort((x, y) => x.t - y.t);
+        return { stationId: station.id, rangeKey, since, until, events, sirens, truncated: false, demo: true };
+    }
+
+    function demoLiveSeries(station) {
+        const rand = seededRng(`${station.id}|live`);
+        const dba = [], dbc = [], labels = [];
+        let a = station.currentDba || 70, d = 11;
         const now = Date.now();
-        for (let i = 29; i >= 0; i--) {
-            const t = new Date(now - i * 10000);
-            liveTimeLabels.push(t.toTimeString().split(' ')[0]);
-            const dba = Number((activeMarkerObj.currentDba + (Math.random() * 4 - 2)).toFixed(1));
-            const dbc = Number((dba + (Math.random() * 6 + 10)).toFixed(1));
-            liveDbHistory.push(dba);
-            liveDbcHistory.push(dbc);
+        for (let i = 59; i >= 0; i--) {
+            a = Math.max(45, Math.min(100, a + (rand() - 0.5) * 6));
+            d = Math.max(4, Math.min(20, d + (rand() - 0.5) * 3));
+            dba.push(Number(a.toFixed(1)));
+            dbc.push(Number((a + d).toFixed(1)));
+            labels.push(new Date(now - i * 10000).toTimeString().split(' ')[0]);
         }
+        return { dba, dbc, labels };
     }
 
+    // ---- Data loading ----
+    async function fetchEvents(station, rangeKey) {
+        const sinceMs = Date.now() - RANGES[rangeKey].ms;
+        const rows = await fetchSupabase('noise_logs',
+            `select=timestamp,dba,dbc,event_class,is_siren&station_id=eq.${station.id}` +
+            `&event_class=not.is.null&timestamp=gte.${new Date(sinceMs).toISOString()}` +
+            `&order=timestamp.desc&limit=${EVENT_LIMIT}`);
+        if (!Array.isArray(rows)) throw new Error('Unexpected response from noise_logs');
+        const truncated = rows.length >= EVENT_LIMIT;
+        const events = [], sirens = [];
+        rows.reverse().forEach(r => {
+            const dba = Number(r.dba);
+            const dbc = validDbc(r.dbc);
+            const ev = { t: new Date(r.timestamp).getTime(), dba, dbc, delta: dbc == null ? null : dbc - dba, cls: r.event_class, siren: !!r.is_siren };
+            (ev.siren ? sirens : events).push(ev);
+        });
+        return { stationId: station.id, rangeKey, since: sinceMs, until: Date.now(), events, sirens, truncated, demo: false };
+    }
+
+    async function getEvents(station, rangeKey, force = false) {
+        if (station.state === 'demo') return demoEvents(station, rangeKey);
+        const key = `${station.id}|${rangeKey}`;
+        const hit = eventsCache.get(key);
+        if (!force && hit && Date.now() - hit.fetchedAt < 30000) return hit.data;
+        const data = await fetchEvents(station, rangeKey);
+        eventsCache.set(key, { fetchedAt: Date.now(), data });
+        return data;
+    }
+
+    async function fetchLiveHistory(station) {
+        const rows = await fetchSupabase('noise_logs',
+            `select=timestamp,dba,dbc&station_id=eq.${station.id}&order=timestamp.desc&limit=300`);
+        if (!Array.isArray(rows)) throw new Error('Unexpected response from noise_logs');
+        rows.reverse();
+        return {
+            dba: rows.map(r => Number(r.dba)),
+            dbc: rows.map(r => validDbc(r.dbc)),
+            labels: rows.map(r => new Date(r.timestamp).toTimeString().split(' ')[0])
+        };
+    }
+
+    async function countSupabase(table, queryParams) {
+        const url = `${SUPABASE_URL}/rest/v1/${table}?${queryParams}&select=id&limit=1`;
+        const res = await fetch(url, {
+            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'count=exact' }
+        });
+        if (!res.ok) throw new Error(`Supabase ${table} count failed (${res.status})`);
+        const total = parseInt((res.headers.get('Content-Range') || '').split('/')[1], 10);
+        return Number.isFinite(total) ? total : 0;
+    }
+
+    // ---- Chart plugins ----
+    // Horizontal reference lines: options.plugins.refLines.lines = [{ y, color, label }]
+    const refLinesPlugin = {
+        id: 'refLines',
+        afterDatasetsDraw(chart, args, opts) {
+            const lines = (opts && opts.lines) || [];
+            const y = chart.scales.y;
+            if (!y || !lines.length) return;
+            const { ctx, chartArea } = chart;
+            ctx.save();
+            lines.forEach(l => {
+                if (l.y < y.min || l.y > y.max) return;
+                const py = y.getPixelForValue(l.y);
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = l.color;
+                ctx.beginPath(); ctx.moveTo(chartArea.left, py); ctx.lineTo(chartArea.right, py); ctx.stroke();
+                if (l.label) {
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = l.color;
+                    ctx.font = '10px sans-serif';
+                    ctx.textAlign = l.align === 'left' ? 'left' : 'right';
+                    ctx.fillText(l.label, l.align === 'left' ? chartArea.left + 4 : chartArea.right - 4, py - 4);
+                }
+            });
+            ctx.restore();
+        }
+    };
+
+    // Watermark so demo charts can't be mistaken for measurements in a screenshot.
+    const demoMarkPlugin = {
+        id: 'demoMark',
+        afterDraw(chart, args, opts) {
+            if (!opts || !opts.enabled) return;
+            const { ctx, chartArea } = chart;
+            ctx.save();
+            ctx.translate((chartArea.left + chartArea.right) / 2, (chartArea.top + chartArea.bottom) / 2);
+            ctx.rotate(-Math.PI / 12);
+            ctx.font = `700 ${Math.max(14, Math.min(34, chartArea.height * 0.4))}px sans-serif`;
+            ctx.fillStyle = 'rgba(255,255,255,0.13)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('DEMO DATA', 0, 0);
+            ctx.restore();
+        }
+    };
+
+    // Shades the dBA-limit zone and the "missed by a dBA-only rule" wedge on the dBA vs dBC scatter.
+    const lfRegionsPlugin = {
+        id: 'lfRegions',
+        beforeDatasetsDraw(chart, args, opts) {
+            const { ctx, chartArea, scales } = chart;
+            const x = scales.x, y = scales.y;
+            if (!x || !y) return;
+            const px = v => x.getPixelForValue(v), py = v => y.getPixelForValue(v);
+            const xMin = x.min, xMax = x.max, yMax = y.max;
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+            ctx.clip();
+
+            // Over the dBA limit
+            if (DECIBEL_THRESHOLD < xMax) {
+                const left = px(Math.max(DECIBEL_THRESHOLD, xMin));
+                ctx.fillStyle = 'rgba(255,183,77,0.08)';
+                ctx.fillRect(left, chartArea.top, chartArea.right - left, chartArea.height);
+            }
+
+            // Wedge: under the limit, dBC - dBA > delta, and (dBA or dBC) >= floor
+            const xEnd = Math.min(DECIBEL_THRESHOLD, xMax);
+            if (xMin < xEnd) {
+                const corner = LF_FLOOR_DB - LF_DELTA_THRESHOLD;
+                const xs = [xMin];
+                if (corner > xMin && corner < xEnd) xs.push(corner);
+                xs.push(xEnd);
+                const bound = v => Math.min(Math.max(LF_FLOOR_DB, v + LF_DELTA_THRESHOLD), yMax);
+                ctx.beginPath();
+                ctx.moveTo(px(xs[0]), py(yMax));
+                xs.forEach(v => ctx.lineTo(px(v), py(bound(v))));
+                ctx.lineTo(px(xEnd), py(yMax));
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(41,182,246,0.11)';
+                ctx.fill();
+
+                ctx.beginPath();
+                xs.forEach((v, i) => (i === 0 ? ctx.moveTo(px(v), py(bound(v))) : ctx.lineTo(px(v), py(bound(v)))));
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 1.2;
+                ctx.strokeStyle = 'rgba(41,182,246,0.8)';
+                ctx.stroke();
+            }
+
+            // This station's typical delta (median of ordinary readings): a dotted diagonal
+            const typical = opts && opts.baseline;
+            if (typical != null) {
+                ctx.beginPath();
+                ctx.moveTo(px(xMin), py(xMin + typical));
+                ctx.lineTo(px(xMax), py(xMax + typical));
+                ctx.setLineDash([2, 3]);
+                ctx.lineWidth = 1.3;
+                ctx.strokeStyle = 'rgba(210,210,210,0.6)';
+                ctx.stroke();
+                const lx = Math.min(xMax, yMax - typical) - 1.5;
+                ctx.setLineDash([]);
+                ctx.font = '10px sans-serif';
+                ctx.fillStyle = 'rgba(210,210,210,0.85)';
+                ctx.textAlign = 'right';
+                ctx.fillText(`typical \u0394 ${signed(typical)}`, px(lx), py(lx + typical) + 13);
+            }
+
+            // dBA limit line
+            if (DECIBEL_THRESHOLD > xMin && DECIBEL_THRESHOLD < xMax) {
+                ctx.beginPath();
+                ctx.moveTo(px(DECIBEL_THRESHOLD), chartArea.top);
+                ctx.lineTo(px(DECIBEL_THRESHOLD), chartArea.bottom);
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#ffeb3b';
+                ctx.stroke();
+            }
+
+            ctx.setLineDash([]);
+            ctx.font = '10px sans-serif';
+            ctx.fillStyle = 'rgba(41,182,246,0.95)';
+            ctx.textAlign = 'left';
+            ctx.fillText('Missed by a dBA-only rule', chartArea.left + 6, chartArea.top + 13);
+            if (DECIBEL_THRESHOLD < xMax) {
+                ctx.fillStyle = 'rgba(255,183,77,0.95)';
+                ctx.textAlign = 'right';
+                ctx.fillText('Over the dBA limit', chartArea.right - 6, chartArea.top + 13);
+            }
+            ctx.restore();
+        }
+    };
+
+    function eventTooltip() {
+        return {
+            callbacks: {
+                title: items => fmtDateTime(items[0].raw.ev.t),
+                label: c => {
+                    const ev = c.raw.ev;
+                    if (ev.siren) return ' Emergency siren (excluded from counts)';
+                    const dbc = ev.dbc != null ? ev.dbc.toFixed(1) : '--';
+                    const delta = ev.delta != null ? `${ev.delta >= 0 ? '+' : ''}${ev.delta.toFixed(1)}` : '--';
+                    return [` dBA ${ev.dba.toFixed(1)} \u00b7 dBC ${dbc}`, ` \u0394 ${delta} dB \u00b7 ${CLASS_META[ev.cls].desc}`];
+                }
+            }
+        };
+    }
+
+    function sirenDataset(points, radius) {
+        return { label: 'Emergency sirens (excluded)', data: points, backgroundColor: 'rgba(0,0,0,0)', borderColor: '#9e9e9e', borderWidth: 1.5, pointRadius: radius, pointHoverRadius: radius + 2 };
+    }
+
+    // LF on top: Chart.js draws the first dataset last
+    const CLASS_DRAW_ORDER = ['LF', 'A_LF', 'A'];
+    function classDatasets(events, toPoint, radius) {
+        return CLASS_DRAW_ORDER.map(cls => ({
+            label: CLASS_META[cls].label,
+            data: events.filter(e => e.cls === cls).map(toPoint).filter(p => p.y != null),
+            backgroundColor: CLASS_META[cls].color + 'cc',
+            borderColor: cls === 'LF' ? '#ffffff' : 'transparent',
+            borderWidth: cls === 'LF' ? 1 : 0,
+            pointRadius: cls === 'LF' ? radius + 1 : radius,
+            pointHoverRadius: radius + 3
+        }));
+    }
+
+    // ---- Summary, scatter, timeline ----
+    function renderRuleText() {
+        document.getElementById('rule-note').innerHTML =
+            `Flag rule: dBA \u2265 ${DECIBEL_THRESHOLD}, or dBC \u2212 dBA &gt; ${LF_DELTA_THRESHOLD} dB while dBA or dBC is \u2265 ${LF_FLOOR_DB}. ` +
+            `<a href="#" onclick="openInfoModal('dba-dbc'); return false;">How this works</a>`;
+        document.getElementById('scatter-help').textContent =
+            `Blue dots sit left of the yellow line: under ${DECIBEL_THRESHOLD} dBA, so a dBA-only rule ignores them, ` +
+            `yet their dBC is more than ${LF_DELTA_THRESHOLD} dB higher.`;
+    }
+
+    function renderSummary(data) {
+        const a = data.events.filter(e => e.cls === 'A' || e.cls === 'A_LF').length;
+        const lf = data.events.filter(e => e.cls === 'LF').length;
+        const total = a + lf;
+        document.getElementById('summary-title').textContent = `Flagged events \u2014 ${RANGES[data.rangeKey].label.toLowerCase()}`;
+        document.getElementById('sum-a').textContent = a;
+        document.getElementById('sum-lf').textContent = lf;
+        document.getElementById('sum-s').textContent = data.sirens.length;
+
+        let sentence;
+        if (total === 0) sentence = 'No flagged events in this time range.';
+        else if (lf === 0) sentence = `All ${a} flagged event${a === 1 ? ' was' : 's were'} also over the ${DECIBEL_THRESHOLD} dBA limit.`;
+        else sentence = `${lf} of ${total} flagged events (${Math.round(100 * lf / total)}%) were under ${DECIBEL_THRESHOLD} dBA, so a dBA-only rule misses them, yet dBC was more than ${LF_DELTA_THRESHOLD} dB higher.`;
+        if (data.truncated) sentence += ` Showing the most recent ${EVENT_LIMIT.toLocaleString()} events.`;
+        document.getElementById('summary-sentence').textContent = sentence;
+    }
+
+    function renderScatter(data) {
+        scatterChartInstance = destroyChart(scatterChartInstance);
+        const toPoint = e => ({ x: e.dba, y: e.dbc, ev: e });
+        const events = data.events.filter(e => e.dbc != null);
+        const sirens = showSirens ? data.sirens.filter(e => e.dbc != null) : [];
+        const all = events.concat(sirens);
+        const xMin = Math.floor((Math.min(70, ...all.map(e => e.dba)) - 2) / 5) * 5;
+        const xMax = Math.ceil((Math.max(100, ...all.map(e => e.dba)) + 2) / 5) * 5;
+        const yMin = Math.floor((Math.min(80, ...all.map(e => e.dbc)) - 2) / 5) * 5;
+        const yMax = Math.ceil((Math.max(105, ...all.map(e => e.dbc)) + 2) / 5) * 5;
+
+        const datasets = classDatasets(events, toPoint, 4);
+        if (showSirens) datasets.push(sirenDataset(sirens.map(toPoint), 4));
+
+        const axisTitle = text => ({ display: true, text, color: '#888', font: { size: 10 } });
+        scatterChartInstance = new Chart(document.getElementById('scatterChart').getContext('2d'), {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    x: { type: 'linear', min: xMin, max: xMax, title: axisTitle('dBA \u2014 what most ordinances measure'), grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 } } },
+                    y: { min: yMin, max: yMax, title: axisTitle('dBC'), grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 } } }
+                },
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa', usePointStyle: true } },
+                    tooltip: eventTooltip(),
+                    demoMark: { enabled: data.demo },
+                    lfRegions: { baseline: baselineDelta() }
+                }
+            },
+            plugins: [lfRegionsPlugin, demoMarkPlugin]
+        });
+    }
+
+    function renderTimeline(data) {
+        timelineChartInstance = destroyChart(timelineChartInstance);
+        deltaChartInstance = destroyChart(deltaChartInstance);
+
+        const sirens = showSirens ? data.sirens : [];
+        const all = data.events.concat(sirens);
+        const xScale = (showLabels) => ({
+            type: 'linear', min: data.since, max: data.until,
+            grid: { color: '#2f2f2f' },
+            ticks: { display: showLabels, color: '#888', font: { size: 9 }, maxRotation: 0, callback: v => fmtTick(v, data.rangeKey) },
+            afterBuildTicks: sc => { sc.ticks = niceTimeTicks(sc.min, sc.max, data.rangeKey).map(value => ({ value })); }
+        });
+        const yScale = (min, max) => ({
+            min, max, grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 } },
+            afterFit: sc => { sc.width = 44; } // same width on both charts so the time axes line up
+        });
+        const base = (yScaleCfg, showLabels, lines) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: { x: xScale(showLabels), y: yScaleCfg },
+            plugins: { legend: { display: false }, tooltip: eventTooltip(), refLines: { lines }, demoMark: { enabled: data.demo } }
+        });
+
+        // dBA per event, with the limit line: blue dots below it are what a dBA-only rule never sees
+        const dbaMin = Math.floor((Math.min(60, ...all.map(e => e.dba)) - 2) / 5) * 5;
+        const dbaMax = Math.ceil((Math.max(95, ...all.map(e => e.dba)) + 2) / 5) * 5;
+        const dbaPoint = e => ({ x: e.t, y: e.dba, ev: e });
+        const topSets = classDatasets(data.events, dbaPoint, 3);
+        if (showSirens) topSets.push(sirenDataset(sirens.map(dbaPoint), 3));
+        timelineChartInstance = new Chart(document.getElementById('timelineChart').getContext('2d'), {
+            type: 'scatter',
+            data: { datasets: topSets },
+            options: base(yScale(dbaMin, dbaMax), false, [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA limit` }]),
+            plugins: [refLinesPlugin, demoMarkPlugin]
+        });
+
+        // Delta strip
+        const deltas = all.filter(e => e.delta != null).map(e => e.delta);
+        const dMin = Math.min(0, Math.floor(Math.min(0, ...deltas) - 1));
+        const dMax = Math.ceil((Math.max(15, ...deltas) + 2) / 5) * 5;
+        const deltaPoint = e => ({ x: e.t, y: e.delta, ev: e });
+        const bottomSets = classDatasets(data.events, deltaPoint, 3);
+        if (showSirens) bottomSets.push(sirenDataset(sirens.filter(e => e.delta != null).map(deltaPoint), 3));
+        deltaChartInstance = new Chart(document.getElementById('deltaChart').getContext('2d'), {
+            type: 'scatter',
+            data: { datasets: bottomSets },
+            options: base(yScale(dMin, dMax), true, [
+                { y: LF_DELTA_THRESHOLD, color: '#29b6f6', label: `\u0394 = ${LF_DELTA_THRESHOLD} dB` },
+                ...(baselineDelta() != null ? [{ y: baselineDelta(), color: '#bdbdbd', label: `typical \u0394 ${signed(baselineDelta())}`, align: 'left' }] : [])
+            ]),
+            plugins: [refLinesPlugin, demoMarkPlugin]
+        });
+    }
+
+    async function loadEvents(station, token, force = false) {
+        const status = document.getElementById('events-status');
+        let data;
+        try {
+            data = await getEvents(station, activeRange, force);
+        } catch (err) {
+            console.error('Could not load events:', err);
+            if (token !== panelToken) return;
+            status.textContent = String(err.message).includes('(400)')
+                ? "Couldn't load events. The database may still need the event_class migration."
+                : "Couldn't load events right now. Please try again in a minute.";
+            status.hidden = false;
+            return;
+        }
+        if (token !== panelToken) return;
+        status.hidden = true;
+        lastEventsData = data;
+        renderSummary(data);
+        renderScatter(data);
+        renderTimeline(data);
+    }
+
+    function syncRangeButtons() {
+        document.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('active', b.dataset.range === activeRange));
+    }
+    function setRange(key) {
+        if (!RANGES[key] || key === activeRange || !activeMarkerObj) return;
+        activeRange = key;
+        syncRangeButtons();
+        loadEvents(activeMarkerObj, panelToken);
+    }
+    function toggleSirens(checked) {
+        showSirens = checked;
+        if (!activeMarkerObj) return;
+        getEvents(activeMarkerObj, activeRange).then(data => { renderScatter(data); renderTimeline(data); }).catch(err => console.error(err));
+    }
+
+    // ========================================================================
+    // STEP 3: hour-by-day heatmap, exact 14-day patterns, station baseline.
+    // Data comes from the events_by_hour and station_delta_baseline database functions.
+    // ========================================================================
+    const STATION_TZ = 'America/Denver'; // the stations table has no timezone column yet
+    const HEATMAP_DAYS = 14;
+    const MIN_BASELINE_N = 720;          // about an hour of 5-second readings
+    const BASELINE_BAND = { min: 55, max: DECIBEL_THRESHOLD };
+    const HEAT_METRICS = {
+        all: { label: 'All flagged', color: [255, 112, 67] },
+        a:   { label: 'Over the dBA limit', color: [255, 183, 77] },
+        lf:  { label: '\u0394 rule only', color: [41, 182, 246] }
+    };
+    let heatMetric = 'all';
+    let lastHourly = null;
+    let lastBaseline = null;
+    let lastEventsData = null;
+    const hourlyCache = new Map();
+    const baselineCache = new Map();
+
+    async function rpcSupabase(fn, args) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+            body: JSON.stringify(args)
+        });
+        if (!res.ok) throw new Error(`Supabase rpc ${fn} failed (${res.status})`);
+        return res.json();
+    }
+
+    const isNight = h => h >= 22 || h < 6;
+    const signed = v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}`;
+    function hourLabel(h) { return `${h % 12 || 12} ${h < 12 ? 'am' : 'pm'}`; }
+    function hourRange(h) { return `${hourLabel(h)}\u2013${hourLabel((h + 1) % 24)}`; }
+    function dayLabel(dateStr) {
+        const dt = new Date(`${dateStr}T12:00:00Z`);
+        return `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dt.getUTCDay()]} ${dt.getUTCMonth() + 1}/${dt.getUTCDate()}`;
+    }
+
+    // The last n calendar dates (YYYY-MM-DD) in the station's time zone, oldest first.
+    // Pure calendar arithmetic, so daylight-saving changes cannot skip or repeat a day.
+    function lastNDates(n) {
+        const today = new Intl.DateTimeFormat('en-CA', { timeZone: STATION_TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+        const [y, m, d] = today.split('-').map(Number);
+        const out = [];
+        for (let i = n - 1; i >= 0; i--) out.push(new Date(Date.UTC(y, m - 1, d - i)).toISOString().slice(0, 10));
+        return out;
+    }
+
+    // rows: [{ local_date, hour_of_day, a_only, a_lf, lf_only, max_dba, max_dbc }]
+    function buildHourlyModel(rows, demo) {
+        const dates = lastNDates(HEATMAP_DAYS);
+        const index = new Map(dates.map((d, i) => [d, i]));
+        const cells = dates.map(() => Array.from({ length: 24 }, () => ({ a: 0, lf: 0 })));
+        const peakDba = Array(dates.length).fill(null), peakDbc = Array(dates.length).fill(null);
+        let total = 0;
+        rows.forEach(r => {
+            const i = index.get(r.local_date);
+            const h = Number(r.hour_of_day);
+            if (i === undefined || !(h >= 0 && h < 24)) return;
+            const a = Number(r.a_only) + Number(r.a_lf), lf = Number(r.lf_only);
+            cells[i][h].a += a;
+            cells[i][h].lf += lf;
+            total += a + lf;
+            if (r.max_dba != null && (peakDba[i] == null || r.max_dba > peakDba[i])) peakDba[i] = Number(r.max_dba);
+            if (r.max_dbc != null && (peakDbc[i] == null || r.max_dbc > peakDbc[i])) peakDbc[i] = Number(r.max_dbc);
+        });
+        return { dates, cells, peakDba, peakDbc, total, demo: !!demo };
+    }
+
+    function demoHourlyRows(station) {
+        const rand = seededRng(`${station.id}|hourly`);
+        const weight = h => (h >= 21 || h < 2) ? 0.55 : h < 5 ? 0.3 : (h >= 17 && h < 21) ? 0.25 : (h >= 6 && h < 17) ? 0.08 : 0.15;
+        // scale so the daily average matches the placeholder count shown on the summary card
+        const perDay = Math.max(4, station.todayExceedances || 0);
+        const scale = perDay / (6 * Array.from({ length: 24 }, (_, h) => weight(h)).reduce((a, b) => a + b, 0));
+        const rows = [];
+        lastNDates(HEATMAP_DAYS).forEach(date => {
+            for (let h = 0; h < 24; h++) {
+                let a = 0, lf = 0;
+                for (let k = 0; k < 6; k++) {
+                    if (rand() < weight(h) * scale) { if (rand() < 0.65) a++; else lf++; }
+                }
+                if (a + lf === 0) continue;
+                rows.push({
+                    local_date: date, hour_of_day: h, a_only: a, a_lf: 0, lf_only: lf,
+                    max_dba: Number((a ? 85 + rand() * 9 : 74 + rand() * 10).toFixed(1)),
+                    max_dbc: Number((90 + rand() * 12).toFixed(1))
+                });
+            }
+        });
+        return rows;
+    }
+
+    async function getHourly(station, force = false) {
+        if (station.state === 'demo') return buildHourlyModel(demoHourlyRows(station), true);
+        const hit = hourlyCache.get(station.id);
+        if (!force && hit && Date.now() - hit.at < 60000) return hit.model;
+        const rows = await rpcSupabase('events_by_hour', { p_station: station.id, p_days: HEATMAP_DAYS, p_tz: STATION_TZ });
+        if (!Array.isArray(rows)) throw new Error('Unexpected response from events_by_hour');
+        const model = buildHourlyModel(rows, false);
+        hourlyCache.set(station.id, { at: Date.now(), model });
+        return model;
+    }
+
+    // ---- Heatmap ----
+    function heatValue(cell, metric) { return metric === 'a' ? cell.a : metric === 'lf' ? cell.lf : cell.a + cell.lf; }
+
+    function heatSentence(model, metric) {
+        const perHour = Array(24).fill(0);
+        let total = 0, night = 0;
+        model.cells.forEach(row => row.forEach((c, h) => {
+            const v = heatValue(c, metric);
+            perHour[h] += v; total += v;
+            if (isNight(h)) night += v;
+        }));
+        if (!total) return `No ${HEAT_METRICS[metric].label.toLowerCase()} events in the last ${HEATMAP_DAYS} days.`;
+        const busiest = perHour.indexOf(Math.max(...perHour));
+        return `${Math.round(100 * night / total)}% of these ${total} events happened between 10 pm and 6 am. Busiest hour: ${hourRange(busiest)} (${perHour[busiest]} events).`;
+    }
+
+    function heatDetail(model, i, h) {
+        const c = model.cells[i][h];
+        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} flagged (${c.a} over the dBA limit, ${c.lf} \u0394 rule only)`;
+    }
+
+    function renderHeatmap(model) {
+        const [r, g, b] = HEAT_METRICS[heatMetric].color;
+        const values = model.cells.map(row => row.map(c => heatValue(c, heatMetric)));
+        const max = Math.max(1, ...values.flat());
+        let cells = '', days = '';
+        for (let i = model.dates.length - 1; i >= 0; i--) { // newest day on top
+            days += `<span>${dayLabel(model.dates[i])}</span>`;
+            for (let h = 0; h < 24; h++) {
+                const v = values[i][h];
+                const bg = v > 0 ? ` style="background:rgba(${r},${g},${b},${(0.25 + 0.75 * Math.sqrt(v / max)).toFixed(2)})"` : '';
+                cells += `<div class="hm-cell${isNight(h) ? ' night' : ''}" data-d="${i}" data-h="${h}"${bg} title="${heatDetail(model, i, h)}"></div>`;
+            }
+        }
+        document.getElementById('hm-days').innerHTML = days;
+        document.getElementById('hm-grid').innerHTML = cells;
+        const swatch = a => `<i style="background:rgba(${r},${g},${b},${a})"></i>`;
+        document.getElementById('hm-legend').innerHTML = `fewer ${swatch(0.25)}${swatch(0.5)}${swatch(0.75)}${swatch(1)} more`;
+        document.getElementById('heatmap-sentence').textContent = heatSentence(model, heatMetric);
+        document.getElementById('heatmap-card').classList.toggle('demo-mark', !!model.demo);
+        document.getElementById('hm-detail').textContent = 'Tap a square for details.';
+    }
+
+    function setHeatMetric(metric) {
+        if (!HEAT_METRICS[metric] || metric === heatMetric) return;
+        heatMetric = metric;
+        syncHeatButtons();
+        if (lastHourly) renderHeatmap(lastHourly);
+    }
+    function syncHeatButtons() {
+        document.querySelectorAll('.heat-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.metric === heatMetric));
+    }
+
+    async function loadHeatmap(station, token, force = false) {
+        const status = document.getElementById('heatmap-status');
+        let model;
+        try {
+            model = await getHourly(station, force);
+        } catch (err) {
+            console.error('Could not load the hour-by-day pattern:', err);
+            if (token !== panelToken) return;
+            status.textContent = "Couldn't load the hour-by-day pattern. The step 3 database functions may not be installed yet.";
+            status.hidden = false;
+            return;
+        }
+        if (token !== panelToken) return;
+        status.hidden = true;
+        lastHourly = model;
+        renderHeatmap(model);
+    }
+
+    // ---- Station baseline: what delta looks like in ordinary conditions ----
+    async function getBaseline(station) {
+        if (station.state === 'demo') return null;
+        const hit = baselineCache.get(station.id);
+        if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.value;
+        const rows = await rpcSupabase('station_delta_baseline', {
+            p_station: station.id, p_days: HEATMAP_DAYS, p_min_dba: BASELINE_BAND.min, p_max_dba: BASELINE_BAND.max, p_rule: LF_DELTA_THRESHOLD
+        });
+        const r = Array.isArray(rows) ? rows[0] : null;
+        const value = r && Number(r.n) > 0 && r.median_delta != null
+            ? { n: Number(r.n), median: Number(r.median_delta), p90: Number(r.p90_delta), share: Number(r.share_over_rule) }
+            : { n: 0 };
+        baselineCache.set(station.id, { at: Date.now(), value });
+        return value;
+    }
+
+    function baselineDelta() { return lastBaseline && lastBaseline.n >= MIN_BASELINE_N ? lastBaseline.median : null; }
+
+    function renderBaselineNote(station, b) {
+        const el = document.getElementById('baseline-note');
+        if (station.state === 'demo') { el.textContent = 'A station baseline appears once this station has real data.'; return; }
+        if (b === null) { el.textContent = ''; return; }
+        if (b.n < MIN_BASELINE_N) { el.textContent = "Not enough readings yet to show this station's typical \u0394."; return; }
+        let text = `Typical \u0394 here (readings between ${BASELINE_BAND.min} and ${BASELINE_BAND.max} dBA, last ${HEATMAP_DAYS} days): ` +
+            `median ${signed(b.median)} dB, 90th percentile ${signed(b.p90)} dB. ` +
+            `\u0394 is above ${LF_DELTA_THRESHOLD} dB in ${Math.round(b.share * 100)}% of these readings (n = ${b.n.toLocaleString()}).`;
+        if (b.share > 0.2) {
+            text += ' That is common at this station, so events flagged only by the \u0394 rule are weaker evidence here. Check microphone placement and wind protection.';
+        }
+        el.textContent = text;
+    }
+
+    async function loadBaseline(station, token) {
+        let baseline = null;
+        try { baseline = await getBaseline(station); }
+        catch (err) { console.warn('Could not load the station baseline:', err); }
+        if (token !== panelToken) return;
+        lastBaseline = baseline;
+        renderBaselineNote(station, baseline);
+        if (lastEventsData) { renderScatter(lastEventsData); renderTimeline(lastEventsData); }
+    }
+
+    // ---- Live strip ----
     function updateLiveHistory(dba, dbc) {
-        const now = new Date();
-        const timeStr = now.toTimeString().split(' ')[0];
-        const safeDbc = dbc || (dba + (Math.random() * 8 + 12));
-
         liveDbHistory.push(dba);
-        liveDbcHistory.push(safeDbc);
-        liveTimeLabels.push(timeStr);
-
+        liveDbcHistory.push(dbc);
+        liveTimeLabels.push(new Date().toTimeString().split(' ')[0]);
         if (liveDbHistory.length > MAX_LIVE_POINTS) {
             liveDbHistory.shift();
             liveDbcHistory.shift();
             liveTimeLabels.shift();
         }
-
-        if (liveMinuteChartInstance) {
-            liveMinuteChartInstance.update('none');
-        }
+        if (liveMinuteChartInstance) liveMinuteChartInstance.update('none');
     }
 
-    function initLiveChart() {
-        const ctxLive = document.getElementById('liveMinuteChart').getContext('2d');
-        
-        if (liveMinuteChartInstance) {
-            liveMinuteChartInstance.destroy();
-            liveMinuteChartInstance = null;
-        }
-
-        liveMinuteChartInstance = new Chart(ctxLive, {
+    function initLiveChart(isDemo) {
+        liveMinuteChartInstance = destroyChart(liveMinuteChartInstance);
+        liveMinuteChartInstance = new Chart(document.getElementById('liveMinuteChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: liveTimeLabels,
                 datasets: [
+                    { label: 'dBA', data: liveDbHistory, borderColor: '#00e676', borderWidth: 2, pointRadius: 0, tension: 0.2, spanGaps: false },
                     {
-                        label: 'dBA Level',
-                        data: liveDbHistory,
-                        borderColor: '#00e676',
-                        borderWidth: 2,
-                        backgroundColor: 'rgba(0, 230, 118, 0.05)',
-                        fill: false,
-                        pointRadius: 0,
-                        tension: 0.2,
-                        order: 2
-                    },
-                    {
-                        label: 'dBC Level',
-                        data: liveDbcHistory,
-                        borderColor: '#29b6f6',
-                        borderWidth: 1.5,
-                        borderDash: [4, 4],
-                        backgroundColor: 'rgba(41, 182, 246, 0.18)',
-                        fill: {
-                            target: 0,
-                            above: 'rgba(41, 182, 246, 0.22)'
-                        },
-                        pointRadius: 0,
-                        tension: 0.2,
-                        order: 1
+                        label: 'dBC', data: liveDbcHistory, borderColor: '#29b6f6', borderWidth: 1.5, pointRadius: 0, tension: 0.2, spanGaps: false,
+                        // red wherever the delta rule is met
+                        segment: { borderColor: c => (meetsLfRule(liveDbHistory[c.p1DataIndex], liveDbcHistory[c.p1DataIndex]) ? '#ef5350' : undefined) }
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
                 scales: {
-                    x: { 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 12 } 
-                    },
-                    y: { 
-                        min: 40, 
-                        suggestedMax: 115, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
-                },
-                plugins: { 
-                    legend: { 
-                        display: true,
-                        position: 'top',
-                        labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa' }
-                    },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const datasetLabel = ctx.dataset.label;
-                                if (datasetLabel.includes('dBA')) {
-                                    const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                    return val >= DECIBEL_THRESHOLD 
-                                        ? ` dBA: ${val} dBA (+${diff} dBA over threshold)`
-                                        : ` dBA: ${val} dBA (${Math.abs(diff)} dBA below threshold)`;
-                                } else {
-                                    const idx = ctx.dataIndex;
-                                    const dbaVal = liveDbHistory[idx] || 0;
-                                    const delta = (val - dbaVal).toFixed(1);
-                                    const isBlindSpot = delta > 12;
-                                    return ` dBC: ${val} dBC (\u0394 +${delta} dB${isBlindSpot ? ' - Acoustic Blind Spot Event!' : ''})`;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    async function renderHourlyExceedanceChart() {
-        if (!activeMarkerObj) return;
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        let chartData = [];
-
-        try {
-            const logs = await fetchSupabase("noise_logs", `select=timestamp,dba,dbc&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneHourAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.false&order=timestamp.asc`);
-            if (Array.isArray(logs) && logs.length > 0) {
-                chartData = logs.map(l => ({
-                    time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                    dba: Number(l.dba),
-                    dbc: l.dbc ? Number(l.dbc) : Number(l.dba) + 14.2
-                }));
-            }
-        } catch(e) { console.error(e); }
-
-        if (chartData.length === 0) {
-            const now = Date.now();
-            for (let i = 0; i < (activeMarkerObj.hourlyExceedances || 0); i++) {
-                const dba = Number((Math.random() * 10 + 85.5).toFixed(1));
-                chartData.push({
-                    time: new Date(now - (i + 1) * 10 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: dba,
-                    dbc: Number((dba + (Math.random() * 6 + 10)).toFixed(1))
-                });
-            }
-            chartData.reverse();
-        }
-
-        const labels = chartData.map(d => d.time);
-        const dbaValues = chartData.map(d => d.dba);
-        const dbcValues = chartData.map(d => d.dbc);
-
-        const maxVal = Math.max(...dbaValues, ...dbcValues, DECIBEL_THRESHOLD);
-        const yMax = Math.max(Math.ceil(maxVal + 2), 105);
-
-        if (hourlyChartInstance) {
-            hourlyChartInstance.destroy();
-            hourlyChartInstance = null;
-        }
-
-        const ctx = document.getElementById('hourlyExceedanceChart').getContext('2d');
-        hourlyChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'dBA Exceedance',
-                        data: dbaValues,
-                        backgroundColor: '#ffb74d',
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'dBC Reading',
-                        data: dbcValues,
-                        backgroundColor: '#29b6f6',
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { 
-                        min: 80, 
-                        suggestedMax: yMax, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
-                },
-                plugins: {
-                    legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa' } },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const datasetLabel = ctx.dataset.label;
-                                if (datasetLabel.includes('dBA')) {
-                                    const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                    return ` dBA: ${val} dBA (+${diff} over threshold)`;
-                                } else {
-                                    const idx = ctx.dataIndex;
-                                    const dba = dbaValues[idx] || DECIBEL_THRESHOLD;
-                                    const delta = (val - dba).toFixed(1);
-                                    return ` dBC: ${val} dBC (\u0394 +${delta} dB)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    async function renderTodayExceedanceChart() {
-        if (!activeMarkerObj) return;
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        let chartData = [];
-
-        try {
-            const logs = await fetchSupabase("noise_logs", `select=timestamp,dba,dbc&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneDayAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.false&order=timestamp.asc&limit=1000`);
-            if (Array.isArray(logs) && logs.length > 0) {
-                chartData = logs.map(l => ({
-                    time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: Number(l.dba),
-                    dbc: l.dbc ? Number(l.dbc) : Number(l.dba) + 14.2
-                }));
-            }
-        } catch(e) { console.error(e); }
-
-        if (chartData.length === 0) {
-            const now = Date.now();
-            for (let i = 0; i < Math.min(activeMarkerObj.todayExceedances || 2, 15); i++) {
-                const dba = Number((Math.random() * 12 + 85.5).toFixed(1));
-                chartData.push({
-                    time: new Date(now - (i + 1) * 45 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: dba,
-                    dbc: Number((dba + (Math.random() * 6 + 11)).toFixed(1))
-                });
-            }
-            chartData.reverse();
-        }
-
-        const labels = chartData.map(d => d.time);
-        const dbaValues = chartData.map(d => d.dba);
-        const dbcValues = chartData.map(d => d.dbc);
-
-        const maxVal = Math.max(...dbaValues, ...dbcValues, DECIBEL_THRESHOLD);
-        const yMax = Math.max(Math.ceil(maxVal + 2), 105);
-
-        if (todayChartInstance) {
-            todayChartInstance.destroy();
-            todayChartInstance = null;
-        }
-
-        const ctx = document.getElementById('todayExceedanceChart').getContext('2d');
-        todayChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'dBA Exceedance',
-                        data: dbaValues,
-                        backgroundColor: '#ff5252',
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'dBC Reading',
-                        data: dbcValues,
-                        backgroundColor: '#29b6f6',
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { 
-                        min: 80, 
-                        suggestedMax: yMax, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
-                },
-                 plugins: {
-                    legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa' } },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const datasetLabel = ctx.dataset.label;
-                                if (datasetLabel.includes('dBA')) {
-                                    const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                    return ` dBA: ${val} dBA (+${diff} over threshold)`;
-                                } else {
-                                    const idx = ctx.dataIndex;
-                                    const dba = dbaValues[idx] || DECIBEL_THRESHOLD;
-                                    const delta = (val - dba).toFixed(1);
-                                    return ` dBC: ${val} dBC (\u0394 +${delta} dB)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    async function renderSirenExceedanceChart() {
-        if (!activeMarkerObj) return;
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        let chartData = [];
-
-        try {
-            const logs = await fetchSupabase("noise_logs", `select=timestamp,dba&station_id=eq.${activeMarkerObj.id}&timestamp=gte.${oneDayAgo}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.true&order=timestamp.asc&limit=1000`);
-            if (Array.isArray(logs) && logs.length > 0) {
-                chartData = logs.map(l => ({
-                    time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: Number(l.dba)
-                }));
-            }
-        } catch(e) { console.error(e); }
-
-        if (chartData.length === 0) {
-            const now = Date.now();
-            const count = activeMarkerObj.sirensCount || 0;
-            for (let i = 0; i < count; i++) {
-                chartData.push({
-                    time: new Date(now - (i + 1) * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    dba: Number((Math.random() * 8 + 88.0).toFixed(1))
-                });
-            }
-            chartData.reverse();
-        }
-
-        const labels = chartData.map(d => d.time);
-        const values = chartData.map(d => d.dba);
-
-        const maxVal = values.length > 0 ? Math.max(...values) : DECIBEL_THRESHOLD;
-        const yMax = Math.max(Math.ceil(maxVal + 2), 95);
-
-        if (sirenChartInstance) {
-            sirenChartInstance.destroy();
-            sirenChartInstance = null;
-        }
-
-        const ctx = document.getElementById('sirenExceedanceChart').getContext('2d');
-        sirenChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Siren Exceedance (dBA)',
-                    data: values,
-                    backgroundColor: '#29b6f6',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { 
-                        min: 80, 
-                        suggestedMax: yMax, 
-                        grid: { color: '#333' }, 
-                        ticks: { color: '#888', font: { size: 9 } } 
-                    }
+                    x: { display: false },
+                    y: { min: 40, suggestedMax: 110, grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 5 } }
                 },
                 plugins: {
                     legend: { display: false },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: thresholdAnnotation
-                        }
-                    },
+                    refLines: { lines: [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b' }] },
+                    demoMark: { enabled: isDemo },
                     tooltip: {
                         callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                return ` Siren Impulse: ${val} dBA (+${diff} dBA over threshold)`;
+                            label: c => {
+                                if (c.raw == null) return ` ${c.dataset.label}: --`;
+                                if (c.dataset.label === 'dBA') return ` dBA ${Number(c.raw).toFixed(1)}`;
+                                const dba = liveDbHistory[c.dataIndex];
+                                return ` dBC ${Number(c.raw).toFixed(1)} (\u0394 ${(c.raw - dba >= 0 ? '+' : '')}${(c.raw - dba).toFixed(1)} dB)`;
                             }
                         }
                     }
                 }
-            }
+            },
+            plugins: [refLinesPlugin, demoMarkPlugin]
         });
+    }
+
+    async function loadLive(station, token) {
+        let hist;
+        if (station.state === 'demo') hist = demoLiveSeries(station);
+        else {
+            try { hist = await fetchLiveHistory(station); }
+            catch (err) { console.warn('Could not load live history:', err); hist = { dba: [], dbc: [], labels: [] }; }
+        }
+        if (token !== panelToken) return;
+        liveDbHistory = hist.dba;
+        liveDbcHistory = hist.dbc;
+        liveTimeLabels = hist.labels;
+        initLiveChart(station.state === 'demo');
     }
 
     function getBadgeClass(exceedances) {
@@ -1685,13 +2090,28 @@
 
     // --- DBA-METRIC MAP MARKER BADGE ---
     function createBadgeIcon(station) {
-        const dba = station.currentDba;
-        const exceedances = station.hourlyExceedances || 0;
-        const badgeClass = getBadgeClass(exceedances);
+        let badgeClass, text;
+        if (station.state === 'live') {
+            badgeClass = getBadgeClass(station.hourlyExceedances || 0);
+            text = `${station.currentDba.toFixed(1)} dBA`;
+        } else if (station.state === 'stale') {
+            badgeClass = 'badge-muted';
+            text = 'offline';
+        } else if (station.state === 'demo') {
+            badgeClass = 'badge-muted badge-demo';
+            text = 'demo';
+        } else {
+            badgeClass = 'badge-muted';
+            text = '\u2026';
+        }
+        const lf = station.state === 'live' ? (station.hourlyLF || 0) : 0;
+        const pip = lf > 0
+            ? `<span class="lf-pip" title="${lf} event(s) in the last hour under the dBA limit but flagged by the delta rule">\u0394${lf}</span>`
+            : '';
 
         return L.divIcon({
             className: 'custom-aqi-icon',
-            html: `<div class="aqi-marker-badge ${badgeClass}" style="display:flex; align-items:center; justify-content:center; padding:3px 8px;"><span>${dba.toFixed(1)} dBA</span></div>`,
+            html: `<div class="aqi-marker-badge ${badgeClass}" style="display:flex; align-items:center; justify-content:center; padding:3px 8px; position:relative;"><span>${text}</span>${pip}</div>`,
             iconSize: [84, 26],
             iconAnchor: [42, 13]
         });
@@ -1722,322 +2142,263 @@
     }
 
     // --- AUTOMATED SUPABASE SYNC ACROSS ALL STATIONS ---
-    async function fetchLiveMeters() {
+    async function refreshCounts(station) {
+        const hourAgo = new Date(Date.now() - RANGES['1h'].ms).toISOString();
+        const dayAgo = new Date(Date.now() - RANGES['24h'].ms).toISOString();
+        const base = `station_id=eq.${station.id}&is_siren=eq.false`;
+        const [hourA, hourLF, dayA, dayLF, sirens] = await Promise.all([
+            countSupabase('noise_logs', `${base}&event_class=in.(A,A_LF)&timestamp=gte.${hourAgo}`),
+            countSupabase('noise_logs', `${base}&event_class=eq.LF&timestamp=gte.${hourAgo}`),
+            countSupabase('noise_logs', `${base}&event_class=in.(A,A_LF)&timestamp=gte.${dayAgo}`),
+            countSupabase('noise_logs', `${base}&event_class=eq.LF&timestamp=gte.${dayAgo}`),
+            countSupabase('noise_logs', `station_id=eq.${station.id}&is_siren=eq.true&event_class=not.is.null&timestamp=gte.${dayAgo}`)
+        ]);
+        Object.assign(station, { hourlyExceedances: hourA, hourlyLF: hourLF, todayExceedances: dayA, todayLF: dayLF, sirensCount: sirens });
+        station.countsAt = Date.now();
+    }
+
+    // Latest reading decides the state: 'demo' (never reported), 'live', or 'stale' (went quiet).
+    // Nothing is invented for a real station: on an error we simply keep what we had.
+    async function refreshStation(station, wantCounts) {
         try {
-            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+            const latest = await fetchSupabase('noise_logs',
+                `select=timestamp,dba,dbc&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
+            if (!Array.isArray(latest)) return;
+            if (latest.length === 0) { station.state = 'demo'; station.lastSeen = null; return; }
+            const row = latest[0];
+            const isNewRow = row.timestamp !== station.lastRowTs;
+            station.lastRowTs = row.timestamp;
+            station.currentDba = Number(row.dba);
+            station.currentDbc = validDbc(row.dbc);
+            station.lastSeen = new Date(row.timestamp).getTime();
+            station.state = Date.now() - station.lastSeen > STALE_AFTER_MS ? 'stale' : 'live';
+            if (isNewRow && station.state === 'live' && activeMarkerObj && activeMarkerObj.id === station.id) {
+                updateLiveHistory(station.currentDba, station.currentDbc);
+            }
+            if (wantCounts) await refreshCounts(station);
+        } catch (err) {
+            console.warn(`Could not refresh ${station.id}:`, err);
+        }
+    }
 
+    function renderLiveHeader(station) {
+        const known = station.state !== 'loading';
+        const dba = station.currentDba, dbc = station.currentDbc;
+        const deltaEl = document.getElementById('panel-delta');
+        const flagEl = document.getElementById('panel-flag');
+        document.getElementById('panel-db').textContent = known && Number.isFinite(dba) ? dba.toFixed(1) : '--';
+        document.getElementById('panel-dbc').textContent = known && dbc != null ? dbc.toFixed(1) : '--';
+
+        if (!known || dbc == null || !Number.isFinite(dba)) {
+            deltaEl.textContent = '\u0394 --';
+            deltaEl.className = 'delta-pill';
+            flagEl.hidden = true;
+        } else {
+            const delta = dbc - dba;
+            deltaEl.textContent = `\u0394 ${delta >= 0 ? '+' : ''}${delta.toFixed(1)} dB`;
+            deltaEl.className = 'delta-pill' + (delta > LF_DELTA_THRESHOLD ? ' delta-high' : delta >= 5 ? ' delta-mid' : '');
+            const cls = classifyEvent(dba, dbc);
+            flagEl.hidden = !cls;
+            if (cls) {
+                flagEl.textContent = CLASS_META[cls].label;
+                flagEl.style.background = CLASS_META[cls].color + '33';
+                flagEl.style.color = CLASS_META[cls].color;
+            }
+        }
+
+        const statusEl = document.getElementById('live-status');
+        if (station.state === 'live') statusEl.textContent = `Live \u00b7 updated ${fmtAgo(station.lastSeen)}`;
+        else if (station.state === 'stale') statusEl.textContent = `Offline \u00b7 last reading ${fmtAgo(station.lastSeen)}`;
+        else if (station.state === 'demo') statusEl.textContent = 'Demo placeholder \u00b7 not a measurement';
+        else statusEl.textContent = 'Loading\u2026';
+    }
+
+    function renderBanner(station) {
+        const el = document.getElementById('panel-banner');
+        if (station.state === 'demo') {
+            el.className = 'panel-banner';
+            el.innerHTML = "<strong>Demo data.</strong> This station isn't reporting yet, so everything below is simulated. It is not included in CSV exports, PDF reports, or 311 requests.";
+            el.hidden = false;
+        } else if (station.state === 'stale') {
+            el.className = 'panel-banner offline';
+            el.textContent = `Offline. The last reading was ${fmtAgo(station.lastSeen)}. Charts show stored data.`;
+            el.hidden = false;
+        } else {
+            el.hidden = true;
+        }
+    }
+
+    let polling = false;
+    let lastStatsFetch = 0;
+    async function fetchLiveMeters() {
+        if (polling) return;
+        polling = true;
+        try {
+            const now = Date.now();
             for (const station of METER_STATIONS) {
-                try {
-                    const data = await fetchSupabase("noise_logs", `select=*&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
-                    
-                    if (Array.isArray(data) && data.length > 0) {
-                        const liveDba = Number(data[0].dba);
-                        const liveDbc = data[0].dbc ? Number(data[0].dbc) : liveDba + (Math.random() * 6 + 12);
-
-                        station.currentDba = liveDba;
-                        station.currentDbc = liveDbc;
-
-                        if (activeMarkerObj && activeMarkerObj.id === station.id) {
-                            updateLiveHistory(liveDba, liveDbc);
-                        }
-
-                        const exceedData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneHourAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.false`);
-                        const hourlyCount = Array.isArray(exceedData) ? exceedData.length : 0;
-
-                        const todayData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneDayAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.false`);
-                        const todayCount = Array.isArray(todayData) ? todayData.length : 0;
-
-                        const sirensData = await fetchSupabase("noise_logs", `select=id&station_id=eq.${station.id}&timestamp=gte.${oneDayAgo}&or=(dba.gte.${DECIBEL_THRESHOLD},dbc.gte.${DECIBEL_THRESHOLD})&is_siren=eq.true`);
-                        const sirensCount = Array.isArray(sirensData) ? sirensData.length : 0;
-
-                        station.hourlyExceedances = hourlyCount;
-                        station.todayExceedances = todayCount;
-                        station.sirensCount = sirensCount;
-                    } else {
-                        station.currentDba = Number((station.currentDba + (Math.random() * 2 - 1)).toFixed(1));
-                        station.currentDbc = Number((station.currentDba + 14.2).toFixed(1));
-                        if (activeMarkerObj && activeMarkerObj.id === station.id) {
-                            updateLiveHistory(station.currentDba, station.currentDbc);
-                        }
-                    }
-                } catch (innerErr) {
-                    station.currentDba = Number((station.currentDba + (Math.random() * 2 - 1)).toFixed(1));
-                    station.currentDbc = Number((station.currentDba + 14.2).toFixed(1));
-                    if (activeMarkerObj && activeMarkerObj.id === station.id) {
-                        updateLiveHistory(station.currentDba, station.currentDbc);
-                    }
-                }
+                const wantCounts = !station.countsAt || now - station.countsAt > 60000;
+                await refreshStation(station, wantCounts);
 
                 const marker = markersMap.get(station.id);
-                if (marker) {
-                    marker.setIcon(createBadgeIcon(station));
-                }
+                if (marker) marker.setIcon(createBadgeIcon(station));
 
                 if (activeMarkerObj && activeMarkerObj.id === station.id) {
-                    const liveDba = station.currentDba;
-                    const liveDbc = station.currentDbc;
-                    const delta = (liveDbc - liveDba).toFixed(1);
-                    document.getElementById('panel-db').innerText = liveDba.toFixed(1);
-                    document.getElementById('panel-dbc').innerText = liveDbc.toFixed(1);
-                    const deltaEl = document.getElementById('panel-delta');
-                    deltaEl.innerText = `\u0394 +${delta} dB${delta > 12 ? ' (Surge)' : ''}`;
-                    deltaEl.style.color = delta > 12 ? '#29b6f6' : '#aaa';
-                    document.getElementById('panel-hourly').innerText = station.hourlyExceedances || 0;
-                    document.getElementById('panel-today').innerText = station.todayExceedances || 0;
-                    document.getElementById('panel-sirens').innerText = station.sirensCount || 0;
+                    renderLiveHeader(station);
+                    renderBanner(station);
+                    // keep the summary and charts fresh about once a minute
+                    if (wantCounts && station.state !== 'demo') {
+                        loadEvents(station, panelToken, true);
+                        loadHeatmap(station, panelToken, true);
+                    }
                 }
             }
+            document.getElementById('active-count').innerText = METER_STATIONS.filter(s => s.state === 'live').length;
 
-            const statsData = await fetchSupabase("report_stats", "select=total_submitted");
-            if (Array.isArray(statsData) && statsData.length > 0) {
-                const total311 = statsData.reduce((sum, item) => sum + (Number(item.total_submitted) || 0), 0);
-                document.getElementById('total-311-count').innerText = total311;
+            if (now - lastStatsFetch > 60000) {
+                lastStatsFetch = now;
+                const statsData = await fetchSupabase('report_stats', 'select=total_submitted');
+                if (Array.isArray(statsData) && statsData.length > 0) {
+                    document.getElementById('total-311-count').innerText =
+                        statsData.reduce((sum, item) => sum + (Number(item.total_submitted) || 0), 0);
+                }
             }
         } catch (err) {
-            console.error("Supabase live sync error:", err);
+            console.error('Supabase live sync error:', err);
+        } finally {
+            polling = false;
         }
+    }
+
+    function destroyPanelCharts() {
+        liveMinuteChartInstance = destroyChart(liveMinuteChartInstance);
+        scatterChartInstance = destroyChart(scatterChartInstance);
+        timelineChartInstance = destroyChart(timelineChartInstance);
+        deltaChartInstance = destroyChart(deltaChartInstance);
+        stackedChartInstance = destroyChart(stackedChartInstance);
+        peakChartInstance = destroyChart(peakChartInstance);
     }
 
     async function openDetailPanel(station) {
         closeInfoPanel();
+        const token = ++panelToken;
         activeMarkerObj = station;
         liveDbHistory = [];
         liveDbcHistory = [];
         liveTimeLabels = [];
 
-        const liveDbc = station.currentDbc || (station.currentDba + 14.2);
-        const delta = (liveDbc - station.currentDba).toFixed(1);
-
         document.getElementById('panel-title').innerText = station.name;
         document.getElementById('panel-address').innerText = station.address;
-        document.getElementById('panel-db').innerText = station.currentDba.toFixed(1);
-        document.getElementById('panel-dbc').innerText = liveDbc.toFixed(1);
-        const deltaEl = document.getElementById('panel-delta');
-        deltaEl.innerText = `\u0394 +${delta} dB${delta > 12 ? ' (Surge)' : ''}`;
-        document.getElementById('panel-hourly').innerText = station.hourlyExceedances || 0;
-        document.getElementById('panel-today').innerText = station.todayExceedances || 0;
-        document.getElementById('panel-sirens').innerText = station.sirensCount || 0;
+        renderLiveHeader(station);
+        renderBanner(station);
+        document.getElementById('events-status').hidden = true;
 
         const detailPanel = document.getElementById('detail-panel');
         detailPanel.scrollTop = 0;
         detailPanel.classList.add('open');
-        
         map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
 
-        if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
-        if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
-        if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
-        if (sirenChartInstance) { sirenChartInstance.destroy(); sirenChartInstance = null; }
+        destroyPanelCharts();
+        lastEventsData = null; lastHourly = null; lastBaseline = null;
+        ['heatmap-sentence', 'baseline-note'].forEach(id => { document.getElementById(id).textContent = ''; });
+        document.getElementById('hm-grid').innerHTML = ''; document.getElementById('hm-days').innerHTML = '';
+        document.getElementById('heatmap-status').hidden = true;
+        document.getElementById('patterns-details').open = false;
+        document.getElementById('show-sirens').checked = showSirens;
+        syncRangeButtons();
+        syncHeatButtons();
 
-        ['live', 'hourly', 'today', 'sirens'].forEach(type => {
-            const tileId = type === 'sirens' ? 'siren-card' : `tile-${type}`;
-            const tile = document.getElementById(tileId);
-            if (tile) {
-                tile.classList.remove('active');
-                tile.setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        await renderStationCharts(station);
+        if (station.state === 'loading') {
+            await refreshStation(station, false);
+            if (token !== panelToken) return;
+            renderLiveHeader(station);
+            renderBanner(station);
+        }
+        await Promise.all([loadLive(station, token), loadEvents(station, token), loadHeatmap(station, token), loadBaseline(station, token)]);
     }
 
     function closePanel() {
         document.getElementById('detail-panel').classList.remove('open');
-        if (liveMinuteChartInstance) { liveMinuteChartInstance.destroy(); liveMinuteChartInstance = null; }
-        if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
-        if (todayChartInstance) { todayChartInstance.destroy(); todayChartInstance = null; }
-        if (sirenChartInstance) { sirenChartInstance.destroy(); sirenChartInstance = null; }
-        if (stackedChartInstance) { stackedChartInstance.destroy(); stackedChartInstance = null; }
-        if (peakChartInstance) { peakChartInstance.destroy(); peakChartInstance = null; }
+        panelToken++;
+        destroyPanelCharts();
         activeMarkerObj = null;
     }
 
-    async function renderStationCharts(station) {
-        const { dateMap, labels } = generate14DayLabels();
+    // 14-day patterns: exact daily totals from the same hourly data as the heatmap
+    async function renderPatterns(station) {
+        const token = panelToken;
+        let model;
+        try { model = await getHourly(station); }
+        catch (err) { console.error('Could not load 14-day patterns:', err); return; }
+        if (token !== panelToken) return;
 
-        let morning = Array(14).fill(0);
-        let afternoon = Array(14).fill(0);
-        let night = Array(14).fill(0);
-        let peakDba = Array(14).fill(0);
-        let peakDbc = Array(14).fill(0);
+        const labels = model.dates.map(d => { const [, m, dd] = d.split('-'); return `${Number(m)}/${Number(dd)}`; });
+        const morning = [], afternoon = [], night = [];
+        model.cells.forEach(row => {
+            let m = 0, a = 0, n = 0;
+            row.forEach((c, h) => {
+                const v = c.a + c.lf;
+                if (h >= 6 && h < 12) m += v; else if (h >= 12 && h < 18) a += v; else n += v;
+            });
+            morning.push(m); afternoon.push(a); night.push(n);
+        });
 
-        try {
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 13);
-            startDate.setHours(0, 0, 0, 0);
+        stackedChartInstance = destroyChart(stackedChartInstance);
+        peakChartInstance = destroyChart(peakChartInstance);
+        const tick = { color: '#888', font: { size: 9 } };
+        const isDemo = model.demo;
 
-            const exceedLogs = await fetchSupabase(
-                "noise_logs", 
-                `select=timestamp,dba,is_siren&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&dba=gte.${DECIBEL_THRESHOLD}&is_siren=eq.false&limit=5000`
-            );
-
-            if (Array.isArray(exceedLogs) && exceedLogs.length > 0) {
-                exceedLogs.forEach(log => {
-                    const dt = new Date(log.timestamp);
-                    const dateKey = dt.toLocaleDateString('en-CA');
-                    if (dateMap.has(dateKey)) {
-                        const idx = dateMap.get(dateKey);
-                        const hour = dt.getHours();
-                        if (hour >= 6 && hour < 12) morning[idx]++;
-                        else if (hour >= 12 && hour < 18) afternoon[idx]++;
-                        else night[idx]++;
-                    }
-                });
-            } else {
-                morning = [0, 1, 0, 2, 0, 1, 0, 0, 1, 2, 0, 1, 0, station.hourlyExceedances > 0 ? 1 : 0];
-                afternoon = [1, 2, 1, 0, 3, 1, 2, 0, 1, 1, 2, 0, 1, 2];
-                night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
-            }
-
-            const peakLogs = await fetchSupabase(
-                "noise_logs", 
-                `select=timestamp,dba,dbc&station_id=eq.${station.id}&timestamp=gte.${startDate.toISOString()}&order=dba.desc&limit=1000`
-            );
-
-            if (Array.isArray(peakLogs) && peakLogs.length > 0) {
-                peakLogs.forEach(log => {
-                    const dt = new Date(log.timestamp);
-                    const dateKey = dt.toLocaleDateString('en-CA');
-                    if (dateMap.has(dateKey)) {
-                        const idx = dateMap.get(dateKey);
-                        const dba = Number(log.dba);
-                        const dbc = log.dbc ? Number(log.dbc) : dba + 14.5;
-                        if (dba > peakDba[idx]) {
-                            peakDba[idx] = dba;
-                            peakDbc[idx] = dbc;
-                        }
-                    }
-                });
-            } else {
-                peakDba = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
-                peakDbc = peakDba.map(v => Number((v + 14.2).toFixed(1)));
-            }
-        } catch (e) {
-            console.error("Error fetching 14-day history, using defaults:", e);
-            morning = [0, 1, 0, 2, 0, 1, 0, 0, 1, 2, 0, 1, 0, 0];
-            afternoon = [1, 2, 1, 0, 3, 1, 2, 0, 1, 1, 2, 0, 1, 2];
-            night = [2, 4, 1, 3, 2, 5, 1, 2, 3, 1, 4, 2, 1, 3];
-            peakDba = [88.1, 92.4, 86.0, 89.5, 94.2, 87.1, 89.0, 85.5, 91.0, 88.4, 93.1, 87.0, 86.2, station.currentDba];
-            peakDbc = peakDba.map(v => Number((v + 14.2).toFixed(1)));
-        }
-
-        if (stackedChartInstance) stackedChartInstance.destroy();
-        if (peakChartInstance) peakChartInstance.destroy();
-
-        const ctxStacked = document.getElementById('stackedChart').getContext('2d');
-        stackedChartInstance = new Chart(ctxStacked, {
+        stackedChartInstance = new Chart(document.getElementById('stackedChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: labels,
+                labels,
                 datasets: [
-                    { label: 'Morning (6a–12p)', data: morning, backgroundColor: '#42a5f5' },
-                    { label: 'Afternoon (12p–6p)', data: afternoon, backgroundColor: '#ffb74d' },
-                    { label: 'Night (6p–6a)', data: night, backgroundColor: '#ef5350' }
+                    { label: 'Morning (6a\u201312p)', data: morning, backgroundColor: '#42a5f5' },
+                    { label: 'Afternoon (12p\u20136p)', data: afternoon, backgroundColor: '#ffb74d' },
+                    { label: 'Night (6p\u20136a)', data: night, backgroundColor: '#ef5350' }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { stacked: true, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { stacked: true, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
-                },
-                plugins: { 
-                    legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 8.5 } } } 
-                }
-            }
+                responsive: true, maintainAspectRatio: false, animation: false,
+                scales: { x: { stacked: true, grid: { color: '#2f2f2f' }, ticks: tick }, y: { stacked: true, beginAtZero: true, grid: { color: '#2f2f2f' }, ticks: { ...tick, precision: 0 } } },
+                plugins: { legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 9 } } }, demoMark: { enabled: isDemo } }
+            },
+            plugins: [demoMarkPlugin]
         });
 
-        const ctxPeak = document.getElementById('peakChart').getContext('2d');
-        peakChartInstance = new Chart(ctxPeak, {
+        peakChartInstance = new Chart(document.getElementById('peakChart').getContext('2d'), {
             type: 'line',
             data: {
-                labels: labels,
+                labels,
                 datasets: [
-                    {
-                        label: 'Peak dBA',
-                        data: peakDba,
-                        borderColor: '#00e676',
-                        backgroundColor: 'rgba(0, 230, 118, 0.08)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 2,
-                        order: 2
-                    },
-                    {
-                        label: 'Peak dBC',
-                        data: peakDbc,
-                        borderColor: '#29b6f6',
-                        borderDash: [4, 4],
-                        backgroundColor: 'rgba(41, 182, 246, 0.12)',
-                        fill: false,
-                        tension: 0.3,
-                        pointRadius: 2,
-                        order: 1
-                    }
+                    { label: 'Peak dBA', data: model.peakDba, borderColor: '#00e676', backgroundColor: 'rgba(0,230,118,0.08)', tension: 0.3, pointRadius: 3, spanGaps: false },
+                    { label: 'Peak dBC', data: model.peakDbc, borderColor: '#29b6f6', borderDash: [4, 4], tension: 0.3, pointRadius: 3, spanGaps: false }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { min: 40, suggestedMax: 120, grid: { color: '#333' }, ticks: { color: '#888', font: { size: 9 } } }
-                },
-                plugins: { 
-                    legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa' } },
-                    annotation: {
-                        annotations: {
-                            thresholdLine: typeof thresholdAnnotation !== 'undefined' ? thresholdAnnotation : undefined
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => {
-                                const val = Number(ctx.raw);
-                                const datasetLabel = ctx.dataset.label;
-                                if (datasetLabel.includes('dBA')) {
-                                    const diff = (val - DECIBEL_THRESHOLD).toFixed(1);
-                                    return ` Peak dBA: ${val} dBA (+${diff} over threshold)`;
-                                } else {
-                                    const idx = ctx.dataIndex;
-                                    const dba = peakDba[idx] || DECIBEL_THRESHOLD;
-                                    const delta = (val - dba).toFixed(1);
-                                    return ` Peak dBC: ${val} dBC (\u0394 +${delta} dB)`;
-                                }
-                            }
-                        }
-                    }
+                responsive: true, maintainAspectRatio: false, animation: false,
+                scales: { x: { grid: { color: '#2f2f2f' }, ticks: tick }, y: { min: 60, suggestedMax: 120, grid: { color: '#2f2f2f' }, ticks: tick } },
+                plugins: {
+                    legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 9 } } },
+                    refLines: { lines: [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA limit` }] },
+                    demoMark: { enabled: isDemo }
                 }
-            }
+            },
+            plugins: [refLinesPlugin, demoMarkPlugin]
         });
-    }
 
-    function showToast(title, message, isError = false) {
-        const toast = document.getElementById('toast-notification');
-        const toastTitle = document.getElementById('toast-title');
-        const toastMessage = document.getElementById('toast-message');
-
-        if (!toast) return;
-
-        toastTitle.innerText = title;
-        toastTitle.style.color = isError ? '#ff5252' : '#00e676';
-        toast.style.borderColor = isError ? '#ff5252' : '#00e676';
-        toastMessage.innerText = message;
-
-        toast.classList.add('show');
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4500);
+        document.getElementById('patterns-note').textContent = 'Days with no flagged events have no point.';
     }
 
     async function trigger311Report() {
         const btn = document.getElementById('btn-311');
-        const origText = "🚨 File Anonymous 311 Noise Report";
-        
-        btn.innerText = "⏳ Requesting 311 Report...";
+        const origText = "\uD83D\uDEA8 File Anonymous 311 Noise Report";
+
+        if (activeMarkerObj && activeMarkerObj.state === 'demo') {
+            showToast("Demo station", "This station isn't reporting yet, so there is nothing to report.", true);
+            return;
+        }
+
+        btn.innerText = "\u23F3 Requesting 311 Report...";
         btn.disabled = true;
 
         try {
@@ -2057,14 +2418,14 @@
                 })
             });
 
-            if (response.ok || response.status === 201) {
-                showToast("311 Report Filed", "Official noise exceedance report successfully logged to Denver 311 queue.");
+            if (response.ok) {
+                showToast("311 Report Queued", "Your request was queued. The station files it with Denver 311 shortly.");
             } else {
-                showToast("Report Logged", "311 report simulation successfully recorded.", false);
+                showToast("Couldn't queue the report", `The server answered ${response.status}. Please try again later.`, true);
             }
         } catch (err) {
             console.error("311 report error:", err);
-            showToast("Report Logged", "311 report queued successfully.", false);
+            showToast("Couldn't queue the report", "Network error. Please check your connection and try again.", true);
         } finally {
             btn.innerText = origText;
             btn.disabled = false;
@@ -2073,32 +2434,46 @@
 
     async function exportStationCSV() {
         if (!activeMarkerObj) return;
+        if (activeMarkerObj.state === 'demo') {
+            showToast("Demo station", "There are no real measurements to export yet.", true);
+            return;
+        }
         try {
-            const data = await fetchSupabase("noise_logs", `select=timestamp,dba,dbc,is_siren&station_id=eq.${activeMarkerObj.id}&order=timestamp.desc&limit=500`);
-            if (Array.isArray(data) && data.length > 0) {
-                let csv = "Timestamp,dBA,dBC,Is Siren\n";
-                data.forEach(row => {
-                    csv += `"${row.timestamp}",${row.dba},${row.dbc || ''},${row.is_siren}\n`;
+            const rows = await fetchSupabase("noise_logs",
+                `select=timestamp,dba,dbc,event_class,is_siren&station_id=eq.${activeMarkerObj.id}&event_class=not.is.null&order=timestamp.desc&limit=${EVENT_LIMIT}`);
+            if (Array.isArray(rows) && rows.length > 0) {
+                let csv = "Timestamp,dBA,dBC,Delta_dB,Event_Class,Is_Siren\n";
+                rows.forEach(r => {
+                    const dba = Number(r.dba);
+                    const dbc = validDbc(r.dbc);
+                    csv += `"${r.timestamp}",${dba},${dbc == null ? '' : dbc},${dbc == null ? '' : (dbc - dba).toFixed(2)},${r.event_class},${r.is_siren}\n`;
                 });
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${activeMarkerObj.id}_noise_log.csv`;
+                a.download = `${activeMarkerObj.id}_flagged_events.csv`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                showToast("CSV Exported", "Station exceedance log downloaded successfully.");
+                URL.revokeObjectURL(url);
+                showToast("CSV Exported", `${rows.length} flagged events downloaded.`);
                 return;
             }
         } catch (err) {
             console.warn("CSV export fetch failed:", err);
+            showToast("Export failed", "Couldn't load the event log. Please try again later.", true);
+            return;
         }
-        showToast("Export Notice", "No remote logs found for CSV export.", true);
+        showToast("Export Notice", "No flagged events found for this station.", true);
     }
 
     function generatePDFReport() {
         if (!activeMarkerObj) return;
+        if (activeMarkerObj.state === 'demo') {
+            showToast("Demo station", "There are no real measurements to put in a report yet.", true);
+            return;
+        }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
@@ -2124,20 +2499,36 @@
         doc.text(`Sensor Hardware Standard: IEC 61672-1 Class 2 / ANSI S1.4 Type 2`, 14, 67);
 
         doc.setFillColor(36, 36, 36);
-        doc.roundedRect(14, 76, 182, 36, 3, 3, 'F');
+        doc.roundedRect(14, 76, 182, 44, 3, 3, 'F');
 
         doc.setTextColor(0, 230, 118);
         doc.setFontSize(11);
-        doc.text("EXCEEDANCE SUMMARY", 20, 86);
+        doc.text("EVENT SUMMARY", 20, 86);
 
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(10);
-        doc.text(`Past Hour Exceedances: ${activeMarkerObj.hourlyExceedances || 0}`, 20, 96);
-        doc.text(`Past 24 Hours Exceedances: ${activeMarkerObj.todayExceedances || 0}`, 110, 96);
+        doc.text(`Past hour: ${activeMarkerObj.hourlyExceedances || 0} over the dBA limit, ${activeMarkerObj.hourlyLF || 0} caught only by the delta rule`, 20, 96);
+        doc.text(`Past 24 hours: ${activeMarkerObj.todayExceedances || 0} over the dBA limit, ${activeMarkerObj.todayLF || 0} caught only by the delta rule`, 20, 104);
+
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Flag rule: dBA >= ${DECIBEL_THRESHOLD}, or dBC - dBA > ${LF_DELTA_THRESHOLD} dB while dBA or dBC >= ${LF_FLOOR_DB}. Sirens excluded.`, 20, 113);
 
         doc.save(`${activeMarkerObj.id}_evidence_report.pdf`);
         showToast("PDF Downloaded", "Official PDF Evidence Report generated successfully.");
     }
+
+    document.getElementById('patterns-details').addEventListener('toggle', e => {
+        if (e.target.open && activeMarkerObj) renderPatterns(activeMarkerObj);
+    });
+    document.getElementById('hm-grid').addEventListener('click', e => {
+        const cell = e.target.closest ? e.target.closest('.hm-cell') : null;
+        if (!cell || !lastHourly) return;
+        document.querySelectorAll('#hm-grid .hm-cell.sel').forEach(c => c.classList.remove('sel'));
+        cell.classList.add('sel');
+        document.getElementById('hm-detail').textContent = heatDetail(lastHourly, Number(cell.dataset.d), Number(cell.dataset.h));
+    });
+    renderRuleText();
 
     setInterval(fetchLiveMeters, 5000);
     fetchLiveMeters();
