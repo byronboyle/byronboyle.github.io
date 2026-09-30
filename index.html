@@ -1181,6 +1181,7 @@ I live in Denver and I'm writing about loud vehicle noise and the gap in how it 
 - Denver's noise code (D.R.M.C. sec. 36-8, Table B) limits motor vehicles under 10,000 lb to 82 dB(A) measured at 25 ft. State law (C.R.S. 42-4-225) requires working mufflers but sets no decibel number.
 - Responsibility for vehicle noise appears to be divided between the Department of Public Health & Environment and the Denver Police Department, with no single office clearly responsible for measuring and acting on it.
 - Community sensors run by the Mile High Noise Project (${SITE_URL}) regularly record vehicle noise at or above 85 dBA about ${SENSOR_DISTANCE_FT} ft from the roadway. New York City's noise cameras issue violations at that same level (85 dB at 50 ft).
+- The city closed the Congress Park pickleball courts over about 70 dB measured at nearby homes. Vehicle noise at 85 dB is at least 30 times that sound energy, yet I'm not aware of any comparable enforcement.
 
 Please consider: (1) a clear standard that can be measured at the roadside, (2) one office responsible for vehicle noise complaints, and (3) a pilot of automated noise cameras like New York City's.
 
@@ -1228,6 +1229,37 @@ Thank you,
         }
         return html;
     }
+    // Loudest readings across all monitors, for the pickleball comparison on The Gap page.
+    async function loadLoudStats(days = 30) {
+        const since = new Date(Date.now() - days * 864e5).toISOString();
+        const base = `is_siren=eq.false&event_class=not.is.null&timestamp=gte.${since}`;
+        const top = col => fetchSupabase('noise_logs', `select=${col}&${base}&order=${col}.desc&limit=1`);
+        const [flagged, n100, topA, topC] = await Promise.all([
+            countSupabase('noise_logs', base),
+            countSupabase('noise_logs', `${base}&or=(dba.gte.100,dbc.gte.100)`),
+            top('dba'), top('dbc')
+        ]);
+        const first = (rows, col) => (Array.isArray(rows) && rows[0] ? Number(rows[0][col]) : null);
+        return { days, flagged, n100, maxDba: first(topA, 'dba'), maxDbc: first(topC, 'dbc') };
+    }
+    function loudStatsHtml(s) {
+        if (!s.flagged) return `Our monitors haven't recorded a flagged event in the last ${s.days} days.`;
+        const peak = [s.maxDba != null ? `${s.maxDba.toFixed(1)} dBA` : null, s.maxDbc != null ? `${s.maxDbc.toFixed(1)} dBC` : null].filter(Boolean).join(' and ');
+        const hundred = s.n100 === 0 ? 'None reached 100 dB.' : `${s.n100} of them reached 100 dBA or dBC.`;
+        return `In the last ${s.days} days our monitors recorded ${s.flagged} flagged events, with peaks of ${peak}, measured about ${SENSOR_DISTANCE_FT} ft from the road. ${hundred}`;
+    }
+    async function fillLoudStats(elementId, topic) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        try {
+            const stats = await loadLoudStats(30);
+            if (currentInfoTopic === topic && document.getElementById(elementId)) el.textContent = loudStatsHtml(stats);
+        } catch (err) {
+            console.warn('Could not load the loudest readings:', err);
+            if (currentInfoTopic === topic) el.textContent = 'Our monitors regularly record vehicle noise of 85 dB and up.';
+        }
+    }
+
     async function fillFlaggedStats(elementId, topic) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -1394,6 +1426,14 @@ Thank you,
                 <p><strong>Bass slips through.</strong> A dBA reading can understate deep exhaust rumble. See <a href="#" onclick="openInfoModal('dba-dbc'); return false;">dBA vs. dBC</a>.</p>
             </div>
             <div class="info-card">
+                <h3>Same city, different treatment</h3>
+                <p><strong>Pickleball.</strong> In April 2023 Denver Parks &amp; Recreation permanently closed the pickleball courts at Congress Park after the health department (DDPHE) measured sound at nearby homes at about 70 dB, against the noise ordinance's 55 dB(A) daytime limit for residential areas. DDPHE tested at sixteen homes; with no one playing, the same homes measured 37 dB. The city closed the courts at Eisenhower Park later that year over similar complaints.</p>
+                <p><strong>Vehicles.</strong> <span id="live-loud-gap">Loading\u2026</span> We haven't found a public record of enforcement at these levels. If you know of one, please tell us.</p>
+                <p><strong>What the difference means.</strong> Every 10 dB is 10 times the sound energy and roughly twice as loud to the ear. The 30 dB between 70 and 100 is 1,000 times the sound energy and about 8 times as loud.</p>
+                <p class="fine">This isn't a like-for-like reading: the pickleball figures were taken at homes and ours are taken beside the road. The courts were also city property, so the city could act on the measurement directly. That is the point. For private vehicles, Denver's test needs a meter 25 ft from a specific vehicle, and responsibility is divided between agencies. In 2023 a DDPHE noise investigator told residents the department can take measurements but can't ticket individuals.</p>
+                <p class="fine"><a href="https://www.denvergazette.com/2023/04/03/raising-a-racket-pickleball-noise-divides-denver-neighbors-and-players-99551544-d269-11ed-ab5e-3bac07a3229e/" target="_blank" rel="noopener">Denver Gazette</a> \u00B7 <a href="https://www.westword.com/news/denver-noise-ordinance-revision-pickleball-recreational-sounds-16657198/" target="_blank" rel="noopener">Westword</a> \u00B7 <a href="https://www.cbsnews.com/colorado/news/colorado-cities-pickleball-policies-noise-ordinance" target="_blank" rel="noopener">CBS Colorado</a> \u00B7 <a href="https://www.denver7.com/news/front-range/denver/denver-closing-pickleball-courts-at-eisenhower-park-amid-noise-complaints" target="_blank" rel="noopener">Denver7</a></p>
+            </div>
+            <div class="info-card">
                 <h3>What our monitors show</h3>
                 <p id="live-stats-gap">Loading\u2026</p>
                 <p id="live-audio-gap"></p>
@@ -1442,6 +1482,10 @@ Thank you,
                 <h3>Myth 6: "Noise laws can't be enforced without a police stop."</h3>
                 <p><strong>Fact:</strong> New York City's Department of Environmental Protection tested a roadside meter and camera that triggers at 85 dB or more at 50 ft or more, records the license plate and mails the owner a notice. The City Council approved a citywide program in late 2023.</p>
                 <p class="fine"><a href="https://www.nyc.gov/site/dep/news/22-005/roadside-sound-meter-camera-is-activated-loud-mufflers-now-sending-notices-vehicle" target="_blank" rel="noopener">NYC DEP announcement</a></p>
+            </div>
+            <div class="info-card">
+                <h3>Myth 8: "The city enforces noise limits the same way everywhere."</h3>
+                <p><strong>Fact:</strong> In 2023 Denver closed the Congress Park pickleball courts over sound of about 70 dB at nearby homes. The vehicle noise our monitors record is far louder, and we haven't found a record of enforcement at those levels. See <a href="#" onclick="openInfoModal('gap'); return false;" style="color:#29b6f6;">The Enforcement Gap</a>.</p>
             </div>
             <div class="info-card">
                 <h3>Myth 7: "Denver already has this covered."</h3>
@@ -1573,7 +1617,7 @@ Thank you,
     };
     const INFO_AFTER = {
         'dba-dbc': () => { fillFlaggedStats('live-stats-dba', 'dba-dbc'); fillAudioStats('live-audio-dba', 'dba-dbc'); },
-        gap: () => { fillFlaggedStats('live-stats-gap', 'gap'); fillAudioStats('live-audio-gap', 'gap'); },
+        gap: () => { fillFlaggedStats('live-stats-gap', 'gap'); fillAudioStats('live-audio-gap', 'gap'); fillLoudStats('live-loud-gap', 'gap'); },
         action: () => updateCouncilEmail(),
         hotspots: () => renderLeaderboard(),
         calculator: () => {
