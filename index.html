@@ -800,10 +800,14 @@
                 <p class="hm-note">Last 14 days, station local time. Darker columns are 10 pm to 6 am.</p>
             </section>
 
+            <section class="chart-card" id="daily-card">
+                <h4>Flagged events per day</h4>
+                <p class="chart-help" id="daily-help">Last 14 days, station local time. Older monitor software only recorded events at or above the dBA threshold, so days before a monitor was updated undercount &Delta;-only events.</p>
+                <div class="chart-box" style="height: 170px;"><canvas id="stackedChart"></canvas></div>
+            </section>
+
             <details class="chart-card patterns" id="patterns-details">
-                <summary>14-day patterns</summary>
-                <h5>Flagged events by time of day</h5>
-                <div class="chart-box" style="height: 150px;"><canvas id="stackedChart"></canvas></div>
+                <summary>Daily peak levels</summary>
                 <h5>Highest flagged dBA and dBC per day</h5>
                 <div class="chart-box" style="height: 150px;"><canvas id="peakChart"></canvas></div>
                 <p class="chart-help" id="patterns-note"></p>
@@ -2249,7 +2253,7 @@ Thank you,
     function buildHourlyModel(rows, demo) {
         const dates = lastNDates(HEATMAP_DAYS);
         const index = new Map(dates.map((d, i) => [d, i]));
-        const cells = dates.map(() => Array.from({ length: 24 }, () => ({ a: 0, lf: 0 })));
+        const cells = dates.map(() => Array.from({ length: 24 }, () => ({ a: 0, lf: 0, aOnly: 0, aLf: 0 })));
         const peakDba = Array(dates.length).fill(null), peakDbc = Array(dates.length).fill(null);
         let total = 0;
         rows.forEach(r => {
@@ -2258,6 +2262,8 @@ Thank you,
             if (i === undefined || !(h >= 0 && h < 24)) return;
             const a = Number(r.a_only) + Number(r.a_lf), lf = Number(r.lf_only);
             cells[i][h].a += a;
+            cells[i][h].aOnly += Number(r.a_only);
+            cells[i][h].aLf += Number(r.a_lf);
             cells[i][h].lf += lf;
             total += a + lf;
             if (r.max_dba != null && (peakDba[i] == null || r.max_dba > peakDba[i])) peakDba[i] = Number(r.max_dba);
@@ -2275,14 +2281,14 @@ Thank you,
         const rows = [];
         lastNDates(HEATMAP_DAYS).forEach(date => {
             for (let h = 0; h < 24; h++) {
-                let a = 0, lf = 0;
+                let aOnly = 0, aLf = 0, lf = 0;
                 for (let k = 0; k < 6; k++) {
-                    if (rand() < weight(h) * scale) { if (rand() < 0.65) a++; else lf++; }
+                    if (rand() < weight(h) * scale) { if (rand() < 0.65) { if (rand() < 0.65) aOnly++; else aLf++; } else lf++; }
                 }
-                if (a + lf === 0) continue;
+                if (aOnly + aLf + lf === 0) continue;
                 rows.push({
-                    local_date: date, hour_of_day: h, a_only: a, a_lf: 0, lf_only: lf,
-                    max_dba: Number((a ? 85 + rand() * 9 : 74 + rand() * 10).toFixed(1)),
+                    local_date: date, hour_of_day: h, a_only: aOnly, a_lf: aLf, lf_only: lf,
+                    max_dba: Number((aOnly + aLf ? 85 + rand() * 9 : 74 + rand() * 10).toFixed(1)),
                     max_dbc: Number((90 + rand() * 12).toFixed(1))
                 });
             }
@@ -2380,6 +2386,7 @@ Thank you,
         status.hidden = true;
         lastHourly = model;
         renderHeatmap(model);
+        renderDailyChart(model);
     }
 
     // ---- Station baseline: what delta looks like in ordinary conditions ----
@@ -2733,70 +2740,88 @@ Thank you,
         activeMarkerObj = null;
     }
 
-    // 14-day patterns: exact daily totals from the same hourly data as the heatmap
-    async function renderPatterns(station) {
-        const token = panelToken;
-        let model;
-        try { model = await getHourly(station); }
-        catch (err) { console.error('Could not load 14-day patterns:', err); return; }
-        if (token !== panelToken) return;
+    // 14-day charts, built from the same hourly data as the heatmap
+    function shortDate(d) { const [, m, dd] = d.split('-'); return `${Number(m)}/${Number(dd)}`; }
 
-        const labels = model.dates.map(d => { const [, m, dd] = d.split('-'); return `${Number(m)}/${Number(dd)}`; });
-        const morning = [], afternoon = [], night = [];
-        model.cells.forEach(row => {
-            let m = 0, a = 0, n = 0;
-            row.forEach((c, h) => {
-                const v = c.a + c.lf;
-                if (h >= 6 && h < 12) m += v; else if (h >= 12 && h < 18) a += v; else n += v;
-            });
-            morning.push(m); afternoon.push(a); night.push(n);
-        });
-
+    // Flagged events per day, stacked by how they were flagged: the same colors as the scatter and timeline.
+    function renderDailyChart(model) {
         stackedChartInstance = destroyChart(stackedChartInstance);
-        peakChartInstance = destroyChart(peakChartInstance);
+        const canvas = document.getElementById('stackedChart');
+        if (!canvas) return;
+        const labels = model.dates.map((d, i) => (i === model.dates.length - 1 ? 'Today' : shortDate(d)));
+        const perDay = key => model.cells.map(row => row.reduce((sum, c) => sum + c[key], 0));
+        const series = [['A', 'aOnly'], ['A_LF', 'aLf'], ['LF', 'lf']];  // amber at the base, the \u0394-only events on top
         const tick = { color: '#888', font: { size: 9 } };
-        const isDemo = model.demo;
-
-        stackedChartInstance = new Chart(document.getElementById('stackedChart').getContext('2d'), {
+        stackedChartInstance = new Chart(canvas.getContext('2d'), {
             type: 'bar',
             data: {
                 labels,
-                datasets: [
-                    { label: 'Morning (6a\u201312p)', data: morning, backgroundColor: '#42a5f5' },
-                    { label: 'Afternoon (12p\u20136p)', data: afternoon, backgroundColor: '#ffb74d' },
-                    { label: 'Night (6p\u20136a)', data: night, backgroundColor: '#ef5350' }
-                ]
+                datasets: series.map(([cls, key]) => ({
+                    label: CLASS_META[cls].label,
+                    data: perDay(key),
+                    backgroundColor: CLASS_META[cls].color + 'cc',
+                    borderRadius: 2,
+                    borderSkipped: false,
+                    maxBarThickness: 24
+                }))
             },
             options: {
                 responsive: true, maintainAspectRatio: false, animation: false,
-                scales: { x: { stacked: true, grid: { color: '#2f2f2f' }, ticks: tick }, y: { stacked: true, beginAtZero: true, grid: { color: '#2f2f2f' }, ticks: { ...tick, precision: 0 } } },
-                plugins: { legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 9 } } }, demoMark: { enabled: isDemo } }
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: { stacked: true, grid: { color: '#2f2f2f' }, ticks: tick },
+                    y: { stacked: true, beginAtZero: true, grid: { color: '#2f2f2f' }, ticks: { ...tick, precision: 0 } }
+                },
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa', usePointStyle: true } },
+                    tooltip: {
+                        callbacks: {
+                            title: items => dayLabel(model.dates[items[0].dataIndex]),
+                            footer: items => `Total: ${items.reduce((sum, it) => sum + it.parsed.y, 0)}`
+                        }
+                    },
+                    demoMark: { enabled: model.demo }
+                }
             },
             plugins: [demoMarkPlugin]
         });
+    }
 
+    function renderPeakChart(model) {
+        peakChartInstance = destroyChart(peakChartInstance);
+        const tick = { color: '#888', font: { size: 9 } };
+        const labels = model.dates.map((d, i) => (i === model.dates.length - 1 ? 'Today' : shortDate(d)));
         peakChartInstance = new Chart(document.getElementById('peakChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels,
                 datasets: [
                     { label: 'Peak dBA', data: model.peakDba, borderColor: '#00e676', backgroundColor: 'rgba(0,230,118,0.08)', tension: 0.3, pointRadius: 3, spanGaps: false },
-                    { label: 'Peak dBC', data: model.peakDbc, borderColor: '#29b6f6', borderDash: [4, 4], tension: 0.3, pointRadius: 3, spanGaps: false }
+                    { label: 'Peak dBC', data: model.peakDbc, borderColor: '#29b6f6', tension: 0.3, pointRadius: 3, spanGaps: false }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false, animation: false,
                 scales: { x: { grid: { color: '#2f2f2f' }, ticks: tick }, y: { min: 60, suggestedMax: 120, grid: { color: '#2f2f2f' }, ticks: tick } },
                 plugins: {
-                    legend: { labels: { color: '#aaa', boxWidth: 10, font: { size: 9 } } },
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa', usePointStyle: true } },
                     refLines: { lines: [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA limit` }] },
-                    demoMark: { enabled: isDemo }
+                    demoMark: { enabled: model.demo }
                 }
             },
             plugins: [refLinesPlugin, demoMarkPlugin]
         });
-
         document.getElementById('patterns-note').textContent = 'Days with no flagged events have no point.';
+    }
+
+    // Opening the collapsed section draws the peak-level chart
+    async function renderPatterns(station) {
+        const token = panelToken;
+        let model;
+        try { model = await getHourly(station); }
+        catch (err) { console.error('Could not load daily peaks:', err); return; }
+        if (token !== panelToken) return;
+        renderPeakChart(model);
     }
 
     async function trigger311Report() {
