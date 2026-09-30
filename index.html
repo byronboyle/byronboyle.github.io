@@ -1951,6 +1951,16 @@
         document.querySelectorAll('.heat-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.metric === heatMetric));
     }
 
+    // Turns a failed database-function call into a message that says what to check.
+    function rpcFailureText(what, err) {
+        const code = (String(err && err.message).match(/\((\d{3})\)/) || [])[1];
+        let hint = 'Please try again in a minute.';
+        if (code === '404') hint = 'The step 3 database functions may not be installed yet, or Supabase has not refreshed its schema cache.';
+        else if (code === '400' || code === '500') hint = 'The database function reported an error. Run the step 1 migration first, then the step 3 SQL.';
+        else if (code === '401' || code === '403') hint = "The public key isn't allowed to run the database function.";
+        return `Couldn't load ${what}. ${hint}${code ? ` (HTTP ${code})` : ''}`;
+    }
+
     async function loadHeatmap(station, token, force = false) {
         const status = document.getElementById('heatmap-status');
         let model;
@@ -1959,7 +1969,7 @@
         } catch (err) {
             console.error('Could not load the hour-by-day pattern:', err);
             if (token !== panelToken) return;
-            status.textContent = "Couldn't load the hour-by-day pattern. The step 3 database functions may not be installed yet.";
+            status.textContent = rpcFailureText('the hour-by-day pattern', err);
             status.hidden = false;
             return;
         }
