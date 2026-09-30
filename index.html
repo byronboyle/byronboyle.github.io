@@ -1669,13 +1669,16 @@ Thank you,
         el.setAttribute('aria-label', markerLabel(station));
     }
     // Replacing a marker's icon drops keyboard focus, so only do it when the badge actually changed.
+    // Leaflet keeps a divIcon's html under icon.options.html (there is no icon.html)
+    const badgeHtml = icon => String((icon && icon.options && icon.options.html) || '');
     function refreshMarker(station) {
         const marker = markersMap.get(station.id);
         if (!marker) return;
         const icon = createBadgeIcon(station);
-        if (icon.html !== station.iconHtml) {
+        const html = badgeHtml(icon);
+        if (html !== station.iconHtml) {
             marker.setIcon(icon);
-            station.iconHtml = icon.html;
+            station.iconHtml = html;
         }
         labelMarker(marker, station);
     }
@@ -2667,7 +2670,7 @@ Thank you,
 
         marker.on('click', () => openDetailPanel(station));
         markersMap.set(station.id, marker);
-        station.iconHtml = createBadgeIcon(station).html;
+        station.iconHtml = badgeHtml(createBadgeIcon(station));
         labelMarker(marker, station);
     });
 
