@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Mile High Noise Project | Live Map</title>
+    <meta name="description" content="Community sensors measuring vehicle noise across Denver, with the data behind the enforcement gap.">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a1a1a'/%3E%3Crect x='6' y='24.0' width='8' height='16' rx='4.0' fill='%2300e676'/%3E%3Crect x='17' y='18.0' width='8' height='28' rx='4.0' fill='%23ffeb3b'/%3E%3Crect x='28' y='10.0' width='8' height='44' rx='4.0' fill='%23ff5252'/%3E%3Crect x='39' y='18.0' width='8' height='28' rx='4.0' fill='%23ffeb3b'/%3E%3Crect x='50' y='24.0' width='8' height='16' rx='4.0' fill='%2300e676'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACJUlEQVR4nOyXv0vDUBDHLz86NCVWg0hb8Re6OEgdu4mg+APERXASRARdHfwjxMFNFMTNP0AUFJwUhOKkoCCiqIi2StFia4u2tt6FRgyEpHlN08UPPN5dc737Ji+PvBPhD/WIJEkLxWIxgm4vx3FN4ACY7wWnU8wXzWQyK0lEu8ZpRiAQGOF5fgPNEFSXp0KhMBuPx/d+BQSDwSFUtw8ugiJGSQTn9/sbfD7fBekAd3lKp9M9gqIo83j3E+A+ssfjifNYPAIMjCkKHIXD6iCbBarNl9542yy2tECn16sOslmg2iKqaAMGqLCRbQeqLUKN4a0CJLy51aVGOD9sVWfJ60xs2QIG+3wwPixDQ72gzuQ7EathuQRdHR5TnzXWUEB2sA1Sc2HVltfPwHtwD05glle3BBSUb69Th/YHJzDLq3sCFGBkV4pZ3ppvw38BupdQvHs3tCvFLK9OAG0RCqBBtlOY5dUtAe1Pp/Z+uXkt34Hr25ypzxqrYfktODj8gO39FLwlv9WZfCdiNbhQKFQEBh4j+nNMczQKLNR+G+Kx6BkYuMlmDW07UG1BluUBPBp1gU0SuRx0SxK85fOw/PAAV2wijkVUQS3TENhk5/VVHZVAtWkXrOFIgvtQzTUe26M7VDID7jNNtQWysEW6xPbsBJeiH10Zqgs1p5OxWGyXHEH7FUVcC4Kwie3SFz6RTxKCgqxPlWVQas+PMd8WtudTiUTiXLv2AwAA//+m40yXAAAABklEQVQDAPOs+nRL6MoxAAAAAElFTkSuQmCC">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Leaflet.js CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -60,10 +65,14 @@
             white-space: nowrap;
         }
         .navbar-brand .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 1.05rem;
             font-weight: 700;
             color: #ffffff;
         }
+        .brand-mark { width: 26px; height: 26px; flex-shrink: 0; display: block; }
         .navbar-brand .tagline {
             font-size: 0.72rem;
             font-weight: 400;
@@ -557,7 +566,7 @@
 
     <div class="navbar">
         <div class="navbar-brand">
-            <span class="brand-title" role="heading" aria-level="1">🔊 Mile High Noise Project</span>
+            <span class="brand-title" role="heading" aria-level="1"><svg class="brand-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="6" y="24.0" width="8" height="16" rx="4.0" fill="#00e676"/><rect x="17" y="18.0" width="8" height="28" rx="4.0" fill="#ffeb3b"/><rect x="28" y="10.0" width="8" height="44" rx="4.0" fill="#ff5252"/><rect x="39" y="18.0" width="8" height="28" rx="4.0" fill="#ffeb3b"/><rect x="50" y="24.0" width="8" height="16" rx="4.0" fill="#00e676"/></svg><span class="brand-name">Mile High Noise Project</span></span>
             <span class="tagline">Mapping illegal excessive vehicle noise across Denver</span>
         </div>
         
@@ -1419,8 +1428,8 @@ Thank you,
                 <p>A printable flyer with a QR code to the live map is coming soon.</p>
             </div>
             <div class="info-card">
-                <h3>4. Local partner</h3>
-                <p>Explore <a href="https://www.fixdenvernoise.org/" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">Fix Denver Noise</a>, a grassroots initiative focused on documenting and advocating against excessive vehicle noise in Denver neighborhoods.</p>
+                <h3>4. Report what you hear</h3>
+                <p><a href="https://www.fixdenvernoise.org/report-noise" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">Fix Denver Noise</a>, our partner, takes resident reports of loud vehicles with a location, a time and a description, and shows them on a <a href="https://www.fixdenvernoise.org/noise-map" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">heat map</a>. Their reports and our sensor readings measure the same problem in different ways.</p>
             </div>`;
     }
 
@@ -1439,6 +1448,14 @@ Thank you,
                 <p><a href="https://www.nyc.gov/assets/dep/downloads/pdf/environment/education/nyc-noise-code-fact-sheet.pdf" target="_blank" rel="noopener" style="color:#00e676;">New York City Noise Code fact sheet</a></p>
                 <p><a href="https://www.fortlauderdale.gov/government/departments-a-h/community-services/community-enhancement-and-compliance/enhancement-and-compliance/noise-ordinance" target="_blank" rel="noopener" style="color:#00e676;">Fort Lauderdale noise ordinance (dBA and dBC limits)</a></p>
                 <p><a href="https://www.who.int/europe/news-room/fact-sheets/item/noise" target="_blank" rel="noopener" style="color:#00e676;">WHO Environmental Noise Guidelines</a></p>
+            </div>
+            <div class="info-card">
+                <h3>Partner: Fix Denver Noise</h3>
+                <p>Fix Denver Noise collects resident reports of loud vehicles (where, when and what kind) and maps them. We measure noise with sensors. They collect what residents hear, so the two fit together.</p>
+                <p><a href="https://www.fixdenvernoise.org/report-noise" target="_blank" rel="noopener" style="color:#00e676;">Report a loud vehicle</a><br>
+                <a href="https://www.fixdenvernoise.org/noise-map" target="_blank" rel="noopener" style="color:#00e676;">Vehicle noise heat map</a><br>
+                <a href="https://www.fixdenvernoise.org/laws" target="_blank" rel="noopener" style="color:#00e676;">Why current laws aren't enforced</a><br>
+                <a href="https://www.fixdenvernoise.org/" target="_blank" rel="noopener" style="color:#00e676;">fixdenvernoise.org</a></p>
             </div>
             <div class="info-card">
                 <h3>Hardware</h3>
