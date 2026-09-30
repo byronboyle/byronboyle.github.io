@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Mile High Noise Project | Live Map</title>
     <!-- Leaflet.js CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -186,7 +186,7 @@
         /* Status Colors */
         .badge-green { background-color: #00e676; color: #000; }
         .badge-yellow { background-color: #ffeb3b; color: #000; }
-        .badge-red { background-color: #ff5252; color: #fff; }
+        .badge-red { background-color: #ff5252; color: #000; }
 
         /* Slide-out Drawer Panel */
         .detail-panel {
@@ -212,7 +212,7 @@
         .close-btn {
             background: none;
             border: none;
-            color: #888;
+            color: #9a9a9a;
             font-size: 1.5rem;
             cursor: pointer;
             align-self: flex-end;
@@ -222,34 +222,7 @@
         .close-btn:hover { color: #fff; }
 
         .panel-header h2 { margin: 0 0 4px 0; color: #fff; font-size: 1.25rem; }
-        .panel-header p { margin: 0 0 16px 0; color: #888; font-size: 0.85rem; }
-
-        /* 2x2 CSS Grid for Expandable Tiles Container */
-        .expandable-tiles-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .expandable-tile {
-            background: #242424;
-            border-radius: 8px;
-            border: 1px solid #333;
-            overflow: hidden;
-            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            grid-column: span 1;
-        }
-        .expandable-tile:hover {
-            border-color: #00e676;
-            background-color: #2a2a2a;
-        }
-        .expandable-tile.active {
-            grid-column: 1 / -1;
-            border-color: #00e676;
-            background: #1e2e24;
-            box-shadow: 0 0 12px rgba(0, 230, 118, 0.25);
-        }
+        .panel-header p { margin: 0 0 16px 0; color: #9a9a9a; font-size: 0.85rem; }
         #siren-card.active {
             background: #192734;
             box-shadow: 0 0 12px rgba(41, 182, 246, 0.25);
@@ -257,101 +230,6 @@
         }
         #siren-card:hover {
             border-color: #29b6f6;
-        }
-
-        .tile-header {
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .tile-title-group h4 {
-            margin: 0 0 2px 0;
-            color: #888;
-            font-size: 0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .tile-main-val {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #00e676;
-        }
-
-        .tile-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-hint-pill {
-            font-size: 0.58rem;
-            background: rgba(0, 230, 118, 0.12);
-            color: #00e676;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-            border: 1px solid rgba(0, 230, 118, 0.25);
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
-        #siren-card .card-hint-pill {
-            background: rgba(41, 182, 246, 0.12);
-            color: #29b6f6;
-            border: 1px solid rgba(41, 182, 246, 0.25);
-        }
-        .expandable-tile:hover .card-hint-pill {
-            background: rgba(0, 230, 118, 0.25);
-            color: #ffffff;
-        }
-        #siren-card:hover .card-hint-pill {
-            background: rgba(41, 182, 246, 0.25);
-            color: #ffffff;
-        }
-        .expandable-tile.active .card-hint-pill {
-            background: #00e676;
-            color: #000000;
-            border-color: #00e676;
-        }
-        #siren-card.active .card-hint-pill {
-            background: #29b6f6;
-            color: #000000;
-            border-color: #29b6f6;
-        }
-        .card-arrow {
-            font-size: 0.65rem;
-            color: #666;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
-        }
-        .expandable-tile:hover .card-arrow { color: #00e676; }
-        #siren-card:hover .card-arrow { color: #29b6f6; }
-        .expandable-tile.active .card-arrow {
-            color: #00e676;
-            transform: rotate(180deg);
-        }
-        #siren-card.active .card-arrow {
-            color: #29b6f6;
-            transform: rotate(180deg);
-        }
-
-        .tile-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
-            padding: 0 14px;
-            background: #1c1c1c;
-            border-top: 1px solid transparent;
-        }
-        .expandable-tile.active .tile-body {
-            max-height: 300px;
-            padding: 12px 14px 16px 14px;
-            border-top-color: #333;
         }
 
         .info-card {
@@ -386,52 +264,6 @@
         .comp-item { text-align: center; font-size: 0.78rem; }
         .comp-val { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
 
-        .calc-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin: 12px 0;
-        }
-        .calc-input-group label { font-size: 0.8rem; color: #aaa; }
-        .calc-slider { width: 100%; accent-color: #00e676; cursor: pointer; }
-
-        .chart-container {
-            background: #242424;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
-            flex-shrink: 0;
-        }
-        .chart-container h4 {
-            margin: 0 0 8px 0;
-            color: #ccc;
-            font-size: 0.8rem;
-        }
-
-        /* Horizontally Scrollable Chart Wrapper Utility */
-        .chart-scroll-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            width: 100%;
-            scrollbar-width: thin;
-            scrollbar-color: #444 #242424;
-        }
-        .chart-scroll-wrapper::-webkit-scrollbar {
-            height: 6px;
-        }
-        .chart-scroll-wrapper::-webkit-scrollbar-track {
-            background: #1a1a1a;
-            border-radius: 3px;
-        }
-        .chart-scroll-wrapper::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 3px;
-        }
-        .chart-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-            background: #00e676;
-        }
-
         .action-btn {
             width: 100%;
             padding: 12px;
@@ -459,7 +291,7 @@
             border: 1px solid #2a2a2a;
             border-radius: 6px;
             font-size: 0.72rem;
-            color: #777;
+            color: #9a9a9a;
             line-height: 1.4;
             flex-shrink: 0;
         }
@@ -511,7 +343,7 @@
         .lf-pip {
             position: absolute; top: -9px; right: -9px;
             background: #29b6f6; color: #00131f;
-            font-size: 0.62rem; font-weight: 800; line-height: 1.2;
+            font-size: 0.72rem; font-weight: 800; line-height: 1.2;
             padding: 1px 5px; border-radius: 8px; border: 1.5px solid #1a1a1a;
         }
 
@@ -528,16 +360,16 @@
         }
         .live-head { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
         .live-val span { font-size: 2rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
-        .live-val small { font-size: 0.72rem; font-weight: 600; color: #888; margin-left: 4px; }
+        .live-val small { font-size: 0.72rem; font-weight: 600; color: #9a9a9a; margin-left: 4px; }
         .live-a span { color: #00e676; }
         .live-c span { color: #29b6f6; }
         .live-flags { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
         .delta-pill { font-size: 0.78rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #333; color: #aaa; }
         .delta-pill.delta-mid { background: rgba(255, 183, 77, 0.18); color: #ffb74d; }
-        .delta-pill.delta-high { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
-        .flag-chip { font-size: 0.66rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+        .delta-pill.delta-high { background: rgba(239, 83, 80, 0.2); color: #ff8a80; }
+        .flag-chip { font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
         .live-chart { position: relative; height: 88px; margin-top: 8px; }
-        .live-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 0.66rem; color: #888; }
+        .live-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 0.72rem; color: #9a9a9a; }
         .live-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin: 0 3px 0 8px; }
 
         .summary-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
@@ -549,40 +381,40 @@
         .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .stat { background: #1c1c1c; border: 1px solid #303030; border-radius: 8px; padding: 8px 6px; text-align: center; }
         .stat-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-        .stat-label { font-size: 0.62rem; color: #999; margin-top: 2px; line-height: 1.2; }
+        .stat-label { font-size: 0.72rem; color: #999; margin-top: 2px; line-height: 1.2; }
         .stat-a .stat-num { color: #ffb74d; }
         .stat-lf { background: #182530; border-color: rgba(41, 182, 246, 0.5); }
         .stat-lf .stat-num { color: #29b6f6; }
         .stat-s .stat-num { color: #9e9e9e; }
         .summary-sentence { margin: 10px 0 4px; font-size: 0.8rem; color: #ddd; line-height: 1.4; }
         .events-status { margin: 6px 0 0; font-size: 0.74rem; color: #ff8a80; }
-        .rule-note { margin: 6px 0 0; font-size: 0.68rem; color: #777; line-height: 1.4; }
+        .rule-note { margin: 6px 0 0; font-size: 0.72rem; color: #9a9a9a; line-height: 1.4; }
         .rule-note a { color: #29b6f6; }
 
-        .chart-help { margin: 4px 0 8px; color: #888; font-size: 0.72rem; line-height: 1.35; }
-        .chart-sub { margin: 8px 0 2px; color: #888; font-size: 0.68rem; }
+        .chart-help { margin: 4px 0 8px; color: #9a9a9a; font-size: 0.72rem; line-height: 1.35; }
+        .chart-sub { margin: 8px 0 2px; color: #9a9a9a; font-size: 0.72rem; }
         .chart-box { position: relative; width: 100%; }
         .siren-toggle { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.72rem; color: #aaa; cursor: pointer; }
         .patterns > summary { cursor: pointer; color: #ccc; font-size: 0.8rem; font-weight: 600; }
         .patterns h5 { margin: 12px 0 4px; color: #aaa; font-size: 0.72rem; font-weight: 600; }
 
         /* ---- Step 3: heatmap + baseline ---- */
-        .heat-btn { background: none; border: none; color: #aaa; padding: 5px 8px; font-size: 0.68rem; font-weight: 600; cursor: pointer; }
+        .heat-btn { background: none; border: none; color: #aaa; padding: 5px 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
         .heat-btn:hover { color: #fff; }
         .heat-btn.active { background: #00e676; color: #000; }
         .hm-wrap { display: grid; grid-template-columns: 50px 1fr; gap: 6px; margin-top: 6px; }
-        .hm-days { display: grid; grid-auto-rows: 16px; gap: 2px; font-size: 0.6rem; color: #888; }
+        .hm-days { display: grid; grid-auto-rows: 16px; gap: 2px; font-size: 0.72rem; color: #9a9a9a; }
         .hm-days span { display: flex; align-items: center; white-space: nowrap; }
         .hm-grid { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); grid-auto-rows: 16px; gap: 2px; }
         .hm-cell { border-radius: 2px; background: #1f1f1f; cursor: pointer; }
         .hm-cell.night { background: #15191d; }
         .hm-cell:hover, .hm-cell.sel { outline: 1.5px solid #fff; outline-offset: -1px; }
-        .hm-hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; margin-top: 3px; font-size: 0.58rem; color: #777; }
+        .hm-hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; margin-top: 3px; font-size: 0.72rem; color: #9a9a9a; }
         .hm-hours span { white-space: nowrap; }
-        .hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.68rem; color: #999; }
+        .hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.72rem; color: #999; }
         .hm-legend { white-space: nowrap; }
         .hm-legend i { display: inline-block; width: 10px; height: 10px; margin-left: 3px; border-radius: 2px; vertical-align: -1px; }
-        .hm-note { margin: 6px 0 0; font-size: 0.64rem; color: #777; }
+        .hm-note { margin: 6px 0 0; font-size: 0.72rem; color: #9a9a9a; }
         .baseline-note { margin: 8px 0 0; font-size: 0.7rem; color: #999; line-height: 1.4; }
         .demo-mark { position: relative; overflow: hidden; }
         .demo-mark::after {
@@ -591,7 +423,7 @@
         }
 
         /* ---- Info pages ---- */
-        .fine { font-size: 0.72rem; color: #8a8a8a; line-height: 1.45; }
+        .fine { font-size: 0.72rem; color: #9a9a9a; line-height: 1.45; }
         .fine a, .info-card a { color: #29b6f6; }
         .info-card a.action-btn.btn-primary { color: #000; }
         .chart-svg { margin: 10px 0 6px; }
@@ -608,7 +440,7 @@
         .audio-bar { display: block; background: #1c1c1c; border-radius: 3px; height: 10px; overflow: hidden; }
         .audio-bar i { display: block; height: 100%; border-radius: 3px; }
         .audio-n { white-space: nowrap; font-variant-numeric: tabular-nums; }
-        .audio-n em { color: #888; font-style: normal; font-size: 0.66rem; }
+        .audio-n em { color: #9a9a9a; font-style: normal; font-size: 0.72rem; }
         .audio-card { overflow: hidden; }
 
         @media (max-width: 600px) {
@@ -620,28 +452,7 @@
             }
             .navbar-brand { font-size: 0.9rem; }
             .navbar-brand .brand-title { font-size: 0.92rem; }
-            .navbar-brand .tagline { font-size: 0.65rem; }
-            .nav-links {
-                width: 100%;
-                padding: 2px 0;
-            }
-            .nav-btn {
-                padding: 4px 10px;
-                font-size: 0.72rem;
-            }
-            .detail-panel { 
-                width: 100% !important; 
-                max-width: 100vw !important;
-                height: 100% !important;
-                right: -100% !important; 
-                padding: 14px 14px calc(90px + env(safe-area-inset-bottom, 0px)) 14px; 
-                border-left: none; 
-            }
-            .detail-panel.open { right: 0 !important; }
-            .tile-header { padding: 10px 12px; }
-            .tile-main-val { font-size: 1.1rem; }
-            .tile-title-group h4 { font-size: 0.6rem; }
-            .card-hint-pill { font-size: 0.52rem; padding: 1px 4px; }
+            .navbar-brand .tagline { font-size: 0.72rem; }
             .map-overlay-legend {
                 top: 8px;
                 right: 8px;
@@ -658,9 +469,75 @@
             }
             .legend-badge { width: 18px; height: 12px; }
         }
-    </style>
+
+        /* ---- Accessibility ---- */
+        .sr-only, .lg-long-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+        .skip-link { position: absolute; left: 8px; top: -60px; z-index: 4000; background: #00e676; color: #000; padding: 10px 14px; border-radius: 6px; font-weight: 700; text-decoration: none; }
+        .skip-link:focus { top: 8px; }
+        :focus-visible { outline: 2px solid #29b6f6; outline-offset: 2px; }
+        .leaflet-marker-icon:focus-visible { outline: 3px solid #0d47a1; outline-offset: 3px; box-shadow: 0 0 0 3px #fff; border-radius: 8px; }
+        .detail-panel:focus, .detail-panel:focus-visible { outline: none; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+
+        /* Closed panels leave the tab order and the accessibility tree */
+        .detail-panel { visibility: hidden; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s; }
+        .detail-panel.open { visibility: visible; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s; }
+
+        .sheet-bar { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+        .sheet-handle { display: none; }
+        .close-btn { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; color: #b5b5b5; font-size: 1.8rem; align-self: auto; }
+        .close-btn:hover { color: #fff; }
+        .menu-toggle { display: none; }
+        .hm-grid:focus-visible { outline-offset: 4px; }
+        .hm-cell.sel { position: relative; z-index: 1; }
+
+        /* ---- Menu instead of the button row on narrower screens ---- */
+        @media (max-width: 1100px) {
+            .menu-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 16px; background: #242424; border: 1px solid #00e676; color: #00e676; border-radius: 6px; font-weight: 700; font-size: 0.9rem; cursor: pointer; flex-shrink: 0; }
+            .navbar { position: relative; flex-wrap: nowrap; }
+            .navbar-brand { min-width: 0; white-space: normal; }
+            .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 2100; width: auto; background: #1a1a1a; border-bottom: 1px solid #333; padding: 10px 12px 14px; overflow: visible; white-space: normal; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.55); }
+            .nav-links.open { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .nav-btn { min-height: 44px; font-size: 0.9rem; padding: 8px 12px; }
+        }
+        @media (min-width: 700px) and (max-width: 1100px) {
+            .nav-links.open { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+
+        /* ---- Phones: panels become bottom sheets so the map stays in view ---- */
+        @media (max-width: 600px) {
+            .detail-panel {
+                top: auto; left: 0; right: 0; bottom: 0; width: 100%; max-width: 100vw;
+                height: 60vh; height: 60dvh;
+                padding: 0 14px calc(28px + env(safe-area-inset-bottom, 0px)) 14px;
+                border-left: none; border-top: 1px solid #333; border-radius: 16px 16px 0 0;
+                box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.55);
+                transform: translateY(105%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
+            }
+            .detail-panel.open { right: 0; transform: translateY(0); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s; }
+            .detail-panel.expanded { height: calc(100vh - 76px); height: calc(100dvh - 76px); }
+            .sheet-bar { position: sticky; top: 0; z-index: 5; justify-content: space-between; background: #1a1a1a; margin: 0 -14px; padding: 0 6px 0 10px; min-height: 48px; }
+            .sheet-handle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; background: none; border: none; color: #d0d0d0; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+            .sheet-grip { display: inline-block; width: 36px; height: 5px; border-radius: 3px; background: #666; }
+            .panel-header { padding-right: 0; }
+            .map-overlay-legend { padding: 6px 10px; }
+            .legend-title { font-size: 0.72rem; margin-bottom: 4px; }
+            .legend-scale { flex-direction: row; flex-wrap: wrap; gap: 4px 12px; }
+            .legend-item { gap: 5px; font-size: 0.78rem; }
+            .lg-long { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+            body.panel-open .map-overlay-stats { display: none; }
+            .range-btn, .heat-btn { min-height: 36px; padding: 6px 12px; }
+            .siren-toggle { min-height: 36px; }
+            input, select, textarea { font-size: 16px !important; }
+        }
+
+</style>
 </head>
 <body>
+    <a class="skip-link" href="#map">Skip to the map</a>
 
     <div id="toast-notification" class="toast-notification" role="alert" aria-live="assertive">
         <div id="toast-title" class="toast-title">Notification</div>
@@ -669,11 +546,13 @@
 
     <div class="navbar">
         <div class="navbar-brand">
-            <span class="brand-title">🔊 Mile High Noise Project</span>
+            <span class="brand-title" role="heading" aria-level="1">🔊 Mile High Noise Project</span>
             <span class="tagline">Mapping illegal excessive vehicle noise across Denver</span>
         </div>
         
-        <div class="nav-links">
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" onclick="toggleMenu()"><span aria-hidden="true">&#9776;</span><span class="menu-label">Menu</span></button>
+
+        <nav class="nav-links" id="nav-links" aria-label="Site sections">
             <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
             <button class="nav-btn" onclick="openInfoModal('gap')">The Gap</button>
             <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
@@ -682,16 +561,16 @@
             <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
             <button class="nav-btn" onclick="openInfoModal('calculator')">Night Noise</button>
             <button class="nav-btn" onclick="openInfoModal('contact')">Contact</button>
-        </div>
+        </nav>
     </div>
 
-    <div class="main-container">
-        <div class="map-overlay-legend">
+    <div class="main-container" role="main">
+        <div class="map-overlay-legend" role="group" aria-label="Map legend">
             <div class="legend-title">Exceedances (Last Hour)</div>
             <div class="legend-scale">
-                <div class="legend-item"><span class="legend-badge badge-green"></span> 0 Exceedances (Safe)</div>
-                <div class="legend-item"><span class="legend-badge badge-yellow"></span> 1–2 Exceedances (High Stress)</div>
-                <div class="legend-item"><span class="legend-badge badge-red"></span> 3+ Exceedances (Critical Risk)</div>
+                <div class="legend-item"><span class="legend-badge badge-green" aria-hidden="true"></span><span class="lg-short">0</span><span class="lg-long"> Exceedances (Safe)</span></div>
+                <div class="legend-item"><span class="legend-badge badge-yellow" aria-hidden="true"></span><span class="lg-short">1–2</span><span class="lg-long"> Exceedances (High Stress)</span></div>
+                <div class="legend-item"><span class="legend-badge badge-red" aria-hidden="true"></span><span class="lg-short">3+</span><span class="lg-long"> Exceedances (Critical Risk)</span></div>
             </div>
         </div>
 
@@ -704,13 +583,19 @@
 
         <div id="map"></div>
 
-        <div class="detail-panel" id="info-panel">
-            <button class="close-btn" onclick="closeInfoPanel()">&times;</button>
+        <div class="detail-panel" id="info-panel" role="dialog" aria-modal="false" aria-label="Information" tabindex="-1">
+            <div class="sheet-bar">
+                <button class="sheet-handle" type="button" aria-expanded="false" aria-label="Expand panel" onclick="toggleSheet('info-panel')"><span class="sheet-grip" aria-hidden="true"></span><span class="sheet-label">Expand</span></button>
+                <button class="close-btn" type="button" aria-label="Close information panel" onclick="closeInfoPanel()">&times;</button>
+            </div>
             <div id="info-panel-content"></div>
         </div>
 
-        <div class="detail-panel" id="detail-panel">
-            <button class="close-btn" onclick="closePanel()">&times;</button>
+        <div class="detail-panel" id="detail-panel" role="dialog" aria-modal="false" aria-labelledby="panel-title" tabindex="-1">
+            <div class="sheet-bar">
+                <button class="sheet-handle" type="button" aria-expanded="false" aria-label="Expand panel" onclick="toggleSheet('detail-panel')"><span class="sheet-grip" aria-hidden="true"></span><span class="sheet-label">Expand</span></button>
+                <button class="close-btn" type="button" aria-label="Close station panel" onclick="closePanel()">&times;</button>
+            </div>
             <div class="panel-header">
                 <h2 id="panel-title">Station Location</h2>
                 <p id="panel-address">Address details...</p>
@@ -727,7 +612,7 @@
                         <span id="panel-flag" class="flag-chip" hidden></span>
                     </div>
                 </div>
-                <div class="live-chart"><canvas id="liveMinuteChart"></canvas></div>
+                <div class="live-chart"><canvas id="liveMinuteChart" role="img" aria-label="Recent dBA and dBC readings from this monitor"></canvas></div>
                 <div class="live-foot">
                     <span id="live-status">Loading&hellip;</span>
                     <span class="live-legend"><i style="background:#00e676"></i>dBA<i style="background:#29b6f6"></i>dBC<i style="background:#ef5350"></i>&Delta; rule met</span>
@@ -790,13 +675,13 @@
                 <div class="hm-wrap">
                     <div class="hm-days" id="hm-days"></div>
                     <div>
-                        <div class="hm-grid" id="hm-grid"></div>
+                        <div class="hm-grid" id="hm-grid" tabindex="0" role="group" aria-label="Flagged events by day and hour. Use the arrow keys to move between squares." aria-describedby="hm-detail"></div>
                         <div class="hm-hours">
                             <span style="grid-column: 1 / span 4">12a</span><span style="grid-column: 7 / span 4">6a</span><span style="grid-column: 13 / span 4">12p</span><span style="grid-column: 19 / span 4">6p</span>
                         </div>
                     </div>
                 </div>
-                <div class="hm-foot"><span id="hm-detail">Tap a square for details.</span><span class="hm-legend" id="hm-legend"></span></div>
+                <div class="hm-foot"><span id="hm-detail" aria-live="polite">Tap a square, or use the arrow keys, for details.</span><span class="hm-legend" id="hm-legend"></span></div>
                 <p class="hm-note">Last 14 days, station local time. Darker columns are 10 pm to 6 am.</p>
             </section>
 
@@ -1147,9 +1032,9 @@
             .concat(gap.slice().reverse().map(f => `${X(f).toFixed(1)},${Y(weightA(f)).toFixed(1)}`)).join(' ');
         const grid = [0, -10, -20, -30, -40, -50].map(db =>
             `<line x1="${L}" x2="${W - R}" y1="${Y(db).toFixed(1)}" y2="${Y(db).toFixed(1)}" stroke="#333" stroke-width="1"/>` +
-            `<text x="${L - 5}" y="${(Y(db) + 3).toFixed(1)}" fill="#888" font-size="9" text-anchor="end">${db}</text>`).join('');
+            `<text x="${L - 5}" y="${(Y(db) + 3).toFixed(1)}" fill="#9a9a9a" font-size="11" text-anchor="end">${db}</text>`).join('');
         const ticks = [[31.5, '31 Hz'], [100, '100 Hz'], [1000, '1 kHz'], [10000, '10 kHz']].map(([f, t]) =>
-            `<text x="${X(f).toFixed(1)}" y="${H - 12}" fill="#888" font-size="9" text-anchor="middle">${t}</text>`).join('');
+            `<text x="${X(f).toFixed(1)}" y="${H - 12}" fill="#9a9a9a" font-size="11" text-anchor="middle">${t}</text>`).join('');
         const x100 = X(100).toFixed(1);
         return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="A-weighting and C-weighting curves. C-weighting stays near 0 dB at low frequencies while A-weighting drops sharply.">` +
             grid + ticks +
@@ -1157,10 +1042,10 @@
             `<polyline points="${pts(weightA).join(' ')}" fill="none" stroke="#00e676" stroke-width="2"/>` +
             `<polyline points="${pts(weightC).join(' ')}" fill="none" stroke="#29b6f6" stroke-width="2"/>` +
             `<line x1="${x100}" x2="${x100}" y1="${Y(weightC(100)).toFixed(1)}" y2="${Y(weightA(100)).toFixed(1)}" stroke="#fff" stroke-dasharray="3 2"/>` +
-            `<text x="${(Number(x100) + 6).toFixed(1)}" y="${(Y(-9)).toFixed(1)}" fill="#ddd" font-size="9">at 100 Hz, A reads ${Math.abs(Math.round(weightA(100) - weightC(100)))} dB lower</text>` +
-            `<text x="${(X(2500)).toFixed(1)}" y="${(Y(weightA(2500)) - 6).toFixed(1)}" fill="#00e676" font-size="10">dBA</text>` +
-            `<text x="${(X(2500)).toFixed(1)}" y="${(Y(weightC(2500)) + 14).toFixed(1)}" fill="#29b6f6" font-size="10">dBC</text>` +
-            `<text x="12" y="${(H / 2).toFixed(0)}" fill="#888" font-size="9" transform="rotate(-90 12 ${(H / 2).toFixed(0)})" text-anchor="middle">weighting (dB)</text>` +
+            `<text x="${(Number(x100) + 6).toFixed(1)}" y="${(Y(-9)).toFixed(1)}" fill="#ddd" font-size="11">at 100 Hz, A reads ${Math.abs(Math.round(weightA(100) - weightC(100)))} dB lower</text>` +
+            `<text x="${(X(2500)).toFixed(1)}" y="${(Y(weightA(2500)) - 6).toFixed(1)}" fill="#00e676" font-size="11">dBA</text>` +
+            `<text x="${(X(2500)).toFixed(1)}" y="${(Y(weightC(2500)) + 14).toFixed(1)}" fill="#29b6f6" font-size="11">dBC</text>` +
+            `<text x="12" y="${(H / 2).toFixed(0)}" fill="#9a9a9a" font-size="11" transform="rotate(-90 12 ${(H / 2).toFixed(0)})" text-anchor="middle">weighting (dB)</text>` +
             `</svg>`;
     }
 
@@ -1629,7 +1514,9 @@ Thank you,
     };
 
     function openInfoModal(topic) {
-        closePanel();
+        closePanel(false);
+        rememberFocus();
+        toggleMenu(false);
         currentInfoTopic = topic;
 
         const infoPanel = document.getElementById('info-panel');
@@ -1642,13 +1529,145 @@ Thank you,
         const build = INFO_PAGES[topic];
         container.innerHTML = build ? build() : 'Select a topic from the navigation bar.';
         infoPanel.scrollTop = 0;
+        setSheetExpanded('info-panel', isPhone());
         infoPanel.classList.add('open');
+        syncPanelState();
+        focusPanel('info-panel');
         if (INFO_AFTER[topic]) INFO_AFTER[topic]();
     }
 
-    function closeInfoPanel() {
+    // ========================================================================
+    // ACCESSIBILITY AND PHONE LAYOUT
+    // ========================================================================
+    const isPhone = () => !!(window.matchMedia && window.matchMedia('(max-width: 600px)').matches);
+    let returnFocusTo = null;
+
+    function isPanelOpen(id) { const p = document.getElementById(id); return !!p && p.classList.contains('open'); }
+    function syncPanelState() {
+        document.body.classList.toggle('panel-open', isPanelOpen('info-panel') || isPanelOpen('detail-panel'));
+    }
+    function rememberFocus() {
+        const el = document.activeElement;
+        const inPanel = el && el.closest && el.closest('.detail-panel');
+        if (el && el !== document.body && !inPanel) returnFocusTo = el;
+    }
+    function focusPanel(id) {
+        const p = document.getElementById(id);
+        if (p && p.focus) p.focus({ preventScroll: true });
+    }
+    function restoreFocus() {
+        const el = returnFocusTo;
+        returnFocusTo = null;
+        if (el && el.isConnected && el.focus) el.focus({ preventScroll: true });
+        // the remembered control may be gone or hidden (a closed menu, a refreshed marker): fall back to something sensible
+        if (document.activeElement === document.body || (el && document.activeElement !== el)) {
+            const fallback = document.getElementById(isPhone() ? 'menu-toggle' : 'map');
+            if (fallback && fallback.focus) fallback.focus({ preventScroll: true });
+        }
+    }
+
+    function setSheetExpanded(id, expanded) {
+        const p = document.getElementById(id);
+        if (!p) return;
+        p.classList.toggle('expanded', expanded);
+        const h = p.querySelector ? p.querySelector('.sheet-handle') : null;
+        if (h) {
+            h.setAttribute('aria-expanded', String(expanded));
+            h.setAttribute('aria-label', expanded ? 'Collapse panel' : 'Expand panel');
+            const label = h.querySelector ? h.querySelector('.sheet-label') : null;
+            if (label) label.textContent = expanded ? 'Collapse' : 'Expand';
+        }
+    }
+    function toggleSheet(id) {
+        const p = document.getElementById(id);
+        setSheetExpanded(id, !(p && p.classList.contains('expanded')));
+    }
+
+    function toggleMenu(force) {
+        const links = document.getElementById('nav-links');
+        const btn = document.getElementById('menu-toggle');
+        if (!links || !btn) return;
+        const open = force === undefined ? !links.classList.contains('open') : !!force;
+        links.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', String(open));
+        const label = btn.querySelector ? btn.querySelector('.menu-label') : null;
+        if (label) label.textContent = open ? 'Close' : 'Menu';
+    }
+
+    // Keep the chosen station visible above the bottom sheet on phones.
+    function centerOnStation(station) {
+        const target = [station.lat, station.lng];
+        const sheet = isPhone() ? document.getElementById('detail-panel').offsetHeight : 0;
+        if (sheet && map.project && map.unproject && map.getZoom) {
+            const zoom = map.getZoom();
+            const point = map.project(target, zoom).add([0, sheet / 2]);
+            map.setView(map.unproject(point, zoom), zoom, { animate: true });
+        } else {
+            map.panTo(target, { animate: true, duration: 0.5 });
+        }
+    }
+
+    function handleGlobalKeydown(e) {
+        if (e.key !== 'Escape') return;
+        const links = document.getElementById('nav-links');
+        if (links && links.classList.contains('open')) {
+            toggleMenu(false);
+            const t = document.getElementById('menu-toggle');
+            if (t && t.focus) t.focus();
+            return;
+        }
+        if (isPanelOpen('info-panel')) { closeInfoPanel(); return; }
+        if (isPanelOpen('detail-panel')) closePanel();
+    }
+    function handleDocumentClick(e) {
+        const links = document.getElementById('nav-links');
+        if (!links || !links.classList.contains('open')) return;
+        const insideNav = e.target && e.target.closest ? e.target.closest('.navbar') : null;
+        if (!insideNav) toggleMenu(false);
+    }
+    document.addEventListener('keydown', handleGlobalKeydown);
+    document.addEventListener('click', handleDocumentClick);
+
+    // ---- screen-reader text for the map markers and charts ----
+    function markerLabel(station) {
+        let status;
+        if (station.state === 'live') status = `${station.currentDba.toFixed(1)} dBA now, ${station.hourlyExceedances || 0} exceedances in the last hour`;
+        else if (station.state === 'stale') status = 'offline';
+        else if (station.state === 'demo') status = 'not reporting yet';
+        else status = 'loading';
+        return `${station.name}: ${status}. Press Enter for details.`;
+    }
+    function labelMarker(marker, station) {
+        const el = marker && marker.getElement ? marker.getElement() : null;
+        if (!el) return;
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', markerLabel(station));
+    }
+    // Replacing a marker's icon drops keyboard focus, so only do it when the badge actually changed.
+    function refreshMarker(station) {
+        const marker = markersMap.get(station.id);
+        if (!marker) return;
+        const icon = createBadgeIcon(station);
+        if (icon.html !== station.iconHtml) {
+            marker.setIcon(icon);
+            station.iconHtml = icon.html;
+        }
+        labelMarker(marker, station);
+    }
+    function describeCanvas(id, text) {
+        const c = document.getElementById(id);
+        if (!c) return;
+        c.setAttribute('role', 'img');
+        c.setAttribute('aria-label', text);
+    }
+
+    function closeInfoPanel(restore = true) {
+        const wasOpen = isPanelOpen('info-panel');
         document.getElementById('info-panel').classList.remove('open');
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        currentInfoTopic = null;
+        syncPanelState();
+        if (restore && wasOpen) restoreFocus();
     }
 
     async function submitProjectContact(e) {
@@ -1730,9 +1749,9 @@ Thank you,
     const LF_DELTA_THRESHOLD = 10.0;
     const LF_FLOOR_DB = DECIBEL_THRESHOLD;
     const CLASS_META = {
-        A:    { label: 'dBA limit only',       desc: 'Over the dBA limit',                                  color: '#ffb74d' },
-        A_LF: { label: 'dBA limit + \u0394 rule', desc: 'Over the dBA limit and the \u0394 rule',          color: '#ef5350' },
-        LF:   { label: '\u0394 rule only',      desc: 'Under the dBA limit, caught only by the \u0394 rule', color: '#29b6f6' }
+        A:    { label: 'dBA limit only',       desc: 'Over the dBA limit',                                  color: '#ffb74d', text: '#ffcc80' },
+        A_LF: { label: 'dBA limit + \u0394 rule', desc: 'Over the dBA limit and the \u0394 rule',          color: '#ef5350', text: '#ff8a80' },
+        LF:   { label: '\u0394 rule only',      desc: 'Under the dBA limit, caught only by the \u0394 rule', color: '#29b6f6', text: '#81d4fa' }
     };
     const RANGES = {
         '1h':  { ms: 60 * 60 * 1000,           label: 'Past hour' },
@@ -2127,8 +2146,9 @@ Thank you,
 
         const datasets = classDatasets(events, toPoint, 4);
         if (showSirens) datasets.push(sirenDataset(sirens.map(toPoint), 4));
+        describeCanvas('scatterChart', `Scatter chart of ${events.length} flagged events with dBA on the horizontal axis and dBC on the vertical axis. ${events.filter(e => e.cls === 'LF').length} of them are under ${DECIBEL_THRESHOLD} dBA but flagged by the \u0394 rule.`);
 
-        const axisTitle = text => ({ display: true, text, color: '#888', font: { size: 10 } });
+        const axisTitle = text => ({ display: true, text, color: '#9a9a9a', font: { size: 10 } });
         scatterChartInstance = new Chart(document.getElementById('scatterChart').getContext('2d'), {
             type: 'scatter',
             data: { datasets },
@@ -2137,8 +2157,8 @@ Thank you,
                 maintainAspectRatio: false,
                 animation: false,
                 scales: {
-                    x: { type: 'linear', min: xMin, max: xMax, title: axisTitle('dBA \u2014 what most ordinances measure'), grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 } } },
-                    y: { min: yMin, max: yMax, title: axisTitle('dBC'), grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 } } }
+                    x: { type: 'linear', min: xMin, max: xMax, title: axisTitle('dBA \u2014 what most ordinances measure'), grid: { color: '#2f2f2f' }, ticks: { color: '#9a9a9a', font: { size: 9 } } },
+                    y: { min: yMin, max: yMax, title: axisTitle('dBC'), grid: { color: '#2f2f2f' }, ticks: { color: '#9a9a9a', font: { size: 9 } } }
                 },
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa', usePointStyle: true } },
@@ -2160,11 +2180,11 @@ Thank you,
         const xScale = (showLabels) => ({
             type: 'linear', min: data.since, max: data.until,
             grid: { color: '#2f2f2f' },
-            ticks: { display: showLabels, color: '#888', font: { size: 9 }, maxRotation: 0, callback: v => fmtTick(v, data.rangeKey) },
+            ticks: { display: showLabels, color: '#9a9a9a', font: { size: 9 }, maxRotation: 0, callback: v => fmtTick(v, data.rangeKey) },
             afterBuildTicks: sc => { sc.ticks = niceTimeTicks(sc.min, sc.max, data.rangeKey).map(value => ({ value })); }
         });
         const yScale = (min, max) => ({
-            min, max, grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 } },
+            min, max, grid: { color: '#2f2f2f' }, ticks: { color: '#9a9a9a', font: { size: 9 } },
             afterFit: sc => { sc.width = 44; } // same width on both charts so the time axes line up
         });
         const base = (yScaleCfg, showLabels, lines) => ({
@@ -2175,6 +2195,8 @@ Thank you,
             plugins: { legend: { display: false }, tooltip: eventTooltip(), refLines: { lines }, demoMark: { enabled: data.demo } }
         });
 
+        describeCanvas('timelineChart', `Timeline of ${data.events.length} flagged events by dBA. Events under the ${DECIBEL_THRESHOLD} dBA line were flagged only by the \u0394 rule.`);
+        describeCanvas('deltaChart', `Timeline of the difference between dBC and dBA for the same events. The \u0394 rule flags differences above ${LF_DELTA_THRESHOLD} dB.`);
         // dBA per event, with the limit line: blue dots below it are what a dBA-only rule never sees
         const dbaMin = Math.floor((Math.min(60, ...all.map(e => e.dba)) - 2) / 5) * 5;
         const dbaMax = Math.ceil((Math.max(95, ...all.map(e => e.dba)) + 2) / 5) * 5;
@@ -2391,7 +2413,42 @@ Thank you,
         document.getElementById('hm-legend').innerHTML = `fewer ${swatch(0.25)}${swatch(0.5)}${swatch(0.75)}${swatch(1)} more`;
         document.getElementById('heatmap-sentence').textContent = heatSentence(model, heatMetric);
         document.getElementById('heatmap-card').classList.toggle('demo-mark', !!model.demo);
-        document.getElementById('hm-detail').textContent = 'Tap a square for details.';
+        document.getElementById('hm-detail').textContent = 'Tap a square, or use the arrow keys, for details.';
+        if (hmSel) selectHeatCell(hmSel.i, hmSel.h, false);
+    }
+
+    let hmSel = null;  // the selected square: { i: day index in the model, h: hour }
+    function selectHeatCell(i, h, announce = true) {
+        if (!lastHourly) return;
+        i = Math.max(0, Math.min(lastHourly.dates.length - 1, i));
+        h = Math.max(0, Math.min(23, h));
+        hmSel = { i, h };
+        document.querySelectorAll('#hm-grid .hm-cell.sel').forEach(c => c.classList.remove('sel'));
+        const cell = document.querySelector(`#hm-grid .hm-cell[data-d="${i}"][data-h="${h}"]`);
+        if (cell) cell.classList.add('sel');
+        if (announce) document.getElementById('hm-detail').textContent = heatDetail(lastHourly, i, h);
+    }
+    function handleHeatKeydown(e) {
+        if (!lastHourly) return;
+        const newest = lastHourly.dates.length - 1;
+        if (!hmSel) {
+            const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: STATION_TZ, hour: '2-digit', hourCycle: 'h23' }).format(new Date()));
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown', 'Enter', ' '].includes(e.key)) {
+                e.preventDefault();
+                selectHeatCell(newest, hour);
+            }
+            return;
+        }
+        const moves = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [1, 0], ArrowDown: [-1, 0] };  // newest day is the top row
+        let next = null;
+        if (moves[e.key]) next = { i: hmSel.i + moves[e.key][0], h: hmSel.h + moves[e.key][1] };
+        else if (e.key === 'Home') next = { i: hmSel.i, h: 0 };
+        else if (e.key === 'End') next = { i: hmSel.i, h: 23 };
+        else if (e.key === 'PageUp') next = { i: newest, h: hmSel.h };
+        else if (e.key === 'PageDown') next = { i: 0, h: hmSel.h };
+        if (!next) return;
+        e.preventDefault();
+        selectHeatCell(next.i, next.h);
     }
 
     function setHeatMetric(metric) {
@@ -2506,7 +2563,7 @@ Thank you,
                 interaction: { mode: 'index', intersect: false },
                 scales: {
                     x: { display: false },
-                    y: { min: 40, suggestedMax: 110, grid: { color: '#2f2f2f' }, ticks: { color: '#888', font: { size: 9 }, maxTicksLimit: 5 } }
+                    y: { min: 40, suggestedMax: 110, grid: { color: '#2f2f2f' }, ticks: { color: '#9a9a9a', font: { size: 9 }, maxTicksLimit: 5 } }
                 },
                 plugins: {
                     legend: { display: false },
@@ -2580,11 +2637,13 @@ Thank you,
     const markersMap = new Map();
     METER_STATIONS.forEach(station => {
         const marker = L.marker([station.lat, station.lng], {
-            icon: createBadgeIcon(station)
+            icon: createBadgeIcon(station), keyboard: true, title: station.name
         }).addTo(map);
 
         marker.on('click', () => openDetailPanel(station));
         markersMap.set(station.id, marker);
+        station.iconHtml = createBadgeIcon(station).html;
+        labelMarker(marker, station);
     });
 
     function generate14DayLabels() {
@@ -2662,7 +2721,7 @@ Thank you,
             if (cls) {
                 flagEl.textContent = CLASS_META[cls].label;
                 flagEl.style.background = CLASS_META[cls].color + '33';
-                flagEl.style.color = CLASS_META[cls].color;
+                flagEl.style.color = CLASS_META[cls].text;
             }
         }
 
@@ -2699,8 +2758,7 @@ Thank you,
                 const wantCounts = !station.countsAt || now - station.countsAt > 60000;
                 await refreshStation(station, wantCounts);
 
-                const marker = markersMap.get(station.id);
-                if (marker) marker.setIcon(createBadgeIcon(station));
+                refreshMarker(station);
 
                 if (activeMarkerObj && activeMarkerObj.id === station.id) {
                     renderLiveHeader(station);
@@ -2739,7 +2797,9 @@ Thank you,
     }
 
     async function openDetailPanel(station) {
-        closeInfoPanel();
+        closeInfoPanel(false);
+        rememberFocus();
+        hmSel = null;
         const token = ++panelToken;
         activeMarkerObj = station;
         liveDbHistory = [];
@@ -2754,8 +2814,11 @@ Thank you,
 
         const detailPanel = document.getElementById('detail-panel');
         detailPanel.scrollTop = 0;
+        setSheetExpanded('detail-panel', false);
         detailPanel.classList.add('open');
-        map.panTo([station.lat, station.lng], { animate: true, duration: 0.5 });
+        syncPanelState();
+        centerOnStation(station);
+        focusPanel('detail-panel');
 
         destroyPanelCharts();
         lastEventsData = null; lastHourly = null; lastBaseline = null;
@@ -2777,11 +2840,14 @@ Thank you,
         await Promise.all([loadLive(station, token), loadEvents(station, token), loadHeatmap(station, token), loadBaseline(station, token)]);
     }
 
-    function closePanel() {
+    function closePanel(restore = true) {
+        const wasOpen = isPanelOpen('detail-panel');
         document.getElementById('detail-panel').classList.remove('open');
+        syncPanelState();
         panelToken++;
         destroyPanelCharts();
         activeMarkerObj = null;
+        if (restore && wasOpen) restoreFocus();
     }
 
     // 14-day charts, built from the same hourly data as the heatmap
@@ -2794,8 +2860,9 @@ Thank you,
         if (!canvas) return;
         const labels = model.dates.map((d, i) => (i === model.dates.length - 1 ? 'Today' : shortDate(d)));
         const perDay = key => model.cells.map(row => row.reduce((sum, c) => sum + c[key], 0));
-        const series = [['A', 'aOnly'], ['A_LF', 'aLf'], ['LF', 'lf']];  // amber at the base, the \u0394-only events on top
-        const tick = { color: '#888', font: { size: 9 } };
+        const series = [['A', 'aOnly'], ['A_LF', 'aLf'], ['LF', 'lf']];
+        describeCanvas('stackedChart', 'Flagged events per day for the last 14 days, stacked by how they were flagged. Totals: ' + model.dates.map((d, i) => `${i === model.dates.length - 1 ? 'today' : shortDate(d)} ${perDay('aOnly')[i] + perDay('aLf')[i] + perDay('lf')[i]}`).join(', ') + '.');  // amber at the base, the \u0394-only events on top
+        const tick = { color: '#9a9a9a', font: { size: 9 } };
         stackedChartInstance = new Chart(canvas.getContext('2d'), {
             type: 'bar',
             data: {
@@ -2833,7 +2900,7 @@ Thank you,
 
     function renderPeakChart(model) {
         peakChartInstance = destroyChart(peakChartInstance);
-        const tick = { color: '#888', font: { size: 9 } };
+        const tick = { color: '#9a9a9a', font: { size: 9 } };
         const labels = model.dates.map((d, i) => (i === model.dates.length - 1 ? 'Today' : shortDate(d)));
         peakChartInstance = new Chart(document.getElementById('peakChart').getContext('2d'), {
             type: 'line',
@@ -2856,6 +2923,7 @@ Thank you,
             plugins: [refLinesPlugin, demoMarkPlugin]
         });
         document.getElementById('patterns-note').textContent = 'Days with no flagged events have no point.';
+        describeCanvas('peakChart', 'Highest flagged dBA and dBC per day for the last 14 days. ' + model.dates.map((d, i) => model.peakDba[i] == null ? null : `${shortDate(d)}: ${model.peakDba[i]} dBA, ${model.peakDbc[i] == null ? 'no dBC' : model.peakDbc[i] + ' dBC'}`).filter(Boolean).join('; ') + '.');
     }
 
     // Opening the collapsed section draws the peak-level chart
@@ -3012,10 +3080,9 @@ Thank you,
     document.getElementById('hm-grid').addEventListener('click', e => {
         const cell = e.target.closest ? e.target.closest('.hm-cell') : null;
         if (!cell || !lastHourly) return;
-        document.querySelectorAll('#hm-grid .hm-cell.sel').forEach(c => c.classList.remove('sel'));
-        cell.classList.add('sel');
-        document.getElementById('hm-detail').textContent = heatDetail(lastHourly, Number(cell.dataset.d), Number(cell.dataset.h));
+        selectHeatCell(Number(cell.dataset.d), Number(cell.dataset.h));
     });
+    document.getElementById('hm-grid').addEventListener('keydown', handleHeatKeydown);
     document.getElementById('sensor-footnote').innerHTML = `<strong>About the sensors:</strong><br>${SENSOR_SPEC_TEXT}. Readings are taken four times a second about ${SENSOR_DISTANCE_FT} ft from the center of the travel lane.`;
     renderRuleText();
 
