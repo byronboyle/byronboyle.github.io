@@ -586,11 +586,11 @@
 
     <div class="main-container" role="main">
         <div class="map-overlay-legend" role="group" aria-label="Map legend">
-            <div class="legend-title">Exceedances (Last Hour)</div>
+            <div class="legend-title">Loud events (last hour)</div>
             <div class="legend-scale">
-                <div class="legend-item"><span class="legend-badge badge-green" aria-hidden="true"></span><span class="lg-short">0</span><span class="lg-long"> Exceedances (Safe)</span></div>
-                <div class="legend-item"><span class="legend-badge badge-yellow" aria-hidden="true"></span><span class="lg-short">1–2</span><span class="lg-long"> Exceedances (High Stress)</span></div>
-                <div class="legend-item"><span class="legend-badge badge-red" aria-hidden="true"></span><span class="lg-short">3+</span><span class="lg-long"> Exceedances (Critical Risk)</span></div>
+                <div class="legend-item"><span class="legend-badge badge-green" aria-hidden="true"></span><span class="lg-short">0</span><span class="lg-long"> loud events</span></div>
+                <div class="legend-item"><span class="legend-badge badge-yellow" aria-hidden="true"></span><span class="lg-short">1–2</span><span class="lg-long"> loud events</span></div>
+                <div class="legend-item"><span class="legend-badge badge-red" aria-hidden="true"></span><span class="lg-short">3+</span><span class="lg-long"> loud events</span></div>
             </div>
             <div class="legend-districts">
                 <label class="layer-toggle"><input type="checkbox" id="toggle-districts" checked onchange="toggleDistricts(this.checked)"> Council districts</label>
@@ -599,8 +599,8 @@
         </div>
 
         <div class="map-overlay-stats">
-            <div>Active: <span class="stat-highlight" id="active-count">4</span></div>
-            <div>Limit: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
+            <div>Active: <span class="stat-highlight" id="active-count">&ndash;</span></div>
+            <div>Threshold: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
             <div>&Delta; rule: <span style="color:#29b6f6; font-weight:bold;">&gt; 10 dB</span></div>
             <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
@@ -624,6 +624,7 @@
                 <h2 id="panel-title">Station Location</h2>
                 <p id="panel-address">Address details...</p>
                 <p class="fine" id="panel-district"></p>
+                <p class="fine" id="panel-distance"></p>
             </div>
 
             <div id="panel-banner" class="panel-banner" hidden></div>
@@ -654,7 +655,7 @@
                     </div>
                 </div>
                 <div class="summary-grid">
-                    <div class="stat stat-a"><div class="stat-num" id="sum-a">&ndash;</div><div class="stat-label">Over the dBA limit</div></div>
+                    <div class="stat stat-a"><div class="stat-num" id="sum-a">&ndash;</div><div class="stat-label">Over the dBA threshold</div></div>
                     <div class="stat stat-lf"><div class="stat-num" id="sum-lf">&ndash;</div><div class="stat-label">Caught only by the &Delta; rule</div></div>
                     <div class="stat stat-s"><div class="stat-num" id="sum-s">&ndash;</div><div class="stat-label">Sirens (excluded)</div></div>
                 </div>
@@ -667,7 +668,7 @@
                 <h4>What the audio suggests</h4>
                 <p class="chart-help" id="audio-sentence"></p>
                 <div id="audio-bars"></div>
-                <p class="fine" style="margin-top:8px;">Each flagged event is also run through an audio classifier on the monitor. Its labels are a best guess from a few seconds of sound. It can't tell a pickup from a heavy truck, and it doesn't prove what any one vehicle was. Audio is analyzed on the monitor and never saved.</p>
+                <p class="fine" style="margin-top:8px;">Each flagged event is also run through an audio classifier on the monitor. It labels its best guess at the source from a few seconds of sound. Audio is analyzed on the monitor and never saved.</p>
             </section>
 
             <section class="chart-card">
@@ -691,7 +692,7 @@
                     <h4>When it happens &mdash; hour by day</h4>
                     <div class="range-toggle" role="group" aria-label="Heatmap measure">
                         <button type="button" class="heat-btn active" data-metric="all" onclick="setHeatMetric('all')">All</button>
-                        <button type="button" class="heat-btn" data-metric="a" onclick="setHeatMetric('a')">dBA limit</button>
+                        <button type="button" class="heat-btn" data-metric="a" onclick="setHeatMetric('a')" aria-label="Events over the dBA threshold">dBA</button>
                         <button type="button" class="heat-btn" data-metric="lf" onclick="setHeatMetric('lf')">&Delta; only</button>
                     </div>
                 </div>
@@ -725,7 +726,7 @@
 
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File Anonymous 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Flagged Events (CSV)</button>
-            <button class="action-btn btn-secondary" id="pdf-report-btn" onclick="generatePDFReport()" style="background: #1e3a8a; color: #ffffff;">📄 Download PDF Evidence Report</button>
+            <button class="action-btn btn-secondary" id="pdf-report-btn" onclick="generatePDFReport()" style="background: #1e3a8a; color: #ffffff;">📄 Download PDF Summary</button>
 
             <div class="sensor-footnote" id="sensor-footnote"></div>
         </div>
@@ -813,7 +814,7 @@
     // --- STATIONS DATA ---
     // The reading and count values below are placeholders. They are only shown (clearly labelled as demo)
     // for a station that has never reported; a station with real rows always uses its real data.
-    const METER_STATIONS = [
+    const BUILT_IN_STATIONS = [
         {
             id: "meter-01",
             name: "Federal Blvd Monitor",
@@ -863,9 +864,12 @@
             sirensCount: 0
         }
     ];
+    // Distances were a site-wide 50 ft before they were stored per station.
+    BUILT_IN_STATIONS.forEach(s => { s.distanceFt = 50; });
+    // The live list: filled from the Supabase `stations` table once the page has loaded (see loadStations).
+    const METER_STATIONS = [];
 
-    // Every station starts as 'loading'; its first reading decides whether it is 'live' or a demo placeholder.
-    METER_STATIONS.forEach(s => { s.state = 'loading'; s.lastSeen = null; s.hourlyLF = 0; s.todayLF = 0; });
+    // Every station starts as 'loading' (see normalizeStation); its first reading decides whether it is 'live' or a demo placeholder.
 
     const map = L.map('map').setView([39.735, -105.000], 12);
     
@@ -1005,8 +1009,13 @@
     // INFO PAGES: shared data and helpers
     // ========================================================================
     // How the sensors are described on the site and in reports. Change it here, in one place.
-    const SENSOR_SPEC_TEXT = 'PCB Artists I2C sound level sensor, designed to IEC 61672 Class 2 guidelines (not formally certified), reporting A- and C-weighted levels';
-    const SENSOR_DISTANCE_FT = 50;      // sensor to the center of the travel lane
+    const SENSOR_SPEC_TEXT = 'PCB Artists I2C sound level sensor, designed to IEC 61672 Class 2 guidelines, reporting A- and C-weighted levels';
+    // What the readings are for. Shown with the sensor description, in the PDF and in reports to the city.
+    const SENSOR_PURPOSE_TEXT = "Community monitoring data for awareness, trends and advocacy. The readings are not legal measurements, and each unit's accuracy depends on its enclosure, mounting and windscreen.";
+    const DEFAULT_SENSOR_DISTANCE_FT = 50;
+    // The typical distance from sensor to the center of the travel lane. Replaced by the median of the
+    // stations' own distances once they load; each station's panel shows its own.
+    let SENSOR_DISTANCE_FT = DEFAULT_SENSOR_DISTANCE_FT;
     const SITE_URL = 'https://byronboyle.github.io/';
     const CONTACT_FORM_VERSION = '2026-09';
 
@@ -1263,6 +1272,7 @@ Thank you,
     // INFO PAGES: content
     // ========================================================================
     function pageDbaDbc() {
+        const eq = equivalentAt25();
         const fname = f => (f >= 1000 ? `${f / 1000} kHz` : `${f} Hz`);
         const rows = [63, 100, 250, 1000, 4000].map(f => {
             const a = weightA(f), c = weightC(f);
@@ -1292,12 +1302,11 @@ Thank you,
             <div class="info-card">
                 <h3>Audio labels</h3>
                 <p>For each flagged event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source: motorcycle, car, truck or bus, music or bass, train or aircraft, or a vehicle of unclear type. This helps separate a modified exhaust from a passing bus or a car stereo.</p>
-                <p class="fine">The labels are a guess, not proof, and the model can't tell a pickup from a heavy truck. Audio is analyzed on the monitor and never saved; only the labels are kept.</p>
+                <p class="fine">Audio is analyzed on the monitor and never saved; only the labels are kept.</p>
             </div>
             <div class="info-card">
                 <h3>Why ${DECIBEL_THRESHOLD}?</h3>
-                <p>Our sensors sit about ${SENSOR_DISTANCE_FT} ft from the travel lane. Denver's code (D.R.M.C. \u00A7 36-8, Table B) limits motor vehicles under 10,000 lb to <strong>82 dB(A) measured at 25 ft</strong>. Sound drops roughly 3 to 6 dB each time the distance doubles, so ${DECIBEL_THRESHOLD} dBA at ${SENSOR_DISTANCE_FT} ft is roughly 88 to 91 dBA at 25 ft, above Denver's limit. New York City's noise cameras also trigger at 85 dB at 50 ft.</p>
-                <p class="fine">The distance conversion is an estimate. Official enforcement uses standardized measurements.</p>
+                <p>Our sensors typically sit about ${SENSOR_DISTANCE_FT} ft from the travel lane (each station's panel shows its own distance). Denver's code (D.R.M.C. \u00A7 36-8, Table B) limits motor vehicles under 10,000 lb to <strong>82 dB(A) measured at 25 ft</strong>. Sound drops roughly 3 to 6 dB each time the distance doubles, so ${DECIBEL_THRESHOLD} dBA at ${SENSOR_DISTANCE_FT} ft is roughly ${eq.range} dBA at 25 ft, ${eq.relation} Denver's ${DENVER_VEHICLE_LIMIT_DBA} dB(A) limit for vehicles under 10,000 lb. New York City's noise cameras also trigger at 85 dB at 50 ft.</p>
             </div>
             <div class="info-card">
                 <h3>Other cities already measure dBC</h3>
@@ -1312,6 +1321,7 @@ Thank you,
     }
 
     function pageGap() {
+        const eq = equivalentAt25();
         return `
             <div class="panel-header">
                 <h2>\u2696\uFE0F The Enforcement Gap</h2>
@@ -1331,23 +1341,28 @@ Thank you,
             <div class="info-card">
                 <h3>Where the gap is</h3>
                 <p><strong>A limit that is hard to check.</strong> Denver's number is defined at 25 ft from a vehicle. In practice that means a meter beside the road and a specific vehicle to test, which is difficult once it has driven past.</p>
-                <p><strong>A state rule with no number.</strong> Colorado's muffler law doesn't say how loud is too loud, so it depends on an officer deciding a vehicle is excessive.</p>
+                <p><strong>A state rule with no decibel number.</strong> Colorado bans modifying an exhaust to be louder than the muffler the vehicle came with (C.R.S. \u00A7 42-4-225), and requires a muffler that prevents "excessive or unusual noise". Neither has a number, so enforcement depends on an officer inspecting the vehicle.</p>
                 <p><strong>No single owner.</strong> Two city agencies share the problem, so it is easy for a complaint to fall between them.</p>
                 <p><strong>Bass slips through.</strong> A dBA reading can understate deep exhaust rumble. See <a href="#" onclick="openInfoModal('dba-dbc'); return false;">dBA vs. dBC</a>.</p>
+            </div>
+            <div class="info-card">
+                <h3>What the numbers show</h3>
+                <p><strong>The law.</strong> Colorado bans modifying a vehicle's exhaust to be louder than the muffler it came with (C.R.S. \u00A7 42-4-225), and Denver sets ${DENVER_VEHICLE_LIMIT_DBA} dB(A) at 25 ft for vehicles under 10,000 lb (D.R.M.C. \u00A7 36-8).</p>
+                <p><strong>Our readings.</strong> An event at ${DECIBEL_THRESHOLD} dBA, measured about ${SENSOR_DISTANCE_FT} ft from the road, works out to roughly ${eq.range} dBA at 25 ft, ${eq.relation} Denver's limit. Many of the events we log are louder than that threshold. That's why we're asking the city to act where and when the readings show it.</p>
             </div>
             <div class="info-card">
                 <h3>Same city, different treatment</h3>
                 <p><strong>Pickleball.</strong> In April 2023 Denver Parks &amp; Recreation permanently closed the pickleball courts at Congress Park after the health department (DDPHE) measured sound at nearby homes at about 70 dB, against the noise ordinance's 55 dB(A) daytime limit for residential areas. DDPHE tested at sixteen homes; with no one playing, the same homes measured 37 dB. The city closed the courts at Eisenhower Park later that year over similar complaints.</p>
                 <p><strong>Vehicles.</strong> <span id="live-loud-gap">Loading\u2026</span> We haven't found a public record of enforcement at these levels. If you know of one, please tell us.</p>
                 <p><strong>What the difference means.</strong> Every 10 dB is 10 times the sound energy and roughly twice as loud to the ear. The 30 dB between 70 and 100 is 1,000 times the sound energy and about 8 times as loud.</p>
-                <p class="fine">This isn't a like-for-like reading: the pickleball figures were taken at homes and ours are taken beside the road. The courts were also city property, so the city could act on the measurement directly. That is the point. For private vehicles, Denver's test needs a meter 25 ft from a specific vehicle, and responsibility is divided between agencies. In 2023 a DDPHE noise investigator told residents the department can take measurements but can't ticket individuals.</p>
+                <p class="fine">The courts were city property, so the city could act on the measurement directly. For private vehicles, Denver's test needs a meter 25 ft from a specific vehicle, and responsibility is divided between agencies. In 2023 a DDPHE noise investigator told residents the department can take measurements but can't ticket individuals.</p>
                 <p class="fine"><a href="https://www.denvergazette.com/2023/04/03/raising-a-racket-pickleball-noise-divides-denver-neighbors-and-players-99551544-d269-11ed-ab5e-3bac07a3229e/" target="_blank" rel="noopener">Denver Gazette</a> \u00B7 <a href="https://www.westword.com/news/denver-noise-ordinance-revision-pickleball-recreational-sounds-16657198/" target="_blank" rel="noopener">Westword</a> \u00B7 <a href="https://www.cbsnews.com/colorado/news/colorado-cities-pickleball-policies-noise-ordinance" target="_blank" rel="noopener">CBS Colorado</a> \u00B7 <a href="https://www.denver7.com/news/front-range/denver/denver-closing-pickleball-courts-at-eisenhower-park-amid-noise-complaints" target="_blank" rel="noopener">Denver7</a></p>
             </div>
             <div class="info-card">
                 <h3>What our monitors show</h3>
                 <p id="live-stats-gap">Loading\u2026</p>
                 <p id="live-audio-gap"></p>
-                <p class="fine">${DECIBEL_THRESHOLD} dBA at ${SENSOR_DISTANCE_FT} ft is the level at which New York City's noise cameras issue violations, and roughly 88 to 91 dBA at 25 ft, above Denver's 82 dB(A) limit for vehicles under 10,000 lb. The distance conversion is an estimate.</p>
+                <p class="fine">New York City's noise cameras issue violations at 85 dB measured at 50 ft. Our ${DECIBEL_THRESHOLD} dBA threshold, measured about ${SENSOR_DISTANCE_FT} ft from the road, is roughly ${eq.range} dBA at 25 ft, ${eq.relation} Denver's ${DENVER_VEHICLE_LIMIT_DBA} dB(A) limit for vehicles under 10,000 lb.</p>
             </div>
             <div class="info-card">
                 <h3>What New York City did</h3>
@@ -1459,7 +1474,8 @@ Thank you,
             </div>
             <div class="info-card">
                 <h3>Hardware</h3>
-                <p>${SENSOR_SPEC_TEXT}. Each monitor takes four A-weighted and C-weighted readings a second and sits about ${SENSOR_DISTANCE_FT} ft from the travel lane.</p>
+                <p>${SENSOR_SPEC_TEXT}. Each monitor takes four A-weighted and C-weighted readings a second and typically sits about ${SENSOR_DISTANCE_FT} ft from the travel lane.</p>
+                <p class="fine">${SENSOR_PURPOSE_TEXT}</p>
             </div>
             <div class="info-card">
                 <h3>Open data</h3>
@@ -1673,7 +1689,7 @@ Thank you,
     // ---- screen-reader text for the map markers and charts ----
     function markerLabel(station) {
         let status;
-        if (station.state === 'live') status = `${station.currentDba.toFixed(1)} dBA now, ${station.hourlyExceedances || 0} exceedances in the last hour`;
+        if (station.state === 'live') status = `${station.currentDba.toFixed(1)} dBA now, ${station.hourlyExceedances || 0} loud events in the last hour`;
         else if (station.state === 'stale') status = 'offline';
         else if (station.state === 'demo') status = 'not reporting yet';
         else status = 'loading';
@@ -1794,9 +1810,9 @@ Thank you,
     const LF_DELTA_THRESHOLD = 10.0;
     const LF_FLOOR_DB = DECIBEL_THRESHOLD;
     const CLASS_META = {
-        A:    { label: 'dBA limit only',       desc: 'Over the dBA limit',                                  color: '#ffb74d', text: '#ffcc80' },
-        A_LF: { label: 'dBA limit + \u0394 rule', desc: 'Over the dBA limit and the \u0394 rule',          color: '#ef5350', text: '#ff8a80' },
-        LF:   { label: '\u0394 rule only',      desc: 'Under the dBA limit, caught only by the \u0394 rule', color: '#29b6f6', text: '#81d4fa' }
+        A:    { label: 'dBA threshold only',       desc: 'Over the dBA threshold',                                  color: '#ffb74d', text: '#ffcc80' },
+        A_LF: { label: 'dBA threshold + \u0394 rule', desc: 'Over the dBA threshold and the \u0394 rule',          color: '#ef5350', text: '#ff8a80' },
+        LF:   { label: '\u0394 rule only',      desc: 'Under the dBA threshold, caught only by the \u0394 rule', color: '#29b6f6', text: '#81d4fa' }
     };
     const RANGES = {
         '1h':  { ms: 60 * 60 * 1000,           label: 'Past hour' },
@@ -2027,7 +2043,7 @@ Thank you,
         }
     };
 
-    // Shades the dBA-limit zone and the "missed by a dBA-only rule" wedge on the dBA vs dBC scatter.
+    // Shades the dBA-threshold zone and the "missed by a dBA-only rule" wedge on the dBA vs dBC scatter.
     const lfRegionsPlugin = {
         id: 'lfRegions',
         beforeDatasetsDraw(chart, args, opts) {
@@ -2041,7 +2057,7 @@ Thank you,
             ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
             ctx.clip();
 
-            // Over the dBA limit
+            // Over the dBA threshold
             if (DECIBEL_THRESHOLD < xMax) {
                 const left = px(Math.max(DECIBEL_THRESHOLD, xMin));
                 ctx.fillStyle = 'rgba(255,183,77,0.08)';
@@ -2090,7 +2106,7 @@ Thank you,
                 ctx.fillText(`typical \u0394 ${signed(typical)}`, px(lx), py(lx + typical) + 13);
             }
 
-            // dBA limit line
+            // dBA threshold line
             if (DECIBEL_THRESHOLD > xMin && DECIBEL_THRESHOLD < xMax) {
                 ctx.beginPath();
                 ctx.moveTo(px(DECIBEL_THRESHOLD), chartArea.top);
@@ -2109,7 +2125,7 @@ Thank you,
             if (DECIBEL_THRESHOLD < xMax) {
                 ctx.fillStyle = 'rgba(255,183,77,0.95)';
                 ctx.textAlign = 'right';
-                ctx.fillText('Over the dBA limit', chartArea.right - 6, chartArea.top + 13);
+                ctx.fillText('Over the dBA threshold', chartArea.right - 6, chartArea.top + 13);
             }
             ctx.restore();
         }
@@ -2172,7 +2188,7 @@ Thank you,
 
         let sentence;
         if (total === 0) sentence = 'No flagged events in this time range.';
-        else if (lf === 0) sentence = `All ${a} flagged event${a === 1 ? ' was' : 's were'} also over the ${DECIBEL_THRESHOLD} dBA limit.`;
+        else if (lf === 0) sentence = `All ${a} flagged event${a === 1 ? ' was' : 's were'} also over the ${DECIBEL_THRESHOLD} dBA threshold.`;
         else sentence = `${lf} of ${total} flagged events (${Math.round(100 * lf / total)}%) were under ${DECIBEL_THRESHOLD} dBA, so a dBA-only rule misses them, yet dBC was more than ${LF_DELTA_THRESHOLD} dB higher.`;
         if (data.truncated) sentence += ` Showing the most recent ${EVENT_LIMIT.toLocaleString()} events.`;
         document.getElementById('summary-sentence').textContent = sentence;
@@ -2251,7 +2267,7 @@ Thank you,
         timelineChartInstance = new Chart(document.getElementById('timelineChart').getContext('2d'), {
             type: 'scatter',
             data: { datasets: topSets },
-            options: base(yScale(dbaMin, dbaMax), false, [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA limit` }]),
+            options: base(yScale(dbaMin, dbaMax), false, [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA threshold` }]),
             plugins: [refLinesPlugin, demoMarkPlugin]
         });
 
@@ -2321,7 +2337,7 @@ Thank you,
     const BASELINE_BAND = { min: 55, max: DECIBEL_THRESHOLD };
     const HEAT_METRICS = {
         all: { label: 'All flagged', color: [255, 112, 67] },
-        a:   { label: 'Over the dBA limit', color: [255, 183, 77] },
+        a:   { label: 'Over the dBA threshold', color: [255, 183, 77] },
         lf:  { label: '\u0394 rule only', color: [41, 182, 246] }
     };
     let heatMetric = 'all';
@@ -2436,7 +2452,7 @@ Thank you,
 
     function heatDetail(model, i, h) {
         const c = model.cells[i][h];
-        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} flagged (${c.a} over the dBA limit, ${c.lf} \u0394 rule only)`;
+        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} flagged (${c.a} over the dBA threshold, ${c.lf} \u0394 rule only)`;
     }
 
     function renderHeatmap(model) {
@@ -2668,7 +2684,7 @@ Thank you,
         }
         const lf = station.state === 'live' ? (station.hourlyLF || 0) : 0;
         const pip = lf > 0
-            ? `<span class="lf-pip" title="${lf} event(s) in the last hour under the dBA limit but flagged by the delta rule">\u0394${lf}</span>`
+            ? `<span class="lf-pip" title="${lf} event(s) in the last hour under the dBA threshold but flagged by the delta rule">\u0394${lf}</span>`
             : '';
 
         return L.divIcon({
@@ -2680,16 +2696,6 @@ Thank you,
     }
 
     const markersMap = new Map();
-    METER_STATIONS.forEach(station => {
-        const marker = L.marker([station.lat, station.lng], {
-            icon: createBadgeIcon(station), keyboard: true, title: station.name
-        }).addTo(map);
-
-        marker.on('click', () => openDetailPanel(station));
-        markersMap.set(station.id, marker);
-        station.iconHtml = badgeHtml(createBadgeIcon(station));
-        labelMarker(marker, station);
-    });
 
     // ========================================================================
     // COUNCIL DISTRICT OVERLAY
@@ -2722,7 +2728,6 @@ Thank you,
         }
         return null;
     }
-    METER_STATIONS.forEach(s => { s.district = districtAt(s.lat, s.lng); });
 
     // A district counts as covered once one of its monitors has reported, even if it is offline right now.
     function coveredDistricts() {
@@ -2776,6 +2781,135 @@ Thank you,
         refreshDistrictStyles();
     }
     initDistricts();
+
+    // ========================================================================
+    // STATIONS: read from the Supabase `stations` table (public columns only).
+    // If the table can't be read, or has no active stations, the built-in list above is used.
+    // ========================================================================
+    const STATION_REFRESH_MS = 10 * 60 * 1000;
+    let stationsReady = false;
+    let stationsSource = 'none';
+
+    function normalizeStation(r) {
+        if (!r) return null;
+        const lat = Number(r.latitude ?? r.lat), lng = Number(r.longitude ?? r.lng);
+        if (!r.id || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+            console.warn('Skipping a station without an id or coordinates:', r);
+            return null;
+        }
+        const dist = Number(r.sensor_distance_ft ?? r.distanceFt);
+        return {
+            id: String(r.id), name: r.name || String(r.id), address: r.address || '', lat, lng,
+            distanceFt: Number.isFinite(dist) && dist > 0 ? dist : null,
+            // placeholders: only ever shown, labelled as demo, for a station that has not reported yet
+            currentDba: Number(r.currentDba) || 70, currentDbc: Number(r.currentDbc) || 82,
+            hourlyExceedances: Number(r.hourlyExceedances) || 0, todayExceedances: Number(r.todayExceedances) || 8, sirensCount: Number(r.sirensCount) || 0,
+            state: 'loading', lastSeen: null, hourlyLF: 0, todayLF: 0, iconHtml: ''
+        };
+    }
+
+    function addStationMarker(station) {
+        const marker = L.marker([station.lat, station.lng], { icon: createBadgeIcon(station), keyboard: true, title: station.name }).addTo(map);
+        marker.on('click', () => openDetailPanel(station));
+        markersMap.set(station.id, marker);
+        station.iconHtml = badgeHtml(createBadgeIcon(station));
+        labelMarker(marker, station);
+    }
+    function removeStationMarker(id) {
+        const marker = markersMap.get(id);
+        if (marker) map.removeLayer(marker);
+        markersMap.delete(id);
+    }
+
+    // The typical distance, for site-wide wording: the median of the stations that have one (nearest 5 ft).
+    function typicalDistanceFt() {
+        const ds = METER_STATIONS.map(s => s.distanceFt).filter(Number.isFinite).sort((a, b) => a - b);
+        if (!ds.length) return DEFAULT_SENSOR_DISTANCE_FT;
+        const mid = ds.length % 2 ? ds[(ds.length - 1) / 2] : (ds[ds.length / 2 - 1] + ds[ds.length / 2]) / 2;
+        return Math.round(mid / 5) * 5 || DEFAULT_SENSOR_DISTANCE_FT;
+    }
+
+    // Brings the map in line with the list: adds new stations, updates existing ones in place
+    // (so an open panel keeps working), and removes stations that are gone.
+    function applyStations(rows) {
+        const incoming = rows.map(normalizeStation).filter(Boolean);
+        const order = new Map(incoming.map((s, i) => [s.id, i]));
+        for (let i = METER_STATIONS.length - 1; i >= 0; i--) {
+            const gone = METER_STATIONS[i];
+            if (order.has(gone.id)) continue;
+            removeStationMarker(gone.id);
+            if (activeMarkerObj && activeMarkerObj.id === gone.id) closePanel(false);
+            METER_STATIONS.splice(i, 1);
+        }
+        for (const fresh of incoming) {
+            const have = METER_STATIONS.find(s => s.id === fresh.id);
+            if (!have) { METER_STATIONS.push(fresh); addStationMarker(fresh); continue; }
+            const moved = have.lat !== fresh.lat || have.lng !== fresh.lng;
+            Object.assign(have, { name: fresh.name, address: fresh.address, lat: fresh.lat, lng: fresh.lng, distanceFt: fresh.distanceFt });
+            const marker = markersMap.get(have.id);
+            if (moved && marker && marker.setLatLng) marker.setLatLng([have.lat, have.lng]);
+        }
+        METER_STATIONS.sort((a, b) => order.get(a.id) - order.get(b.id));
+        METER_STATIONS.forEach(s => { s.district = districtAt(s.lat, s.lng); });
+        SENSOR_DISTANCE_FT = typicalDistanceFt();
+        renderFootnote();
+        refreshDistrictStyles();
+        if (activeMarkerObj) { renderStationDistrict(activeMarkerObj); renderStationDistance(activeMarkerObj); }
+    }
+
+    async function loadStations() {
+        let rows = null;
+        try {
+            const data = await fetchSupabase('stations', 'select=id,name,address,latitude,longitude,is_active,sensor_distance_ft&is_active=eq.true&order=id.asc');
+            if (Array.isArray(data) && data.length) rows = data;
+            else console.warn('The stations table returned no active stations. If you expected some, run stations_public.sql so the public key can read them. Using the built-in list.');
+        } catch (err) {
+            console.warn('Could not read the stations table. Using the built-in list.', err);
+        }
+        if (rows) stationsSource = 'database';
+        else {
+            if (stationsReady) return;          // a failed refresh keeps the list we already have
+            rows = BUILT_IN_STATIONS;
+            stationsSource = 'built-in';
+        }
+        applyStations(rows);
+        stationsReady = true;
+    }
+
+    // Distance from the sensor to the center of the travel lane, and what the dBA threshold means at Denver's 25 ft test distance.
+    // Sound falls by 3 dB (a long line of traffic) to 6 dB (a single vehicle) each time the distance doubles.
+    function levelAt25ft(level, distanceFt) {
+        const r = distanceFt / 25;
+        const a = level + 10 * Math.log10(r), b = level + 20 * Math.log10(r);
+        return [Math.min(a, b), Math.max(a, b)];
+    }
+    const fmtFt = d => (Number.isInteger(d) ? String(d) : d.toFixed(1));
+    // Denver's vehicle limit (D.R.M.C. sec. 36-8, Table B): 82 dB(A) at 25 ft for vehicles under 10,000 lb.
+    const DENVER_VEHICLE_LIMIT_DBA = 82;
+    // What the dBA threshold is at 25 ft for a sensor at `distanceFt`, and how that compares with Denver's limit.
+    // This is an estimate (3 to 6 dB per doubling of distance), so the wording follows the numbers instead of assuming.
+    function equivalentAt25(distanceFt = SENSOR_DISTANCE_FT, level = DECIBEL_THRESHOLD) {
+        const [lo, hi] = levelAt25ft(level, distanceFt).map(Math.round);
+        const relation = lo > DENVER_VEHICLE_LIMIT_DBA ? 'above' : hi > DENVER_VEHICLE_LIMIT_DBA ? 'around' : 'below';
+        return { lo, hi, range: lo === hi ? `${lo}` : `${lo} to ${hi}`, relation };
+    }
+    function stationDistanceText(station) {
+        if (!station.distanceFt) return 'Sensor distance from the travel lane not measured yet.';
+        const d = station.distanceFt;
+        if (d === 25) return "Sensor about 25 ft from the center of the travel lane, the distance Denver's vehicle limit uses.";
+        const [lo, hi] = levelAt25ft(DECIBEL_THRESHOLD, d).map(Math.round);
+        const range = lo === hi ? `${lo}` : `${lo}\u2013${hi}`;
+        return `Sensor about ${fmtFt(d)} ft from the center of the travel lane. At that distance ${DECIBEL_THRESHOLD} dBA is roughly ${range} dBA at Denver's 25 ft test distance.`;
+    }
+    function renderStationDistance(station) {
+        const el = document.getElementById('panel-distance');
+        if (el) el.textContent = stationDistanceText(station);
+    }
+    function renderFootnote() {
+        const el = document.getElementById('sensor-footnote');
+        if (el) el.innerHTML = `<strong>About the sensors:</strong><br>${SENSOR_SPEC_TEXT}. Readings are taken four times a second, typically about ${SENSOR_DISTANCE_FT} ft from the center of the travel lane.<br>${SENSOR_PURPOSE_TEXT}`;
+    }
+
 
     // Zoom to a district and flash its outline.
     function showDistrict(n) {
@@ -2945,11 +3079,11 @@ Thank you,
     let polling = false;
     let lastStatsFetch = 0;
     async function fetchLiveMeters() {
-        if (polling) return;
+        if (polling || !stationsReady) return;
         polling = true;
         try {
             const now = Date.now();
-            for (const station of METER_STATIONS) {
+            for (const station of METER_STATIONS.slice()) {
                 const wantCounts = !station.countsAt || now - station.countsAt > 60000;
                 await refreshStation(station, wantCounts);
 
@@ -3005,6 +3139,7 @@ Thank you,
         document.getElementById('panel-title').innerText = station.name;
         document.getElementById('panel-address').innerText = station.address;
         renderStationDistrict(station);
+        renderStationDistance(station);
         renderLiveHeader(station);
         renderBanner(station);
         document.getElementById('events-status').hidden = true;
@@ -3113,7 +3248,7 @@ Thank you,
                 scales: { x: { grid: { color: '#2f2f2f' }, ticks: tick }, y: { min: 60, suggestedMax: 120, grid: { color: '#2f2f2f' }, ticks: tick } },
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, color: '#aaa', usePointStyle: true } },
-                    refLines: { lines: [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA limit` }] },
+                    refLines: { lines: [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA threshold` }] },
                     demoMark: { enabled: model.demo }
                 }
             },
@@ -3239,7 +3374,7 @@ Thank you,
 
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(12);
-        doc.text("Official Acoustic Evidence Report & Compliance Summary", 14, 28);
+        doc.text("Community Noise Monitoring Summary", 14, 28);
 
         doc.setDrawColor(51, 51, 51);
         doc.line(14, 34, 196, 34);
@@ -3250,25 +3385,30 @@ Thank you,
         doc.text(`Location Address: ${activeMarkerObj.address}`, 14, 53);
         doc.text(`Report Generated: ${new Date().toLocaleString()}`, 14, 60);
         doc.text(doc.splitTextToSize(`Sensor: ${SENSOR_SPEC_TEXT}`, 180), 14, 67);
+        doc.text(activeMarkerObj.distanceFt ? `Sensor distance from the travel lane: about ${fmtFt(activeMarkerObj.distanceFt)} ft` : 'Sensor distance from the travel lane: not recorded', 14, 76);
 
         doc.setFillColor(36, 36, 36);
-        doc.roundedRect(14, 76, 182, 44, 3, 3, 'F');
+        doc.roundedRect(14, 82, 182, 44, 3, 3, 'F');
 
         doc.setTextColor(0, 230, 118);
         doc.setFontSize(11);
-        doc.text("EVENT SUMMARY", 20, 86);
+        doc.text("EVENT SUMMARY", 20, 92);
 
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(10);
-        doc.text(`Past hour: ${activeMarkerObj.hourlyExceedances || 0} over the dBA limit, ${activeMarkerObj.hourlyLF || 0} caught only by the delta rule`, 20, 96);
-        doc.text(`Past 24 hours: ${activeMarkerObj.todayExceedances || 0} over the dBA limit, ${activeMarkerObj.todayLF || 0} caught only by the delta rule`, 20, 104);
+        doc.text(`Past hour: ${activeMarkerObj.hourlyExceedances || 0} over the dBA threshold, ${activeMarkerObj.hourlyLF || 0} caught only by the delta rule`, 20, 102);
+        doc.text(`Past 24 hours: ${activeMarkerObj.todayExceedances || 0} over the dBA threshold, ${activeMarkerObj.todayLF || 0} caught only by the delta rule`, 20, 110);
 
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text(`Flag rule: dBA >= ${DECIBEL_THRESHOLD}, or dBC - dBA > ${LF_DELTA_THRESHOLD} dB while dBA or dBC >= ${LF_FLOOR_DB}. Sirens excluded.`, 20, 113);
+        doc.text(`Flag rule: dBA >= ${DECIBEL_THRESHOLD}, or dBC - dBA > ${LF_DELTA_THRESHOLD} dB while dBA or dBC >= ${LF_FLOOR_DB}. Sirens excluded.`, 20, 119);
 
-        doc.save(`${activeMarkerObj.id}_evidence_report.pdf`);
-        showToast("PDF Downloaded", "Official PDF Evidence Report generated successfully.");
+        doc.setFontSize(9);
+        doc.setTextColor(170, 170, 170);
+        doc.text(doc.splitTextToSize(SENSOR_PURPOSE_TEXT, 178), 14, 136);
+
+        doc.save(`${activeMarkerObj.id}_noise_summary.pdf`);
+        showToast("PDF Downloaded", "Noise summary PDF generated.");
     }
 
     document.getElementById('patterns-details').addEventListener('toggle', e => {
@@ -3280,11 +3420,12 @@ Thank you,
         selectHeatCell(Number(cell.dataset.d), Number(cell.dataset.h));
     });
     document.getElementById('hm-grid').addEventListener('keydown', handleHeatKeydown);
-    document.getElementById('sensor-footnote').innerHTML = `<strong>About the sensors:</strong><br>${SENSOR_SPEC_TEXT}. Readings are taken four times a second about ${SENSOR_DISTANCE_FT} ft from the center of the travel lane.`;
     renderRuleText();
 
+    renderFootnote();
     setInterval(fetchLiveMeters, 5000);
-    fetchLiveMeters();
+    setInterval(loadStations, STATION_REFRESH_MS);
+    loadStations().then(fetchLiveMeters);
     </script>
 </body>
 </html>
