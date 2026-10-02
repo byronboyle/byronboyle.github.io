@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Mile High Noise Project | Live Map</title>
-    <meta name="description" content="Community sensors measuring vehicle noise across Denver, with the data behind the enforcement gap.">
+    <meta name="description" content="Neighbors across Denver are measuring vehicle noise around the clock. See live readings and tell your council member.">
     <meta name="theme-color" content="#1a1a1a">
     <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a1a1a'/%3E%3Crect x='6' y='24.0' width='8' height='16' rx='4.0' fill='%2300e676'/%3E%3Crect x='17' y='18.0' width='8' height='28' rx='4.0' fill='%23ffeb3b'/%3E%3Crect x='28' y='10.0' width='8' height='44' rx='4.0' fill='%23ff5252'/%3E%3Crect x='39' y='18.0' width='8' height='28' rx='4.0' fill='%23ffeb3b'/%3E%3Crect x='50' y='24.0' width='8' height='16' rx='4.0' fill='%2300e676'/%3E%3C/svg%3E">
     <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACJUlEQVR4nOyXv0vDUBDHLz86NCVWg0hb8Re6OEgdu4mg+APERXASRARdHfwjxMFNFMTNP0AUFJwUhOKkoCCiqIi2StFia4u2tt6FRgyEpHlN08UPPN5dc737Ji+PvBPhD/WIJEkLxWIxgm4vx3FN4ACY7wWnU8wXzWQyK0lEu8ZpRiAQGOF5fgPNEFSXp0KhMBuPx/d+BQSDwSFUtw8ugiJGSQTn9/sbfD7fBekAd3lKp9M9gqIo83j3E+A+ssfjifNYPAIMjCkKHIXD6iCbBarNl9542yy2tECn16sOslmg2iKqaAMGqLCRbQeqLUKN4a0CJLy51aVGOD9sVWfJ60xs2QIG+3wwPixDQ72gzuQ7EathuQRdHR5TnzXWUEB2sA1Sc2HVltfPwHtwD05glle3BBSUb69Th/YHJzDLq3sCFGBkV4pZ3ppvw38BupdQvHs3tCvFLK9OAG0RCqBBtlOY5dUtAe1Pp/Z+uXkt34Hr25ypzxqrYfktODj8gO39FLwlv9WZfCdiNbhQKFQEBh4j+nNMczQKLNR+G+Kx6BkYuMlmDW07UG1BluUBPBp1gU0SuRx0SxK85fOw/PAAV2wijkVUQS3TENhk5/VVHZVAtWkXrOFIgvtQzTUe26M7VDID7jNNtQWysEW6xPbsBJeiH10Zqgs1p5OxWGyXHEH7FUVcC4Kwie3SFz6RTxKCgqxPlWVQas+PMd8WtudTiUTiXLv2AwAA//+m40yXAAAABklEQVQDAPOs+nRL6MoxAAAAAElFTkSuQmCC">
@@ -579,19 +579,20 @@
         .flyer-brand { padding-top: 0.06in; }
         .flyer-name { font-size: 27pt; font-weight: 800; line-height: 1.05; letter-spacing: -0.01em; }
         .flyer-tag { margin-top: 0.07in; font-size: 12.5pt; color: #00e676; font-weight: 600; }
-        .flyer-body { padding: 0.36in 0.65in 0 0.65in; }
+        .flyer-body { padding: 0.3in 0.65in 0 0.65in; }
         .flyer-headline { margin: 0; font-size: 44pt; line-height: 1.0; font-weight: 900; letter-spacing: -0.02em; color: #111; }
-        .flyer-lead { margin: 0.16in 0 0.26in; font-size: 16pt; line-height: 1.35; color: #333; max-width: 6.6in; }
-        .flyer-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2in; }
+        .flyer-lead { margin: 0.12in 0 0.2in; font-size: 15pt; line-height: 1.35; color: #333; max-width: 6.8in; }
+        .flyer-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.15in; }
         .flyer-points li { display: flex; gap: 0.18in; align-items: flex-start; }
-        .flyer-num { flex: 0 0 0.42in; height: 0.42in; border-radius: 50%; background: #00703a; color: #fff; font-weight: 800; font-size: 17pt; display: flex; align-items: center; justify-content: center; }
-        .flyer-points strong { display: block; font-size: 15pt; color: #00703a; margin-bottom: 0.02in; }
-        .flyer-points p { margin: 0; font-size: 13.5pt; line-height: 1.38; color: #222; }
-        .flyer-scan { margin-top: 0.26in; display: flex; align-items: center; gap: 0.3in; padding: 0.2in 0.25in; border: 3px solid #111; border-radius: 0.16in; }
-        .flyer-qr { width: 2.65in; height: 2.65in; flex-shrink: 0; }
+        .flyer-icon { flex: 0 0 0.5in; height: 0.5in; border-radius: 50%; background: #00703a; display: flex; align-items: center; justify-content: center; }
+        .flyer-icon svg { width: 0.29in; height: 0.29in; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .flyer-points strong { display: block; font-size: 14.5pt; color: #00703a; margin-bottom: 0.02in; }
+        .flyer-points p { margin: 0; font-size: 13pt; line-height: 1.38; color: #222; }
+        .flyer-scan { margin-top: 0.22in; display: flex; align-items: center; gap: 0.3in; padding: 0.16in 0.25in; border: 3px solid #111; border-radius: 0.16in; }
+        .flyer-qr { width: 2.4in; height: 2.4in; flex-shrink: 0; }
         .flyer-qr svg { width: 100%; height: 100%; display: block; }
-        .flyer-scan-title { font-size: 28pt; font-weight: 900; line-height: 1.05; color: #111; text-wrap: balance; }
-        .flyer-url { margin-top: 0.1in; font-size: 18pt; font-weight: 700; color: #00703a; word-break: break-all; }
+        .flyer-scan-title { font-size: 23pt; font-weight: 900; line-height: 1.05; color: #111; text-wrap: balance; }
+        .flyer-url { margin-top: 0.1in; font-size: 16pt; font-weight: 700; color: #00703a; word-break: break-all; }
         .flyer-scan-text p { margin: 0.1in 0 0; font-size: 12pt; color: #333; line-height: 1.35; }
         .flyer-foot { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.14in 0.65in; font-size: 10.5pt; color: #444; border-top: 1px solid #ddd; background: #fff; }
         @media print {
@@ -605,6 +606,18 @@
             body.flyer-open .flyer-sheet { transform: none !important; box-shadow: none; page-break-after: avoid; }
             .flyer-sheet, .flyer-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
+
+        /* ---- Welcome card (first visit) and the "Start here" badge ---- */
+        .welcome-card { position: absolute; top: 12px; left: 58px; z-index: 1000; max-width: 360px; box-sizing: border-box; background: rgba(26, 26, 26, 0.96); border: 1px solid #333; border-left: 3px solid #00e676; border-radius: 10px; padding: 14px 44px 14px 16px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45); }
+        .welcome-card[hidden] { display: none; }
+        .welcome-card h2 { margin: 0 0 6px 0; font-size: 1.05rem; color: #fff; line-height: 1.25; }
+        .welcome-card p { margin: 0 0 10px 0; font-size: 0.85rem; line-height: 1.45; color: #ccc; }
+        .welcome-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .welcome-actions .action-btn { flex: 1 1 auto; width: auto; margin: 0; min-height: 40px; padding: 9px 12px; font-size: 0.8rem; }
+        .welcome-close { position: absolute; top: 2px; right: 2px; min-width: 44px; min-height: 44px; background: none; border: none; color: #b5b5b5; font-size: 1.6rem; line-height: 1; cursor: pointer; }
+        .welcome-close:hover { color: #fff; }
+        @media (max-width: 600px) { .welcome-card { top: auto; left: 8px; right: 8px; bottom: 46px; max-width: none; } }
+        .start-badge { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: #00e676; color: #000; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -663,6 +676,15 @@
             <div>&Delta; rule: <span style="color:#29b6f6; font-weight:bold;">&gt; 10 dB</span></div>
             <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
+        <section class="welcome-card" id="welcome-card" role="region" aria-label="Welcome" hidden>
+            <button type="button" class="welcome-close" id="welcome-close" aria-label="Dismiss the welcome message" onclick="dismissWelcome()">&times;</button>
+            <h2>Tired of loud exhausts at night?</h2>
+            <p>Neighbors across Denver are proving where and when it happens. Tap a marker to see the readings from that street.</p>
+            <div class="welcome-actions">
+                <button type="button" class="action-btn btn-primary" onclick="welcomeGo('hotspots')">See the loudest streets</button>
+                <button type="button" class="action-btn btn-secondary" onclick="welcomeGo('action')">Email your council member</button>
+            </div>
+        </section>
 
         <div id="map"></div>
 
@@ -706,7 +728,7 @@
 
             <section class="summary-card">
                 <div class="summary-top">
-                    <h4 id="summary-title">Flagged events</h4>
+                    <h4 id="summary-title">Loud events</h4>
                     <div class="range-toggle" role="group" aria-label="Time range">
                         <button type="button" class="range-btn" data-range="1h" onclick="setRange('1h')">1 h</button>
                         <button type="button" class="range-btn active" data-range="24h" onclick="setRange('24h')">24 h</button>
@@ -714,8 +736,8 @@
                     </div>
                 </div>
                 <div class="summary-grid">
-                    <div class="stat stat-a"><div class="stat-num" id="sum-a">&ndash;</div><div class="stat-label">Over the dBA threshold</div></div>
-                    <div class="stat stat-lf"><div class="stat-num" id="sum-lf">&ndash;</div><div class="stat-label">Caught only by the &Delta; rule</div></div>
+                    <div class="stat stat-a"><div class="stat-num" id="sum-a">&ndash;</div><div class="stat-label" id="tile-a-label">Very loud</div></div>
+                    <div class="stat stat-lf"><div class="stat-num" id="sum-lf">&ndash;</div><div class="stat-label">Deep rumble only</div></div>
                     <div class="stat stat-s"><div class="stat-num" id="sum-s">&ndash;</div><div class="stat-label">Sirens (excluded)</div></div>
                 </div>
                 <p class="summary-sentence" id="summary-sentence"></p>
@@ -727,11 +749,11 @@
                 <h4>What the audio suggests</h4>
                 <p class="chart-help" id="audio-sentence"></p>
                 <div id="audio-bars"></div>
-                <p class="fine" style="margin-top:8px;">Each flagged event is also run through an audio classifier on the monitor. It labels its best guess at the source from a few seconds of sound. Audio is analyzed on the monitor and never saved.</p>
+                <p class="fine" style="margin-top:8px;">Each loud event is also run through an audio classifier on the monitor. It labels its best guess at the source from a few seconds of sound. Audio is analyzed on the monitor and never saved.</p>
             </section>
 
             <section class="chart-card">
-                <h4>dBA vs. dBC &mdash; every flagged event</h4>
+                <h4>Every loud event: dBA vs. dBC</h4>
                 <p class="chart-help" id="scatter-help"></p>
                 <div class="chart-box" style="height: 270px;"><canvas id="scatterChart"></canvas></div>
                 <p class="baseline-note" id="baseline-note"></p>
@@ -739,7 +761,7 @@
             </section>
 
             <section class="chart-card">
-                <h4>When events happen</h4>
+                <h4>When loud events happen</h4>
                 <div class="chart-sub">dBA</div>
                 <div class="chart-box" style="height: 150px;"><canvas id="timelineChart"></canvas></div>
                 <div class="chart-sub">&Delta; (dBC &minus; dBA)</div>
@@ -751,8 +773,8 @@
                     <h4>When it happens &mdash; hour by day</h4>
                     <div class="range-toggle" role="group" aria-label="Heatmap measure">
                         <button type="button" class="heat-btn active" data-metric="all" onclick="setHeatMetric('all')">All</button>
-                        <button type="button" class="heat-btn" data-metric="a" onclick="setHeatMetric('a')" aria-label="Events over the dBA threshold">dBA</button>
-                        <button type="button" class="heat-btn" data-metric="lf" onclick="setHeatMetric('lf')">&Delta; only</button>
+                        <button type="button" class="heat-btn" data-metric="a" onclick="setHeatMetric('a')" aria-label="Very loud events, over the dBA threshold">Very loud</button>
+                        <button type="button" class="heat-btn" data-metric="lf" onclick="setHeatMetric('lf')" aria-label="Deep-rumble-only events, caught by the delta rule">Deep rumble</button>
                     </div>
                 </div>
                 <p class="chart-help" id="heatmap-sentence"></p>
@@ -760,7 +782,7 @@
                 <div class="hm-wrap">
                     <div class="hm-days" id="hm-days"></div>
                     <div>
-                        <div class="hm-grid" id="hm-grid" tabindex="0" role="group" aria-label="Flagged events by day and hour. Use the arrow keys to move between squares." aria-describedby="hm-detail"></div>
+                        <div class="hm-grid" id="hm-grid" tabindex="0" role="group" aria-label="Loud events by day and hour. Use the arrow keys to move between squares." aria-describedby="hm-detail"></div>
                         <div class="hm-hours">
                             <span style="grid-column: 1 / span 4">12a</span><span style="grid-column: 7 / span 4">6a</span><span style="grid-column: 13 / span 4">12p</span><span style="grid-column: 19 / span 4">6p</span>
                         </div>
@@ -771,19 +793,19 @@
             </section>
 
             <section class="chart-card" id="daily-card">
-                <h4>Flagged events per day</h4>
+                <h4>Loud events per day</h4>
                 <p class="chart-help" id="daily-help">Last 14 days, station local time. Older monitor software only recorded events at or above the dBA threshold, so days before a monitor was updated undercount &Delta;-only events.</p>
                 <div class="chart-box" style="height: 170px;"><canvas id="stackedChart"></canvas></div>
             </section>
 
             <section class="chart-card" id="peaks-card">
                 <h4>Daily peak levels</h4>
-                <p class="chart-help">Highest flagged dBA and dBC each day. Days with no flagged events have no point.</p>
+                <p class="chart-help">Highest dBA and dBC each day. Days with no loud events have no point.</p>
                 <div class="chart-box" style="height: 150px;"><canvas id="peakChart"></canvas></div>
             </section>
 
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File Anonymous 311 Noise Report</button>
-            <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Flagged Events (CSV)</button>
+            <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Loud Events (CSV)</button>
             <button class="action-btn btn-secondary" id="pdf-report-btn" onclick="generatePDFReport()" style="background: #1e3a8a; color: #ffffff;">📄 Download PDF Summary</button>
 
             <div class="sensor-footnote" id="sensor-footnote"></div>
@@ -994,7 +1016,7 @@
         card.classList.toggle('demo-mark', !!data.demo);
         const b = audioBreakdown(data.events);
         if (!b.total) {
-            sentenceEl.textContent = 'No flagged events in this time range.';
+            sentenceEl.textContent = 'No loud events in this time range.';
             barsEl.innerHTML = '';
             return;
         }
@@ -1009,7 +1031,7 @@
         const lfCounts = {};
         let lfLabelled = 0;
         data.events.forEach(e => { if (e.cls === 'LF' && e.grp) { lfCounts[e.grp] = (lfCounts[e.grp] || 0) + 1; lfLabelled++; } });
-        if (lfLabelled >= 3) text += ' ' + audioShareSentence(lfCounts, lfLabelled, `For the ${lfLabelled} events flagged only by the \u0394 rule,`);
+        if (lfLabelled >= 3) text += ' ' + audioShareSentence(lfCounts, lfLabelled, `For the ${lfLabelled} deep-rumble-only events,`);
         if (b.labelled < b.total) text += ` ${b.total - b.labelled} older events have no label.`;
         sentenceEl.textContent = text;
 
@@ -1048,7 +1070,7 @@
     function audioStatsHtml(s) {
         if (s.labelled < 10) return `Audio labels are still being collected (${s.labelled} labelled event${s.labelled === 1 ? '' : 's'} so far).`;
         let text = audioShareSentence(s.all, s.labelled, `Audio analysis labelled ${s.labelled} of these events. Its best guess is that`);
-        if (s.lfLabelled >= 5) text += ' ' + audioShareSentence(s.lf, s.lfLabelled, `Among the ${s.lfLabelled} flagged only by the \u0394 rule,`);
+        if (s.lfLabelled >= 5) text += ' ' + audioShareSentence(s.lf, s.lfLabelled, `Among the ${s.lfLabelled} deep-rumble-only events,`);
         return text;
     }
     async function fillAudioStats(elementId, topic) {
@@ -1196,9 +1218,9 @@ Thank you,
     }
     function flaggedStatsHtml(s) {
         const total = s.a + s.lf;
-        if (!total) return 'No flagged events have been recorded yet.';
-        let html = `In the last ${s.days} days our monitors logged <strong>${total}</strong> flagged events: <strong>${s.a}</strong> at or above ${DECIBEL_THRESHOLD} dBA and ` +
-            `<strong>${s.lf}</strong> (${Math.round(100 * s.lf / total)}%) flagged only by the \u0394 rule, meaning under ${DECIBEL_THRESHOLD} dBA but with dBC more than ${LF_DELTA_THRESHOLD} dB higher.`;
+        if (!total) return 'No loud events have been recorded yet.';
+        let html = `In the last ${s.days} days our monitors logged <strong>${total}</strong> loud events: <strong>${s.a}</strong> at or above ${DECIBEL_THRESHOLD} dBA and ` +
+            `<strong>${s.lf}</strong> (${Math.round(100 * s.lf / total)}%) deep rumbles, under ${DECIBEL_THRESHOLD} dBA but with dBC more than ${LF_DELTA_THRESHOLD} dB higher.`;
         if (s.latest) {
             const st = METER_STATIONS.find(x => x.id === s.latest.station_id);
             const dba = Number(s.latest.dba), dbc = Number(s.latest.dbc);
@@ -1221,10 +1243,10 @@ Thank you,
         return { days, flagged, n100, maxDba: first(topA, 'dba'), maxDbc: first(topC, 'dbc') };
     }
     function loudStatsHtml(s) {
-        if (!s.flagged) return `Our monitors haven't recorded a flagged event in the last ${s.days} days.`;
+        if (!s.flagged) return `Our monitors haven't recorded a loud event in the last ${s.days} days.`;
         const peak = [s.maxDba != null ? `${s.maxDba.toFixed(1)} dBA` : null, s.maxDbc != null ? `${s.maxDbc.toFixed(1)} dBC` : null].filter(Boolean).join(' and ');
         const hundred = s.n100 === 0 ? 'None reached 100 dB.' : `${s.n100} of them reached 100 dBA or dBC.`;
-        return `In the last ${s.days} days our monitors recorded ${s.flagged} flagged events, with peaks of ${peak}, measured about ${SENSOR_DISTANCE_FT} ft from the road. ${hundred}`;
+        return `In the last ${s.days} days our monitors recorded ${s.flagged} loud events, with peaks of ${peak}, measured about ${SENSOR_DISTANCE_FT} ft from the road. ${hundred}`;
     }
     async function fillLoudStats(elementId, topic) {
         const el = document.getElementById(elementId);
@@ -1266,9 +1288,9 @@ Thank you,
                 const [a, lf, first] = await Promise.all([
                     countSupabase('noise_logs', `${base}&event_class=in.(A,A_LF)`),
                     countSupabase('noise_logs', `${base}&event_class=eq.LF`),
-                    fetchSupabase('noise_logs', `select=timestamp&station_id=eq.${s.id}&order=timestamp.asc&limit=1`)
+                    firstReadingMs(s.id)
                 ]);
-                const firstMs = Array.isArray(first) && first[0] ? new Date(first[0].timestamp).getTime() : now;
+                const firstMs = first != null ? first : now;
                 const days = Math.min(30, Math.max(1, (now - firstMs) / 864e5));
                 rows.push({ station: s, a, lf, days, perDay: (a + lf) / days });
             } catch (err) {
@@ -1320,7 +1342,7 @@ Thank you,
         const withEvents = nights.filter(n => n.events > 0).length;
         out.innerHTML = (model.demo ? '<div class="panel-banner"><strong>Demo data.</strong> This station isn\'t reporting yet, so these numbers are simulated.</div>' : '') +
             `<div class="summary-grid">
-                <div class="stat"><div class="stat-num">${(total / nights.length).toFixed(1)}</div><div class="stat-label">flagged events per night, on average</div></div>
+                <div class="stat"><div class="stat-num">${(total / nights.length).toFixed(1)}</div><div class="stat-label">loud events per night, on average</div></div>
                 <div class="stat"><div class="stat-num">${worst.events}</div><div class="stat-label">on the worst night (${dayLabel(worst.date)})</div></div>
                 <div class="stat"><div class="stat-num">${withEvents} of ${nights.length}</div><div class="stat-label">nights with at least one</div></div>
             </div>
@@ -1340,7 +1362,7 @@ Thank you,
         return `
             <div class="panel-header">
                 <h2>\uD83C\uDF9B\uFE0F dBA vs. dBC</h2>
-                <p>Why a dBA-only number can understate bass-heavy vehicle noise.</p>
+                <p>Why a normal loudness reading can miss the deep rumble of a modified exhaust.</p>
             </div>
             <div class="info-card">
                 <h3>What the two weightings do</h3>
@@ -1355,12 +1377,12 @@ Thank you,
             <div class="info-card">
                 <h3>How this site flags a noise event</h3>
                 <p><strong>Over the dBA threshold:</strong> dBA of ${DECIBEL_THRESHOLD} or more.</p>
-                <p><strong>\u0394 rule:</strong> dBC is more than ${LF_DELTA_THRESHOLD} dB higher than dBA <em>and</em> dBA or dBC is at least ${DECIBEL_THRESHOLD}. Everyday sound below ${DECIBEL_THRESHOLD} dB is never flagged, whatever its \u0394.</p>
+                <p><strong>\u0394 rule:</strong> dBC is more than ${LF_DELTA_THRESHOLD} dB higher than dBA <em>and</em> dBA or dBC is at least ${DECIBEL_THRESHOLD}. Everyday sound below ${DECIBEL_THRESHOLD} dB is never counted, whatever its \u0394.</p>
                 <p class="fine">Both readings are taken at the same instant. Emergency sirens are detected by audio analysis and excluded.</p>
             </div>
             <div class="info-card">
                 <h3>Audio labels</h3>
-                <p>For each flagged event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source: motorcycle, car, truck or bus, music or bass, train or aircraft, or a vehicle of unclear type. This helps separate a modified exhaust from a passing bus or a car stereo.</p>
+                <p>For each loud event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source: motorcycle, car, truck or bus, music or bass, train or aircraft, or a vehicle of unclear type. This helps separate a modified exhaust from a passing bus or a car stereo.</p>
                 <p class="fine">Audio is analyzed on the monitor and never saved; only the labels are kept.</p>
             </div>
             <div class="info-card">
@@ -1480,14 +1502,10 @@ Thank you,
         return `
             <div class="panel-header">
                 <h2>\uD83D\uDCE2 Take Action</h2>
-                <p>Use data to ask for clear, enforceable rules.</p>
+                <p>Turn the readings into pressure for change. Start with an email; it takes a minute.</p>
             </div>
             <div class="info-card">
-                <h3>1. Report loud vehicles to Denver 311</h3>
-                <p>Open a monitor on the map and use its report button, or call 3\u20111\u20111. Reports from nearby residents help show where the problem is.</p>
-            </div>
-            <div class="info-card">
-                <h3>2. Email your City Council member</h3>
+                <h3>1. Email your City Council member <span class="start-badge">Start here</span></h3>
                 <p>Choose your district and we'll open a pre-written email to your council member. You can edit it before you send it. Not sure of your district? <a href="${COUNCIL_LOOKUP_URL}" target="_blank" rel="noopener" style="color:#29b6f6;">Look it up by address</a>.</p>
                 <select id="council-district" onchange="updateCouncilEmail()" style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; margin:6px 0;">${councilOptionsHtml()}</select>
                 <button type="button" class="action-btn btn-secondary" onclick="findMyDistrict()">\uD83D\uDCCD Use my location to find my district</button>
@@ -1496,15 +1514,20 @@ Thank you,
                 <a id="council-email-link" class="action-btn btn-primary" href="#" style="display:block; text-align:center; text-decoration:none;">\u2709\uFE0F Open email</a>
                 <p class="fine">Council contact details checked September 2026. The At-Large seat B is vacant until the November 3 special election.</p>
             </div>
-            <div class="info-card">
-                <h3>3. Spread the word</h3>
+        <div class="info-card">
+                <h3>2. Report loud vehicles to Denver 311</h3>
+                <p>Open a monitor on the map and use its report button, or call 3\u20111\u20111. Reports from nearby residents help show where the problem is.</p>
+            </div>
+        <div class="info-card">
+                <h3>3. Report what you hear</h3>
+                <p><a href="https://www.fixdenvernoise.org/report-noise" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">Fix Denver Noise</a>, our partner, takes resident reports of loud vehicles with a location, a time and a description, and shows them on a <a href="https://www.fixdenvernoise.org/noise-map" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">heat map</a>. Their reports and our sensor readings measure the same problem in different ways.</p>
+            </div>
+        <div class="info-card">
+                <h3>4. Spread the word</h3>
                 <p>A one-page flyer with a QR code that opens the live map. Print it, or save it as a PDF to share.</p>
                 <button type="button" class="action-btn btn-primary" id="open-flyer" onclick="openFlyer()">\uD83D\uDDA8\uFE0F Open printable flyer</button>
             </div>
-            <div class="info-card">
-                <h3>4. Report what you hear</h3>
-                <p><a href="https://www.fixdenvernoise.org/report-noise" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">Fix Denver Noise</a>, our partner, takes resident reports of loud vehicles with a location, a time and a description, and shows them on a <a href="https://www.fixdenvernoise.org/noise-map" target="_blank" rel="noopener" style="color:#00e676; text-decoration:underline;">heat map</a>. Their reports and our sensor readings measure the same problem in different ways.</p>
-            </div>`;
+    `;
     }
 
     function pageResources() {
@@ -1544,12 +1567,12 @@ Thank you,
     function pageHotspots() {
         return `
             <div class="panel-header">
-                <h2>\uD83C\uDFC6 Noise Leaderboard</h2>
-                <p>Flagged events per day at our monitored locations, last 30 days.</p>
+                <h2>\uD83C\uDFC6 The loudest streets we're watching</h2>
+                <p>Loud events per day at the places we monitor, last 30 days.</p>
             </div>
             <div class="info-card">
                 <div id="leaderboard">Loading\u2026</div>
-                <p class="fine" style="margin-top:10px;">Ranks only the places where we have a monitor, not all of Denver. Counts include dBA-threshold events and events flagged only by the \u0394 rule; sirens are excluded.</p>
+                <p class="fine" style="margin-top:10px;">Ranks only the places where we have a monitor, not all of Denver. Counts include very loud events and deep-rumble-only events; sirens are excluded.</p>
             </div>
             <div class="info-card">
                 <h3>District coverage</h3>
@@ -1578,14 +1601,14 @@ Thank you,
     }
 
     function pageContact() {
-        const vol = ['Vehicle noise', 'Residential noise', 'Commercial noise', 'Fundraising / communications', 'Legal advice / services', 'Health / child-development expertise', 'Donation / materials']
+        const vol = ['Host a monitor', 'Vehicle noise', 'Residential noise', 'Commercial noise', 'Fundraising / communications', 'Legal advice / services', 'Health / child-development expertise', 'Donation / materials']
             .map(v => `<label style="display:flex; gap:8px; align-items:center; font-size:0.8rem; margin:4px 0;"><input type="checkbox" class="vol-cb" value="${v}" style="accent-color:#00e676;"> ${v}</label>`).join('');
         const field = 'width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; font-size:0.85rem;';
         const lab = 'display:block; font-size:0.75rem; color:#aaa; margin:10px 0 4px;';
         return `
             <div class="panel-header">
                 <h2>\u2709\uFE0F Contact the Mile High Noise Project</h2>
-                <p>Questions, updates or offers to help.</p>
+                <p>Want a monitor on your street, or want to help? Tell us.</p>
             </div>
             <div class="info-card">
                 <form id="contact-project-form" onsubmit="submitProjectContact(event)">
@@ -1630,6 +1653,7 @@ Thank you,
     };
 
     function openInfoModal(topic) {
+        dismissWelcome();
         closePanel(false);
         rememberFocus();
         toggleMenu(false);
@@ -1730,6 +1754,24 @@ Thank you,
     }
     syncHeaderHeight();
     if (window.addEventListener) { window.addEventListener('resize', syncHeaderHeight); window.addEventListener('load', syncHeaderHeight); }
+
+    // The first-visit welcome card. Dismissing it (or opening any panel) is remembered in this browser.
+    const WELCOME_KEY = 'mhnp-welcome-dismissed';
+    function welcomeSeen() { try { return localStorage.getItem(WELCOME_KEY) === '1'; } catch (err) { return false; } }
+    function dismissWelcome() {
+        const card = document.getElementById('welcome-card');
+        if (card) card.hidden = true;
+        try { localStorage.setItem(WELCOME_KEY, '1'); } catch (err) { /* private browsing: it just shows again next visit */ }
+    }
+    function welcomeGo(topic) { dismissWelcome(); openInfoModal(topic); }
+    // Wording that depends on the threshold, and the welcome card's first state.
+    function initPlainLanguage() {
+        const tile = document.getElementById('tile-a-label');
+        if (tile) tile.textContent = `Very loud (${DECIBEL_THRESHOLD}+ dBA)`;
+        const card = document.getElementById('welcome-card');
+        if (card) card.hidden = welcomeSeen();
+    }
+    initPlainLanguage();
 
     function handleGlobalKeydown(e) {
         if (flyerIsOpen()) {
@@ -1887,9 +1929,9 @@ Thank you,
     const LF_DELTA_THRESHOLD = 10.0;
     const LF_FLOOR_DB = DECIBEL_THRESHOLD;
     const CLASS_META = {
-        A:    { label: 'dBA threshold only',       desc: 'Over the dBA threshold',                                  color: '#ffb74d', text: '#ffcc80' },
-        A_LF: { label: 'dBA threshold + \u0394 rule', desc: 'Over the dBA threshold and the \u0394 rule',          color: '#ef5350', text: '#ff8a80' },
-        LF:   { label: '\u0394 rule only',      desc: 'Under the dBA threshold, caught only by the \u0394 rule', color: '#29b6f6', text: '#81d4fa' }
+        A: { label: `Very loud (${DECIBEL_THRESHOLD}+ dBA)`, desc: `Over ${DECIBEL_THRESHOLD} dBA`, color: '#ffb74d', text: '#ffcc80' },
+        A_LF: { label: 'Very loud + deep rumble', desc: 'Over the dBA threshold and the \u0394 rule also met', color: '#ef5350', text: '#ff8a80' },
+        LF: { label: 'Deep rumble only', desc: `Under ${DECIBEL_THRESHOLD} dBA, caught only by the \u0394 rule`, color: '#29b6f6', text: '#81d4fa' }
     };
     const RANGES = {
         '1h':  { ms: 60 * 60 * 1000,           label: 'Past hour' },
@@ -2258,15 +2300,17 @@ Thank you,
         const a = data.events.filter(e => e.cls === 'A' || e.cls === 'A_LF').length;
         const lf = data.events.filter(e => e.cls === 'LF').length;
         const total = a + lf;
-        document.getElementById('summary-title').textContent = `Flagged events \u2014 ${RANGES[data.rangeKey].label.toLowerCase()}`;
+        document.getElementById('summary-title').textContent = `Loud events \u2014 ${RANGES[data.rangeKey].label.toLowerCase()}`;
         document.getElementById('sum-a').textContent = a;
         document.getElementById('sum-lf').textContent = lf;
         document.getElementById('sum-s').textContent = data.sirens.length;
 
         let sentence;
-        if (total === 0) sentence = 'No flagged events in this time range.';
-        else if (lf === 0) sentence = `All ${a} flagged event${a === 1 ? ' was' : 's were'} also over the ${DECIBEL_THRESHOLD} dBA threshold.`;
-        else sentence = `${lf} of ${total} flagged events (${Math.round(100 * lf / total)}%) were under ${DECIBEL_THRESHOLD} dBA, so a dBA-only rule misses them, yet dBC was more than ${LF_DELTA_THRESHOLD} dB higher.`;
+        const eventsIn = `${total} loud event${total === 1 ? '' : 's'} in the ${RANGES[data.rangeKey].label.toLowerCase()}.`;
+        if (total === 0) sentence = 'No loud events in this time range.';
+        else if (lf === 0) sentence = `${eventsIn} ${total === 1 ? 'It was' : 'All were'} over ${DECIBEL_THRESHOLD} dBA.`;
+        else if (lf === total) sentence = `${eventsIn} ${total === 1 ? 'It was a deep rumble' : 'All were deep rumbles'} that a regular dBA reading would miss.`;
+        else sentence = `${eventsIn} ${lf} ${lf === 1 ? 'was a deep rumble' : 'were deep rumbles'} that a regular dBA reading would miss.`;
         if (data.truncated) sentence += ` Showing the most recent ${EVENT_LIMIT.toLocaleString()} events.`;
         document.getElementById('summary-sentence').textContent = sentence;
     }
@@ -2284,7 +2328,7 @@ Thank you,
 
         const datasets = classDatasets(events, toPoint, 4);
         if (showSirens) datasets.push(sirenDataset(sirens.map(toPoint), 4));
-        describeCanvas('scatterChart', `Scatter chart of ${events.length} flagged events with dBA on the horizontal axis and dBC on the vertical axis. ${events.filter(e => e.cls === 'LF').length} of them are under ${DECIBEL_THRESHOLD} dBA but flagged by the \u0394 rule.`);
+        describeCanvas('scatterChart', `Scatter chart of ${events.length} loud events with dBA on the horizontal axis and dBC on the vertical axis. ${events.filter(e => e.cls === 'LF').length} of them are deep rumbles, under ${DECIBEL_THRESHOLD} dBA but caught by the \u0394 rule.`);
 
         const axisTitle = text => ({ display: true, text, color: '#9a9a9a', font: { size: 10 } });
         scatterChartInstance = new Chart(document.getElementById('scatterChart').getContext('2d'), {
@@ -2333,7 +2377,7 @@ Thank you,
             plugins: { legend: { display: false }, tooltip: eventTooltip(), refLines: { lines }, demoMark: { enabled: data.demo } }
         });
 
-        describeCanvas('timelineChart', `Timeline of ${data.events.length} flagged events by dBA. Events under the ${DECIBEL_THRESHOLD} dBA line were flagged only by the \u0394 rule.`);
+        describeCanvas('timelineChart', `Timeline of ${data.events.length} loud events by dBA. Events under the ${DECIBEL_THRESHOLD} dBA line are deep rumbles, caught only by the \u0394 rule.`);
         describeCanvas('deltaChart', `Timeline of the difference between dBC and dBA for the same events. The \u0394 rule flags differences above ${LF_DELTA_THRESHOLD} dB.`);
         // dBA per event, with the limit line: blue dots below it are what a dBA-only rule never sees
         const dbaMin = Math.floor((Math.min(60, ...all.map(e => e.dba)) - 2) / 5) * 5;
@@ -2413,9 +2457,9 @@ Thank you,
     const MIN_BASELINE_N = 720;          // about an hour of 5-second readings
     const BASELINE_BAND = { min: 55, max: DECIBEL_THRESHOLD };
     const HEAT_METRICS = {
-        all: { label: 'All flagged', color: [255, 112, 67] },
-        a:   { label: 'Over the dBA threshold', color: [255, 183, 77] },
-        lf:  { label: '\u0394 rule only', color: [41, 182, 246] }
+        all: { label: 'All loud events', noun: 'loud events', color: [255, 112, 67] },
+        a: { label: 'Very loud', noun: 'very loud events', color: [255, 183, 77] },
+        lf: { label: 'Deep rumble only', noun: 'deep-rumble-only events', color: [41, 182, 246] }
     };
     let heatMetric = 'all';
     let lastHourly = null;
@@ -2522,14 +2566,14 @@ Thank you,
             perHour[h] += v; total += v;
             if (isNight(h)) night += v;
         }));
-        if (!total) return `No ${HEAT_METRICS[metric].label.toLowerCase()} events in the last ${HEATMAP_DAYS} days.`;
+        if (!total) return `No ${HEAT_METRICS[metric].noun} in the last ${HEATMAP_DAYS} days.`;
         const busiest = perHour.indexOf(Math.max(...perHour));
         return `${Math.round(100 * night / total)}% of these ${total} events happened between 10 pm and 6 am. Busiest hour: ${hourRange(busiest)} (${perHour[busiest]} events).`;
     }
 
     function heatDetail(model, i, h) {
         const c = model.cells[i][h];
-        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} flagged (${c.a} over the dBA threshold, ${c.lf} \u0394 rule only)`;
+        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} loud event${c.a + c.lf === 1 ? '' : 's'} (${c.a} very loud, ${c.lf} deep rumble only)`;
     }
 
     function renderHeatmap(model) {
@@ -2654,7 +2698,7 @@ Thank you,
         if (b.n < MIN_BASELINE_N) { el.textContent = "Not enough readings yet to show this station's typical \u0394."; return; }
         el.textContent = `Typical \u0394 for everyday sound here (readings between ${BASELINE_BAND.min} and ${BASELINE_BAND.max} dBA, last ${HEATMAP_DAYS} days): ` +
             `median ${signed(b.median)} dB, 90th percentile ${signed(b.p90)} dB. ` +
-            `The \u0394 rule only applies when dBA or dBC is at least ${LF_FLOOR_DB}, so everyday sound below that is never flagged.`;
+            `The \u0394 rule only applies when dBA or dBC is at least ${LF_FLOOR_DB}, so everyday sound below that is never counted.`;
     }
 
     async function loadBaseline(station, token) {
@@ -2762,7 +2806,7 @@ Thank you,
         }
         const lf = station.state === 'live' ? (station.hourlyLF || 0) : 0;
         const pip = lf > 0
-            ? `<span class="lf-pip" title="${lf} event(s) in the last hour under the dBA threshold but flagged by the delta rule">\u0394${lf}</span>`
+            ? `<span class="lf-pip" title="${lf} deep-rumble event(s) in the last hour: under the dBA threshold but caught by the delta rule">\u0394${lf}</span>`
             : '';
 
         return L.divIcon({
@@ -3205,6 +3249,7 @@ Thank you,
     }
 
     async function openDetailPanel(station) {
+        dismissWelcome();
         closeInfoPanel(false);
         rememberFocus();
         hmSel = null;
@@ -3270,7 +3315,7 @@ Thank you,
         const labels = model.dates.map((d, i) => (i === model.dates.length - 1 ? 'Today' : shortDate(d)));
         const perDay = key => model.cells.map(row => row.reduce((sum, c) => sum + c[key], 0));
         const series = [['A', 'aOnly'], ['A_LF', 'aLf'], ['LF', 'lf']];
-        describeCanvas('stackedChart', 'Flagged events per day for the last 14 days, stacked by how they were flagged. Totals: ' + model.dates.map((d, i) => `${i === model.dates.length - 1 ? 'today' : shortDate(d)} ${perDay('aOnly')[i] + perDay('aLf')[i] + perDay('lf')[i]}`).join(', ') + '.');  // amber at the base, the \u0394-only events on top
+        describeCanvas('stackedChart', 'Loud events per day for the last 14 days, stacked by type. Totals: ' + model.dates.map((d, i) => `${i === model.dates.length - 1 ? 'today' : shortDate(d)} ${perDay('aOnly')[i] + perDay('aLf')[i] + perDay('lf')[i]}`).join(', ') + '.');  // amber at the base, the \u0394-only events on top
         const tick = { color: '#9a9a9a', font: { size: 9 } };
         stackedChartInstance = new Chart(canvas.getContext('2d'), {
             type: 'bar',
@@ -3331,7 +3376,7 @@ Thank you,
             },
             plugins: [refLinesPlugin, demoMarkPlugin]
         });
-        describeCanvas('peakChart', 'Highest flagged dBA and dBC per day for the last 14 days. ' + model.dates.map((d, i) => model.peakDba[i] == null ? null : `${shortDate(d)}: ${model.peakDba[i]} dBA, ${model.peakDbc[i] == null ? 'no dBC' : model.peakDbc[i] + ' dBC'}`).filter(Boolean).join('; ') + '.');
+        describeCanvas('peakChart', 'Highest dBA and dBC per day for the last 14 days. ' + model.dates.map((d, i) => model.peakDba[i] == null ? null : `${shortDate(d)}: ${model.peakDba[i]} dBA, ${model.peakDbc[i] == null ? 'no dBC' : model.peakDbc[i] + ' dBC'}`).filter(Boolean).join('; ') + '.');
     }
 
     // ========================================================================
@@ -3495,16 +3540,22 @@ Thank you,
     // PRINTABLE FLYER: a one-page preview with a QR code to this site. Edit the words in FLYER_TEXT.
     // ========================================================================
     const FLYER_W = 816, FLYER_H = 1056;   // US Letter at 96 px per inch
+    const FLYER_ICON = p => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${p}</svg>`;
+    const FLYER_ICONS = {
+        wave: FLYER_ICON('<path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/>'),
+        pin: FLYER_ICON('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
+        horn: FLYER_ICON('<path d="M4 9.5v5h3.5L15 19V5L7.5 9.5H4z"/><path d="M18 9a4.5 4.5 0 0 1 0 6"/>')
+    };
     const FLYER_TEXT = {
-        headline: 'Loud vehicles. Measured.',
-        lead: 'Community sensors are recording vehicle noise on Denver streets around the clock, and the readings are public.',
+        headline: 'Tired of loud exhausts at night?',
+        lead: 'Neighbors across Denver are proving where and when it happens: sensors on our streets record vehicle noise around the clock, and the readings are public.',
         points: [
-            ['The law', 'Colorado bans modifying an exhaust to be louder than the muffler it came with. Denver caps vehicles under 10,000 lb at 82 dB(A), measured at 25 ft.'],
-            ['The numbers', 'Our sensors log every event at 85 dBA or louder, plus bass-heavy sound that dBA understates. Watch them arrive live.'],
-            ['Your voice', 'Email your council member from the site, and report loud vehicles at fixdenvernoise.org. Every report adds to the record.']
+            ['wave', 'We record it.', 'Sensors log every loud spike and the deep, bass-heavy rumble you feel through the walls, day and night.'],
+            ['pin', 'You can see it.', 'Live readings and 14-day patterns, street by street. Find the loudest blocks near you.'],
+            ['horn', 'Speak up.', 'Making a vehicle louder than it left the factory is illegal in Colorado. Email your council member from the site, with the message already written.']
         ],
-        scanTitle: 'Scan to see the live map',
-        scanNote: 'Updated every few seconds from sensors on Denver streets.',
+        scanTitle: 'Scan to see what your street sounds like',
+        scanNote: 'Live readings from sensors on Denver streets, plus an easy way to email your council member.',
         footer: 'Partner: Fix Denver Noise \u00B7 fixdenvernoise.org'
     };
     const FLYER_MARK = '<svg class="flyer-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="6" y="24.0" width="8" height="16" rx="4.0" fill="#00e676"/><rect x="17" y="18.0" width="8" height="28" rx="4.0" fill="#ffeb3b"/><rect x="28" y="10.0" width="8" height="44" rx="4.0" fill="#ff5252"/><rect x="39" y="18.0" width="8" height="28" rx="4.0" fill="#ffeb3b"/><rect x="50" y="24.0" width="8" height="16" rx="4.0" fill="#00e676"/></svg>';
@@ -3512,8 +3563,8 @@ Thank you,
 
     function flyerHtml(url = SITE_URL) {
         const shownUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-        const points = FLYER_TEXT.points.map(([title, text], i) =>
-            `<li><span class="flyer-num">${i + 1}</span><div><strong>${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></div></li>`).join('');
+        const points = FLYER_TEXT.points.map(([icon, title, text]) =>
+            `<li><span class="flyer-icon">${FLYER_ICONS[icon] || ''}</span><div><strong>${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></div></li>`).join('');
         return `<div class="flyer-sheet" id="flyer-sheet">
             <div class="flyer-banner">
                 ${FLYER_MARK}
@@ -3589,6 +3640,19 @@ Thank you,
         if (el) el.classList.remove('show');
     }
 
+    // When a station first reported. Routine readings are trimmed after a few days (see noise_logs_retention.sql), so the
+    // hourly summaries, which are kept, hold the real start; the oldest remaining reading is the fallback.
+    async function firstReadingMs(stationId) {
+        const [hourly, raw] = await Promise.all([
+            fetchSupabase('noise_hourly', `select=hour_start&station_id=eq.${stationId}&order=hour_start.asc&limit=1`).catch(() => null),   // the table may not exist yet
+            fetchSupabase('noise_logs', `select=timestamp&station_id=eq.${stationId}&order=timestamp.asc&limit=1`)
+        ]);
+        const times = [];
+        if (Array.isArray(hourly) && hourly[0] && hourly[0].hour_start) times.push(new Date(hourly[0].hour_start).getTime());
+        if (Array.isArray(raw) && raw[0] && raw[0].timestamp) times.push(new Date(raw[0].timestamp).getTime());
+        return times.length ? Math.min(...times) : null;
+    }
+
     async function trigger311Report() {
         const btn = document.getElementById('btn-311');
         const origText = "\uD83D\uDEA8 File Anonymous 311 Noise Report";
@@ -3661,12 +3725,12 @@ Thank you,
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${activeMarkerObj.id}_flagged_events.csv`;
+                a.download = `${activeMarkerObj.id}_loud_events.csv`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast("CSV Exported", `${rows.length} flagged events downloaded.`);
+                showToast("CSV Exported", `${rows.length} loud events downloaded.`);
                 return;
             }
         } catch (err) {
@@ -3674,7 +3738,7 @@ Thank you,
             showToast("Export failed", "Couldn't load the event log. Please try again later.", true);
             return;
         }
-        showToast("Export Notice", "No flagged events found for this station.", true);
+        showToast("Export Notice", "No loud events found for this station.", true);
     }
 
     function generatePDFReport() {
