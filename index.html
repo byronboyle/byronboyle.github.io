@@ -333,6 +333,8 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        .toast-notification.error { border-color: #ff5252; }
+        .toast-notification.error .toast-title { color: #ff8a80; }
         .toast-title {
             font-weight: 700;
             font-size: 0.9rem;
@@ -404,8 +406,6 @@
         .chart-sub { margin: 8px 0 2px; color: #9a9a9a; font-size: 0.72rem; }
         .chart-box { position: relative; width: 100%; }
         .siren-toggle { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.72rem; color: #aaa; cursor: pointer; }
-        .patterns > summary { cursor: pointer; color: #ccc; font-size: 0.8rem; font-weight: 600; }
-        .patterns h5 { margin: 12px 0 4px; color: #aaa; font-size: 0.72rem; font-weight: 600; }
 
         /* ---- Step 3: heatmap + baseline ---- */
         .heat-btn { background: none; border: none; color: #aaa; padding: 5px 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
@@ -536,7 +536,7 @@
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
             }
             .detail-panel.open { right: 0; transform: translateY(0); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s; }
-            .detail-panel.expanded { height: calc(100vh - 84px); height: calc(100dvh - 84px); }
+            .detail-panel.expanded { height: calc(100vh - var(--header-h, 66px)); height: calc(100dvh - var(--header-h, 66px)); }
             .sheet-bar { position: sticky; top: 0; z-index: 5; justify-content: space-between; background: #1a1a1a; margin: 0 -14px; padding: 0 6px 0 10px; min-height: 48px; }
             .sheet-handle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; background: none; border: none; color: #d0d0d0; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
             .sheet-grip { display: inline-block; width: 36px; height: 5px; border-radius: 3px; background: #666; }
@@ -554,21 +554,71 @@
             input, select, textarea { font-size: 16px !important; }
         }
 
-        /* ---- Mountain ridgeline (the "Mile High" theme): a band of two ridges under the header content, and a
-               ridge under every panel title. Decorative only, and clear of all text. --ridge-strength fades it
-               (1 is as drawn, 0 removes it). ---- */
-        :root { --ridge-strength: 1; --ridge-h: 22px; }
-        .navbar { isolation: isolate; padding-bottom: calc(var(--ridge-h) + 2px); }
-        .navbar::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: var(--ridge-h); z-index: -1; pointer-events: none; opacity: var(--ridge-strength); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='22' viewBox='0 0 1440 22'%3E%3Cpath d='M-2,24 L-2,16.1 L0,16.1 L10,15 L20,13.4 L31,12.1 L41,10.5 L51,8.5 L61,6.9 L72,5.1 L82,3.1 L90,5 L97,6.7 L105,8.9 L113,10.6 L121,12.6 L128,14.1 L136,16 L144,17.9 L149,16.4 L154,15.2 L159,13.5 L165,12.1 L170,10.5 L175,8.9 L180,7.3 L185,5.4 L198,7.2 L211,8.8 L224,10.1 L237,11.8 L249,12.9 L262,14.5 L275,15.7 L288,17.2 L299,15.3 L311,13.1 L322,11.4 L334,9.7 L345,8 L357,6.3 L368,4.5 L380,2.9 L386,4.8 L393,6.6 L399,8 L406,9.6 L412,10.8 L419,12.3 L425,14 L432,15.4 L441,13.9 L451,12.2 L460,10.3 L470,8.8 L479,7.5 L489,6 L498,4.3 L508,3.1 L516,5.3 L525,7.5 L533,9.3 L542,11.4 L550,12.9 L559,14.7 L567,16.4 L576,17.9 L585,16.9 L593,15.6 L602,14.5 L610,13.1 L619,11.4 L627,9.8 L636,8.4 L644,7.1 L654,8.1 L663,8.8 L673,9.1 L682,9.7 L692,10.7 L701,11.7 L711,12.8 L720,13.7 L726,12.4 L731,11 L737,9.3 L742,7.9 L748,6.3 L753,4.8 L759,3.3 L764,1.9 L777,4 L789,6.7 L802,8.2 L814,10.3 L827,12.3 L839,14.6 L852,16.5 L864,18.3 L874,16.7 L885,15.2 L895,13.3 L906,11.8 L916,10 L927,8.6 L937,7.1 L948,5.7 L955,7.3 L963,8.8 L970,10 L978,11.1 L985,12.4 L993,13.8 L1000,15.1 L1008,16.5 L1020,16 L1031,14.9 L1043,13.7 L1055,12.6 L1067,11.4 L1078,10.7 L1090,9.3 L1102,8.2 L1108,9.5 L1114,11.1 L1121,12.4 L1127,13.9 L1133,14.9 L1139,15.8 L1146,17 L1152,18.4 L1164,16.6 L1177,14.6 L1189,12.9 L1201,10.7 L1213,8.9 L1226,6.9 L1238,5.7 L1250,4.3 L1256,5.9 L1262,7.7 L1267,9.1 L1273,10.7 L1279,12.4 L1285,14.2 L1290,16.1 L1296,18.2 L1309,16.1 L1322,13.4 L1335,10.8 L1347,8.2 L1360,6.4 L1373,5 L1386,3 L1399,0.9 L1404,2.7 L1409,4.4 L1414,6.4 L1419,8.3 L1425,10.2 L1430,12 L1435,14 L1440,16.1 L1442,16.1 L1442,24 Z' fill='%2300e676' fill-opacity='0.1' stroke='%2300e676' stroke-opacity='0.4' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='M-2,24 L-2,19.3 L0,19.3 L6,18.2 L11,17.6 L17,16.3 L23,14.9 L29,12.7 L34,11.1 L40,9.2 L46,7.9 L50,8.6 L53,9.5 L57,10.6 L61,12.1 L65,13.6 L68,15.5 L72,16.9 L76,18.2 L82,17.5 L87,16.7 L93,15.6 L99,13.9 L104,11.5 L110,9.7 L116,7.9 L122,6.8 L125,8.5 L129,10.1 L133,11.8 L137,13.5 L140,15.4 L144,17.5 L148,19.3 L152,21.2 L156,19.6 L161,17.5 L165,15.1 L170,13.1 L175,11.4 L179,9.8 L184,8.1 L188,6.6 L193,8.4 L198,10 L203,12 L208,14.1 L213,15.2 L218,16.7 L222,17.9 L227,19.2 L234,18.1 L240,17.4 L247,16.8 L253,15.4 L259,15.6 L266,15.2 L272,14.5 L279,13.6 L282,14.2 L285,14.9 L288,16 L291,16.9 L294,17.7 L297,18.7 L300,19.2 L303,19.8 L307,18.7 L311,17.3 L314,16 L318,14.7 L322,13.5 L325,12 L329,11.2 L333,10 L338,12.1 L344,13.6 L350,15 L356,16.2 L362,17 L367,17.5 L373,18.7 L379,19.4 L382,18.8 L384,17.8 L387,17.2 L390,16.7 L392,15.7 L395,14.6 L398,13.6 L401,12.7 L407,13.6 L414,14.7 L421,16.4 L428,17.7 L434,18.3 L441,19.7 L448,20.5 L455,20.4 L461,18.6 L468,16.7 L474,14.9 L481,12.8 L487,12 L494,11 L500,9.9 L507,8.1 L510,9.6 L513,11.3 L516,13.1 L519,14.9 L522,16.7 L525,18 L528,19.4 L531,20.8 L537,20 L542,18.6 L548,17.4 L554,16.3 L560,15.3 L566,14.1 L572,13.7 L578,13.4 L582,13.5 L585,14.1 L589,14.7 L592,15.6 L596,16.3 L599,17 L603,18 L606,19.3 L609,18.5 L613,17.8 L616,17 L619,16.2 L622,15.9 L625,15.4 L629,14.9 L632,14.5 L638,14.9 L644,15.4 L651,15.8 L657,17 L663,17 L670,17.8 L676,18 L682,18.5 L686,18 L689,17.3 L693,16.4 L696,15.9 L700,15.3 L703,14.4 L707,13.7 L710,12.7 L716,13.6 L722,14.6 L728,14.9 L734,15.3 L740,16.4 L746,16.9 L752,17.4 L758,18.1 L764,16.4 L770,15.4 L777,14.9 L783,14.2 L789,13.4 L796,12.4 L802,12.5 L808,12.1 L811,13.1 L815,13.8 L818,14.6 L821,15.8 L824,16.4 L827,17 L830,17.4 L834,18.2 L839,16.7 L843,15.7 L848,14.2 L853,12.9 L858,12.3 L863,11.4 L868,9.8 L873,8.9 L877,10.3 L882,11.7 L887,12.9 L891,14.1 L896,15.7 L900,17 L905,18.6 L909,20.7 L916,18.6 L923,16.5 L929,15.2 L936,13.5 L942,12.4 L949,11.4 L955,10.4 L962,8.7 L965,9.9 L968,11.2 L971,12.7 L974,14.1 L977,15.1 L979,15.9 L982,16.9 L985,18.2 L992,16.6 L998,15.6 L1004,15 L1011,13.6 L1017,13.1 L1024,12.6 L1030,12.5 L1036,12 L1039,12.9 L1042,14.2 L1046,15.3 L1049,16.7 L1052,17.7 L1055,18.5 L1058,19.4 L1061,20.1 L1064,19.4 L1068,18.4 L1071,17.5 L1074,17 L1078,16.3 L1081,15.3 L1084,14.3 L1088,13.3 L1094,14.2 L1100,15.1 L1106,15.9 L1112,16.9 L1118,17.6 L1125,18.6 L1131,19.7 L1137,21.1 L1141,19.6 L1145,17.6 L1149,15.9 L1152,14.5 L1156,13.4 L1160,12.2 L1164,10.8 L1168,9.5 L1174,10.9 L1179,12 L1185,14.1 L1190,15.9 L1196,17.1 L1202,18.4 L1207,19.9 L1213,21.3 L1218,19.9 L1224,18.2 L1229,16.6 L1235,15.3 L1240,14.7 L1246,14.2 L1251,13.3 L1256,11.7 L1260,12.9 L1264,13.8 L1268,14.9 L1272,15.9 L1276,16.9 L1280,18.4 L1284,19.1 L1288,20.3 L1294,19.1 L1301,17.9 L1307,17.3 L1313,16 L1319,14.4 L1325,13.3 L1331,12 L1337,10.5 L1340,11.6 L1344,12.8 L1347,14.2 L1351,15.7 L1354,16.7 L1357,17.9 L1361,19.1 L1364,20.3 L1369,18.6 L1374,17.4 L1378,16.4 L1383,15.2 L1388,13.7 L1392,12.1 L1397,10.2 L1401,8.6 L1406,10.3 L1411,11.6 L1416,13.4 L1421,15 L1426,15.7 L1430,16.8 L1435,18.3 L1440,19.3 L1442,19.3 L1442,24 Z' fill='%2300e676' fill-opacity='0.18' stroke='%2300e676' stroke-opacity='0.7' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") repeat-x right bottom / auto 100%; }
-        .panel-header { position: relative; padding-bottom: 22px; margin-bottom: 4px; }
-        .panel-header::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 14px; pointer-events: none; opacity: var(--ridge-strength); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='14' viewBox='0 0 640 14'%3E%3Cpath d='M0,14 L0,12.6 L3,11.5 L6,10.5 L9,9.3 L12,8.2 L15,7.2 L18,6.1 L20,5 L23,3.9 L29,4.5 L35,5.3 L41,6 L47,6.5 L53,7.5 L59,8.4 L65,9.5 L71,10.7 L74,9.9 L77,9.1 L80,8.6 L83,7.8 L86,7.3 L89,6.5 L92,6.2 L95,5.6 L101,6.2 L107,6.9 L113,7.9 L119,9.1 L125,9.3 L131,10 L136,10.9 L142,12 L148,11.2 L153,10.3 L159,9.6 L164,9.2 L169,8.1 L175,7.5 L180,6.5 L186,5.4 L189,6.2 L193,6.7 L196,7.2 L200,7.6 L203,8.4 L206,9 L210,9.9 L213,10.5 L218,9.9 L223,8.8 L229,8.2 L234,7.2 L239,6.6 L244,6.2 L249,6 L254,5.5 L258,6.4 L262,7.4 L265,8.2 L269,8.9 L273,9.6 L277,10.2 L281,10.5 L284,11.1 L289,10 L293,8.8 L297,8.1 L301,7.1 L306,6.3 L310,5.4 L314,4.5 L318,3.8 L323,4.4 L328,4.9 L332,5.5 L337,6.3 L342,7.3 L346,8.3 L351,9.1 L356,9.8 L358,9.3 L361,8.9 L364,8.4 L367,7.9 L370,7.3 L373,6.8 L376,6.5 L378,6.2 L384,6.9 L390,7.3 L396,8.1 L403,8.6 L409,8.6 L415,8.8 L421,9.3 L427,10 L431,9.2 L435,8.8 L439,7.9 L443,7.2 L447,6.6 L451,6.2 L455,5.7 L459,5.1 L464,5.6 L469,6.3 L474,7.3 L478,8 L483,9 L488,9.9 L493,10.9 L498,11.7 L502,10.3 L506,8.9 L510,7.8 L513,6.5 L517,5 L521,3.5 L525,2 L529,0.6 L534,2.1 L539,3.6 L544,4.9 L549,6.1 L554,7.6 L559,9.3 L564,10.6 L569,12 L572,10.7 L576,9.6 L579,8.8 L582,7.7 L586,6.5 L589,5.4 L592,4 L596,2.8 L601,4.4 L607,5.9 L612,7.3 L618,8.5 L623,9.4 L629,10.7 L634,11.7 L640,12.6 L640,14 Z' fill='%2300e676' fill-opacity='0.16'/%3E%3Cpath d='M0,12.6 L3,11.5 L6,10.5 L9,9.3 L12,8.2 L15,7.2 L18,6.1 L20,5 L23,3.9 L29,4.5 L35,5.3 L41,6 L47,6.5 L53,7.5 L59,8.4 L65,9.5 L71,10.7 L74,9.9 L77,9.1 L80,8.6 L83,7.8 L86,7.3 L89,6.5 L92,6.2 L95,5.6 L101,6.2 L107,6.9 L113,7.9 L119,9.1 L125,9.3 L131,10 L136,10.9 L142,12 L148,11.2 L153,10.3 L159,9.6 L164,9.2 L169,8.1 L175,7.5 L180,6.5 L186,5.4 L189,6.2 L193,6.7 L196,7.2 L200,7.6 L203,8.4 L206,9 L210,9.9 L213,10.5 L218,9.9 L223,8.8 L229,8.2 L234,7.2 L239,6.6 L244,6.2 L249,6 L254,5.5 L258,6.4 L262,7.4 L265,8.2 L269,8.9 L273,9.6 L277,10.2 L281,10.5 L284,11.1 L289,10 L293,8.8 L297,8.1 L301,7.1 L306,6.3 L310,5.4 L314,4.5 L318,3.8 L323,4.4 L328,4.9 L332,5.5 L337,6.3 L342,7.3 L346,8.3 L351,9.1 L356,9.8 L358,9.3 L361,8.9 L364,8.4 L367,7.9 L370,7.3 L373,6.8 L376,6.5 L378,6.2 L384,6.9 L390,7.3 L396,8.1 L403,8.6 L409,8.6 L415,8.8 L421,9.3 L427,10 L431,9.2 L435,8.8 L439,7.9 L443,7.2 L447,6.6 L451,6.2 L455,5.7 L459,5.1 L464,5.6 L469,6.3 L474,7.3 L478,8 L483,9 L488,9.9 L493,10.9 L498,11.7 L502,10.3 L506,8.9 L510,7.8 L513,6.5 L517,5 L521,3.5 L525,2 L529,0.6 L534,2.1 L539,3.6 L544,4.9 L549,6.1 L554,7.6 L559,9.3 L564,10.6 L569,12 L572,10.7 L576,9.6 L579,8.8 L582,7.7 L586,6.5 L589,5.4 L592,4 L596,2.8 L601,4.4 L607,5.9 L612,7.3 L618,8.5 L623,9.4 L629,10.7 L634,11.7 L640,12.6' fill='none' stroke='%2300e676' stroke-opacity='0.6' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E") repeat-x left bottom / auto 100%; }
-        @media (forced-colors: active) { .navbar::before, .panel-header::after { display: none; } }
+        /* ---- Mountain ridgeline (the "Mile High" theme): faint mountains behind the whole header, with a lit and a shaded face on each
+               summit. Decorative only; text keeps at least 4.5:1 contrast over it. --ridge-strength fades it (1 is as drawn, 0 removes it). ---- */
+        :root { --ridge-strength: 1; --ridge-art: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='57' viewBox='0 0 1440 57' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cdefs%3E%3ClinearGradient id='f56237c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e676' stop-opacity='0.08'/%3E%3Cstop offset='1' stop-color='%2300e676' stop-opacity='0.03'/%3E%3C/linearGradient%3E%3ClinearGradient id='s56237c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e676' stop-opacity='0.07'/%3E%3Cstop offset='1' stop-color='%2300e676' stop-opacity='0.025'/%3E%3C/linearGradient%3E%3ClinearGradient id='h56237c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e676' stop-opacity='0.11'/%3E%3Cstop offset='1' stop-color='%2300e676' stop-opacity='0.04'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,51.1 10,51.1 20,51.3 30,51.1 40,46.9 50,42.7 60,37.1 69,40.1 79,42.8 88,45.5 97,48.2 106,50.5 117,46.2 128,41.2 139,35.7 150,29.5 160,34.5 169,38.8 179,42.2 189,45.5 198,48.1 209,44.8 219,41.1 230,38.0 240,33.8 250,40.7 261,46.3 271,51.1 281,46.4 291,42.1 300,36.4 310,31.8 320,25.7 330,19.8 340,26.3 350,31.6 360,37.0 370,43.0 380,48.0 390,42.1 400,34.3 410,26.3 419,31.1 428,35.4 437,38.8 446,42.6 457,36.9 468,30.3 479,23.2 489,15.6 500,6.8 511,16.9 522,26.2 533,35.4 544,42.0 553,38.4 562,34.7 572,30.0 581,26.4 590,21.9 600,28.5 610,34.6 619,39.4 629,43.6 639,36.3 650,29.5 660,21.9 670,13.3 681,25.4 692,36.4 704,45.6 713,43.1 722,40.4 732,37.9 741,33.9 751,31.0 760,27.3 769,31.1 779,34.2 788,37.4 798,40.9 807,44.0 817,46.4 828,40.1 839,31.8 850,23.0 861,28.0 871,32.9 882,36.6 892,40.3 903,43.7 912,36.5 921,28.2 931,18.3 940,9.0 950,22.3 961,33.4 971,43.9 981,41.4 991,38.7 1000,35.8 1010,32.5 1020,29.0 1030,25.2 1041,31.7 1051,37.6 1062,43.0 1073,47.3 1082,40.3 1091,33.5 1101,25.5 1110,16.5 1120,27.2 1130,37.0 1140,45.9 1150,44.0 1160,41.3 1170,39.8 1180,37.1 1190,34.5 1200,31.7 1211,35.5 1222,40.0 1233,43.2 1244,46.7 1253,42.3 1262,38.1 1272,32.4 1281,26.6 1290,20.9 1300,26.7 1310,31.7 1321,36.7 1331,41.9 1341,46.4 1351,42.6 1360,37.2 1370,30.6 1382,36.7 1393,40.9 1405,45.1 1417,47.4 1428,49.4 1440,51.1 1440,57.0 0,57.0Z' fill='url(%23f56237c)'/%3E%3Cpath d='M150,29.5 160,34.5 169,38.8 179,42.2 189,45.5 198,48.1 198,57.0 155,57.0Z M330,19.8 340,26.3 350,31.6 360,37.0 370,43.0 380,48.0 380,57.0 335,57.0Z M410,26.3 419,31.1 428,35.4 437,38.8 446,42.6 446,57.0 414,57.0Z M500,6.8 511,16.9 522,26.2 533,35.4 544,42.0 544,57.0 504,57.0Z M590,21.9 600,28.5 610,34.6 619,39.4 629,43.6 629,57.0 594,57.0Z M670,13.3 681,25.4 692,36.4 704,45.6 704,57.0 673,57.0Z M760,27.3 769,31.1 779,34.2 788,37.4 798,40.9 807,44.0 817,46.4 817,57.0 766,57.0Z M850,23.0 861,28.0 871,32.9 882,36.6 892,40.3 903,43.7 903,57.0 855,57.0Z M940,9.0 950,22.3 961,33.4 971,43.9 971,57.0 943,57.0Z M1030,25.2 1041,31.7 1051,37.6 1062,43.0 1073,47.3 1073,57.0 1034,57.0Z M1110,16.5 1120,27.2 1130,37.0 1140,45.9 1140,57.0 1113,57.0Z M1290,20.9 1300,26.7 1310,31.7 1321,36.7 1331,41.9 1341,46.4 1341,57.0 1295,57.0Z' fill='url(%23s56237c)'/%3E%3Cpath d='M150,29.5 155,54.2 M330,19.8 335,53.3 M410,26.3 414,53.9 M500,6.8 504,52.0 M590,21.9 594,53.5 M670,13.3 673,52.6 M760,27.3 766,54.0 M850,23.0 855,53.6 M940,9.0 943,52.2 M1030,25.2 1034,53.8 M1110,16.5 1113,53.0 M1290,20.9 1295,53.4' stroke='%2300e676' stroke-opacity='0.08' stroke-width='0.80'/%3E%3Cpath d='M0,51.1 10,51.1 20,51.3 30,51.1 40,46.9 50,42.7 60,37.1 69,40.1 79,42.8 88,45.5 97,48.2 106,50.5 117,46.2 128,41.2 139,35.7 150,29.5 160,34.5 169,38.8 179,42.2 189,45.5 198,48.1 209,44.8 219,41.1 230,38.0 240,33.8 250,40.7 261,46.3 271,51.1 281,46.4 291,42.1 300,36.4 310,31.8 320,25.7 330,19.8 340,26.3 350,31.6 360,37.0 370,43.0 380,48.0 390,42.1 400,34.3 410,26.3 419,31.1 428,35.4 437,38.8 446,42.6 457,36.9 468,30.3 479,23.2 489,15.6 500,6.8 511,16.9 522,26.2 533,35.4 544,42.0 553,38.4 562,34.7 572,30.0 581,26.4 590,21.9 600,28.5 610,34.6 619,39.4 629,43.6 639,36.3 650,29.5 660,21.9 670,13.3 681,25.4 692,36.4 704,45.6 713,43.1 722,40.4 732,37.9 741,33.9 751,31.0 760,27.3 769,31.1 779,34.2 788,37.4 798,40.9 807,44.0 817,46.4 828,40.1 839,31.8 850,23.0 861,28.0 871,32.9 882,36.6 892,40.3 903,43.7 912,36.5 921,28.2 931,18.3 940,9.0 950,22.3 961,33.4 971,43.9 981,41.4 991,38.7 1000,35.8 1010,32.5 1020,29.0 1030,25.2 1041,31.7 1051,37.6 1062,43.0 1073,47.3 1082,40.3 1091,33.5 1101,25.5 1110,16.5 1120,27.2 1130,37.0 1140,45.9 1150,44.0 1160,41.3 1170,39.8 1180,37.1 1190,34.5 1200,31.7 1211,35.5 1222,40.0 1233,43.2 1244,46.7 1253,42.3 1262,38.1 1272,32.4 1281,26.6 1290,20.9 1300,26.7 1310,31.7 1321,36.7 1331,41.9 1341,46.4 1351,42.6 1360,37.2 1370,30.6 1382,36.7 1393,40.9 1405,45.1 1417,47.4 1428,49.4 1440,51.1' stroke='%2300e676' stroke-opacity='0.14' stroke-width='1.00'/%3E%3Cpath d='M0,53.3 10,53.2 20,53.4 30,53.3 39,53.3 49,52.4 59,51.0 69,49.5 79,47.8 88,48.6 98,49.2 107,49.7 117,50.5 126,50.8 136,51.4 145,51.6 155,52.2 164,52.5 174,52.8 183,53.0 192,52.5 201,52.0 211,51.4 220,50.8 229,50.2 238,49.2 247,48.3 256,47.3 266,48.2 275,48.9 284,49.7 293,50.4 302,50.8 311,51.6 320,51.7 329,52.3 338,52.6 347,52.8 357,51.8 366,50.2 376,48.6 385,46.8 394,44.6 404,45.5 413,46.3 422,47.0 431,47.7 440,48.4 450,49.1 459,49.4 468,50.2 477,50.7 487,51.2 496,51.3 505,52.0 514,52.1 523,52.5 533,52.8 542,53.1 551,53.3 560,52.3 570,51.3 579,50.1 588,48.8 597,47.4 607,46.0 616,44.3 625,42.3 635,40.3 644,41.7 653,42.9 662,44.3 671,45.5 680,46.5 689,47.5 698,48.3 707,49.5 716,50.0 725,50.8 734,51.6 743,52.1 752,51.9 762,51.6 771,51.2 781,50.9 790,50.4 800,50.2 809,49.6 818,49.1 828,48.7 837,48.0 847,47.3 856,46.5 866,47.3 876,48.0 886,48.7 896,49.3 905,49.9 915,50.6 925,51.0 935,51.3 944,51.6 954,51.9 964,52.2 974,51.9 983,51.4 993,51.1 1003,50.5 1012,49.8 1022,49.0 1031,48.1 1041,47.1 1051,46.0 1060,47.8 1069,49.4 1078,50.6 1087,51.9 1096,52.6 1105,53.3 1115,53.0 1124,52.7 1134,52.3 1144,52.0 1153,51.5 1163,50.9 1173,50.1 1182,49.5 1192,48.7 1201,47.8 1211,49.1 1220,50.1 1229,51.2 1238,51.9 1247,52.4 1256,52.9 1265,53.3 1274,52.4 1284,51.5 1293,50.5 1302,49.4 1311,47.8 1320,46.6 1330,44.9 1339,43.1 1348,41.1 1357,38.9 1368,42.9 1378,45.7 1388,48.2 1399,50.1 1409,51.2 1419,52.1 1430,52.6 1440,53.3 1442,59.0 -2,59.0Z' fill='%231a1a1a'/%3E%3Cpath d='M0,53.3 10,53.2 20,53.4 30,53.3 39,53.3 49,52.4 59,51.0 69,49.5 79,47.8 88,48.6 98,49.2 107,49.7 117,50.5 126,50.8 136,51.4 145,51.6 155,52.2 164,52.5 174,52.8 183,53.0 192,52.5 201,52.0 211,51.4 220,50.8 229,50.2 238,49.2 247,48.3 256,47.3 266,48.2 275,48.9 284,49.7 293,50.4 302,50.8 311,51.6 320,51.7 329,52.3 338,52.6 347,52.8 357,51.8 366,50.2 376,48.6 385,46.8 394,44.6 404,45.5 413,46.3 422,47.0 431,47.7 440,48.4 450,49.1 459,49.4 468,50.2 477,50.7 487,51.2 496,51.3 505,52.0 514,52.1 523,52.5 533,52.8 542,53.1 551,53.3 560,52.3 570,51.3 579,50.1 588,48.8 597,47.4 607,46.0 616,44.3 625,42.3 635,40.3 644,41.7 653,42.9 662,44.3 671,45.5 680,46.5 689,47.5 698,48.3 707,49.5 716,50.0 725,50.8 734,51.6 743,52.1 752,51.9 762,51.6 771,51.2 781,50.9 790,50.4 800,50.2 809,49.6 818,49.1 828,48.7 837,48.0 847,47.3 856,46.5 866,47.3 876,48.0 886,48.7 896,49.3 905,49.9 915,50.6 925,51.0 935,51.3 944,51.6 954,51.9 964,52.2 974,51.9 983,51.4 993,51.1 1003,50.5 1012,49.8 1022,49.0 1031,48.1 1041,47.1 1051,46.0 1060,47.8 1069,49.4 1078,50.6 1087,51.9 1096,52.6 1105,53.3 1115,53.0 1124,52.7 1134,52.3 1144,52.0 1153,51.5 1163,50.9 1173,50.1 1182,49.5 1192,48.7 1201,47.8 1211,49.1 1220,50.1 1229,51.2 1238,51.9 1247,52.4 1256,52.9 1265,53.3 1274,52.4 1284,51.5 1293,50.5 1302,49.4 1311,47.8 1320,46.6 1330,44.9 1339,43.1 1348,41.1 1357,38.9 1368,42.9 1378,45.7 1388,48.2 1399,50.1 1409,51.2 1419,52.1 1430,52.6 1440,53.3 1442,59.0 -2,59.0Z' fill='url(%23h56237c)'/%3E%3Cpath d='M0,53.3 10,53.2 20,53.4 30,53.3 39,53.3 49,52.4 59,51.0 69,49.5 79,47.8 88,48.6 98,49.2 107,49.7 117,50.5 126,50.8 136,51.4 145,51.6 155,52.2 164,52.5 174,52.8 183,53.0 192,52.5 201,52.0 211,51.4 220,50.8 229,50.2 238,49.2 247,48.3 256,47.3 266,48.2 275,48.9 284,49.7 293,50.4 302,50.8 311,51.6 320,51.7 329,52.3 338,52.6 347,52.8 357,51.8 366,50.2 376,48.6 385,46.8 394,44.6 404,45.5 413,46.3 422,47.0 431,47.7 440,48.4 450,49.1 459,49.4 468,50.2 477,50.7 487,51.2 496,51.3 505,52.0 514,52.1 523,52.5 533,52.8 542,53.1 551,53.3 560,52.3 570,51.3 579,50.1 588,48.8 597,47.4 607,46.0 616,44.3 625,42.3 635,40.3 644,41.7 653,42.9 662,44.3 671,45.5 680,46.5 689,47.5 698,48.3 707,49.5 716,50.0 725,50.8 734,51.6 743,52.1 752,51.9 762,51.6 771,51.2 781,50.9 790,50.4 800,50.2 809,49.6 818,49.1 828,48.7 837,48.0 847,47.3 856,46.5 866,47.3 876,48.0 886,48.7 896,49.3 905,49.9 915,50.6 925,51.0 935,51.3 944,51.6 954,51.9 964,52.2 974,51.9 983,51.4 993,51.1 1003,50.5 1012,49.8 1022,49.0 1031,48.1 1041,47.1 1051,46.0 1060,47.8 1069,49.4 1078,50.6 1087,51.9 1096,52.6 1105,53.3 1115,53.0 1124,52.7 1134,52.3 1144,52.0 1153,51.5 1163,50.9 1173,50.1 1182,49.5 1192,48.7 1201,47.8 1211,49.1 1220,50.1 1229,51.2 1238,51.9 1247,52.4 1256,52.9 1265,53.3 1274,52.4 1284,51.5 1293,50.5 1302,49.4 1311,47.8 1320,46.6 1330,44.9 1339,43.1 1348,41.1 1357,38.9 1368,42.9 1378,45.7 1388,48.2 1399,50.1 1409,51.2 1419,52.1 1430,52.6 1440,53.3' stroke='%2300e676' stroke-opacity='0.16' stroke-width='1.00'/%3E%3C/svg%3E"); --flyer-ridge-art: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='816' height='76' viewBox='0 0 816 76' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cdefs%3E%3ClinearGradient id='fb71d4b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e676' stop-opacity='0.17'/%3E%3Cstop offset='1' stop-color='%2300e676' stop-opacity='0.05'/%3E%3C/linearGradient%3E%3ClinearGradient id='sb71d4b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e676' stop-opacity='0.15'/%3E%3Cstop offset='1' stop-color='%2300e676' stop-opacity='0.045'/%3E%3C/linearGradient%3E%3ClinearGradient id='hb71d4b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e676' stop-opacity='0.22'/%3E%3Cstop offset='1' stop-color='%2300e676' stop-opacity='0.07'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,68.2 6,68.3 12,68.4 19,68.2 25,62.9 31,56.4 37,49.2 47,56.5 56,62.2 66,67.4 75,59.4 84,49.8 93,39.0 103,48.9 113,57.5 123,64.2 132,58.0 140,52.1 149,44.8 155,53.5 162,60.9 168,68.2 177,58.7 186,49.2 195,38.1 205,25.9 215,39.3 225,52.3 235,64.0 242,55.0 248,44.5 254,34.6 262,43.9 269,50.8 277,56.7 288,42.7 299,25.5 310,8.3 319,26.1 328,42.0 337,55.8 347,49.1 356,39.5 366,28.8 374,40.0 382,49.8 390,58.1 399,45.5 407,32.1 415,17.1 422,34.7 429,49.3 436,60.8 448,53.4 460,45.7 471,36.1 483,46.3 495,55.3 506,61.9 513,52.2 520,41.6 527,30.2 538,40.1 549,49.7 560,58.2 567,44.6 575,29.0 583,11.3 589,29.1 596,45.7 602,58.5 611,53.4 620,46.7 629,40.1 639,33.2 647,43.7 656,53.8 665,63.1 673,51.3 680,37.6 688,21.5 694,35.5 701,48.7 707,61.1 716,57.7 725,52.7 735,47.7 744,41.9 753,48.3 762,53.9 771,59.5 780,64.3 789,65.4 798,66.4 807,67.4 816,68.2 816,76.0 0,76.0Z' fill='url(%23fb71d4b)'/%3E%3Cpath d='M93,39.0 103,48.9 113,57.5 123,64.2 123,76.0 96,76.0Z M205,25.9 215,39.3 225,52.3 235,64.0 235,76.0 208,76.0Z M254,34.6 262,43.9 269,50.8 277,56.7 277,76.0 256,76.0Z M310,8.3 319,26.1 328,42.0 337,55.8 337,76.0 313,76.0Z M366,28.8 374,40.0 382,49.8 390,58.1 390,76.0 368,76.0Z M415,17.1 422,34.7 429,49.3 436,60.8 436,76.0 417,76.0Z M471,36.1 483,46.3 495,55.3 506,61.9 506,76.0 475,76.0Z M527,30.2 538,40.1 549,49.7 560,58.2 560,76.0 530,76.0Z M583,11.3 589,29.1 596,45.7 602,58.5 602,76.0 585,76.0Z M639,33.2 647,43.7 656,53.8 665,63.1 665,76.0 641,76.0Z M688,21.5 694,35.5 701,48.7 707,61.1 707,76.0 690,76.0Z' fill='url(%23sb71d4b)'/%3E%3Cpath d='M93,39.0 96,72.3 M205,25.9 208,71.0 M254,34.6 256,71.9 M310,8.3 313,69.2 M366,28.8 368,71.3 M415,17.1 417,70.1 M471,36.1 475,72.0 M527,30.2 530,71.4 M583,11.3 585,69.5 M639,33.2 641,71.7 M688,21.5 690,70.5' stroke='%2300e676' stroke-opacity='0.26' stroke-width='0.96'/%3E%3Cpath d='M0,68.2 6,68.3 12,68.4 19,68.2 25,62.9 31,56.4 37,49.2 47,56.5 56,62.2 66,67.4 75,59.4 84,49.8 93,39.0 103,48.9 113,57.5 123,64.2 132,58.0 140,52.1 149,44.8 155,53.5 162,60.9 168,68.2 177,58.7 186,49.2 195,38.1 205,25.9 215,39.3 225,52.3 235,64.0 242,55.0 248,44.5 254,34.6 262,43.9 269,50.8 277,56.7 288,42.7 299,25.5 310,8.3 319,26.1 328,42.0 337,55.8 347,49.1 356,39.5 366,28.8 374,40.0 382,49.8 390,58.1 399,45.5 407,32.1 415,17.1 422,34.7 429,49.3 436,60.8 448,53.4 460,45.7 471,36.1 483,46.3 495,55.3 506,61.9 513,52.2 520,41.6 527,30.2 538,40.1 549,49.7 560,58.2 567,44.6 575,29.0 583,11.3 589,29.1 596,45.7 602,58.5 611,53.4 620,46.7 629,40.1 639,33.2 647,43.7 656,53.8 665,63.1 673,51.3 680,37.6 688,21.5 694,35.5 701,48.7 707,61.1 716,57.7 725,52.7 735,47.7 744,41.9 753,48.3 762,53.9 771,59.5 780,64.3 789,65.4 798,66.4 807,67.4 816,68.2' stroke='%2300e676' stroke-opacity='0.5' stroke-width='1.20'/%3E%3Cpath d='M0,71.1 8,71.0 16,71.1 24,71.1 33,69.3 41,67.1 49,63.8 58,65.0 67,66.5 77,67.4 86,68.4 95,69.5 104,70.2 114,70.7 123,69.7 132,68.3 141,67.1 150,65.1 159,63.0 168,64.7 178,66.1 187,67.4 197,68.6 206,69.7 215,70.5 225,68.4 235,64.8 245,59.4 254,61.1 264,62.7 274,64.0 283,65.7 293,66.6 303,67.9 312,68.9 322,69.6 332,70.5 342,71.1 352,68.7 362,65.8 373,62.5 383,58.1 393,53.6 403,56.9 413,59.9 422,62.5 432,64.8 441,66.4 451,68.2 460,69.6 471,69.0 481,67.9 491,67.0 501,66.0 511,64.9 521,63.4 531,62.0 540,63.6 550,64.9 560,66.1 569,67.2 579,68.3 588,69.1 598,69.7 608,68.9 619,67.7 630,66.1 641,64.0 651,61.2 663,65.6 674,69.1 685,71.1 695,70.4 705,69.7 715,68.7 725,67.2 735,65.7 745,63.7 757,67.1 769,69.4 780,71.1 792,71.2 804,71.1 816,71.1 818,78.0 -2,78.0Z' fill='%231a1a1a'/%3E%3Cpath d='M0,71.1 8,71.0 16,71.1 24,71.1 33,69.3 41,67.1 49,63.8 58,65.0 67,66.5 77,67.4 86,68.4 95,69.5 104,70.2 114,70.7 123,69.7 132,68.3 141,67.1 150,65.1 159,63.0 168,64.7 178,66.1 187,67.4 197,68.6 206,69.7 215,70.5 225,68.4 235,64.8 245,59.4 254,61.1 264,62.7 274,64.0 283,65.7 293,66.6 303,67.9 312,68.9 322,69.6 332,70.5 342,71.1 352,68.7 362,65.8 373,62.5 383,58.1 393,53.6 403,56.9 413,59.9 422,62.5 432,64.8 441,66.4 451,68.2 460,69.6 471,69.0 481,67.9 491,67.0 501,66.0 511,64.9 521,63.4 531,62.0 540,63.6 550,64.9 560,66.1 569,67.2 579,68.3 588,69.1 598,69.7 608,68.9 619,67.7 630,66.1 641,64.0 651,61.2 663,65.6 674,69.1 685,71.1 695,70.4 705,69.7 715,68.7 725,67.2 735,65.7 745,63.7 757,67.1 769,69.4 780,71.1 792,71.2 804,71.1 816,71.1 818,78.0 -2,78.0Z' fill='url(%23hb71d4b)'/%3E%3Cpath d='M0,71.1 8,71.0 16,71.1 24,71.1 33,69.3 41,67.1 49,63.8 58,65.0 67,66.5 77,67.4 86,68.4 95,69.5 104,70.2 114,70.7 123,69.7 132,68.3 141,67.1 150,65.1 159,63.0 168,64.7 178,66.1 187,67.4 197,68.6 206,69.7 215,70.5 225,68.4 235,64.8 245,59.4 254,61.1 264,62.7 274,64.0 283,65.7 293,66.6 303,67.9 312,68.9 322,69.6 332,70.5 342,71.1 352,68.7 362,65.8 373,62.5 383,58.1 393,53.6 403,56.9 413,59.9 422,62.5 432,64.8 441,66.4 451,68.2 460,69.6 471,69.0 481,67.9 491,67.0 501,66.0 511,64.9 521,63.4 531,62.0 540,63.6 550,64.9 560,66.1 569,67.2 579,68.3 588,69.1 598,69.7 608,68.9 619,67.7 630,66.1 641,64.0 651,61.2 663,65.6 674,69.1 685,71.1 695,70.4 705,69.7 715,68.7 725,67.2 735,65.7 745,63.7 757,67.1 769,69.4 780,71.1 792,71.2 804,71.1 816,71.1' stroke='%2300e676' stroke-opacity='0.6' stroke-width='1.20'/%3E%3C/svg%3E"); }
+        .navbar { isolation: isolate; }
+        .navbar::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: var(--ridge-strength); background: var(--ridge-art) repeat-x right bottom / auto 100%; }
+        @media (forced-colors: active) { .navbar::before { display: none; } }
+
+        /* ---- Printable flyer ---- */
+        .flyer-overlay { display: none; position: fixed; inset: 0; z-index: 3500; flex-direction: column; background: rgba(10, 10, 10, 0.94); }
+        .flyer-overlay.open { display: flex; }
+        .flyer-bar { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1a1a1a; border-bottom: 1px solid #333; flex-shrink: 0; }
+        .flyer-bar-title { flex: 1; color: #fff; font-weight: 700; }
+        .flyer-bar .action-btn { width: auto; margin: 0; padding: 10px 16px; min-height: 44px; }
+        .flyer-close { min-width: 44px; min-height: 44px; background: none; border: none; color: #b5b5b5; font-size: 1.8rem; cursor: pointer; }
+        .flyer-close:hover { color: #fff; }
+        @media (max-width: 600px) { .flyer-bar-title { display: none; } .flyer-bar .action-btn { flex: 1; min-width: 0; padding: 10px 8px; } }
+        .flyer-stage { flex: 1; min-height: 0; overflow: auto; padding: 12px; display: flex; justify-content: center; align-items: flex-start; }
+        .flyer-fit { flex-shrink: 0; }
+        .flyer-sheet { width: 8.5in; height: 11in; box-sizing: border-box; background: #fff; color: #111; position: relative; overflow: hidden; transform-origin: top left; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .flyer-banner { position: relative; background: #1a1a1a; color: #fff; height: 2.05in; padding: 0.4in 0.65in 0; display: flex; align-items: flex-start; gap: 0.22in; box-sizing: border-box; isolation: isolate; }
+        .flyer-banner::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 76px; z-index: -1; background: var(--flyer-ridge-art) no-repeat left bottom / 100% 100%; }
+        .flyer-mark { width: 0.95in; height: 0.95in; flex-shrink: 0; }
+        .flyer-brand { padding-top: 0.06in; }
+        .flyer-name { font-size: 27pt; font-weight: 800; line-height: 1.05; letter-spacing: -0.01em; }
+        .flyer-tag { margin-top: 0.07in; font-size: 12.5pt; color: #00e676; font-weight: 600; }
+        .flyer-body { padding: 0.36in 0.65in 0 0.65in; }
+        .flyer-headline { margin: 0; font-size: 44pt; line-height: 1.0; font-weight: 900; letter-spacing: -0.02em; color: #111; }
+        .flyer-lead { margin: 0.16in 0 0.26in; font-size: 16pt; line-height: 1.35; color: #333; max-width: 6.6in; }
+        .flyer-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2in; }
+        .flyer-points li { display: flex; gap: 0.18in; align-items: flex-start; }
+        .flyer-num { flex: 0 0 0.42in; height: 0.42in; border-radius: 50%; background: #00703a; color: #fff; font-weight: 800; font-size: 17pt; display: flex; align-items: center; justify-content: center; }
+        .flyer-points strong { display: block; font-size: 15pt; color: #00703a; margin-bottom: 0.02in; }
+        .flyer-points p { margin: 0; font-size: 13.5pt; line-height: 1.38; color: #222; }
+        .flyer-scan { margin-top: 0.26in; display: flex; align-items: center; gap: 0.3in; padding: 0.2in 0.25in; border: 3px solid #111; border-radius: 0.16in; }
+        .flyer-qr { width: 2.65in; height: 2.65in; flex-shrink: 0; }
+        .flyer-qr svg { width: 100%; height: 100%; display: block; }
+        .flyer-scan-title { font-size: 28pt; font-weight: 900; line-height: 1.05; color: #111; text-wrap: balance; }
+        .flyer-url { margin-top: 0.1in; font-size: 18pt; font-weight: 700; color: #00703a; word-break: break-all; }
+        .flyer-scan-text p { margin: 0.1in 0 0; font-size: 12pt; color: #333; line-height: 1.35; }
+        .flyer-foot { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.14in 0.65in; font-size: 10.5pt; color: #444; border-top: 1px solid #ddd; background: #fff; }
+        @media print {
+            @page { size: letter; margin: 0; }
+            html, body { position: static !important; width: auto !important; max-width: none !important; height: auto !important; overflow: visible !important; background: #fff !important; }
+            body.flyer-open > *:not(#flyer-overlay) { display: none !important; }
+            body.flyer-open .flyer-overlay { position: static; display: block; background: none; }
+            body.flyer-open .flyer-bar { display: none; }
+            body.flyer-open .flyer-stage { display: block; overflow: visible; padding: 0; }
+            body.flyer-open .flyer-fit { width: 8.5in !important; height: 11in !important; }
+            body.flyer-open .flyer-sheet { transform: none !important; box-shadow: none; page-break-after: avoid; }
+            .flyer-sheet, .flyer-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body>
     <a class="skip-link" href="#map">Skip to the map</a>
 
-    <div id="toast-notification" class="toast-notification" role="alert" aria-live="assertive">
+    <div class="flyer-overlay" id="flyer-overlay" role="dialog" aria-modal="true" aria-label="Printable flyer">
+        <div class="flyer-bar">
+            <span class="flyer-bar-title">Printable flyer</span>
+            <button type="button" class="action-btn btn-primary" id="flyer-print" onclick="printFlyer()">🖨️ Print or save as PDF</button>
+            <button type="button" class="flyer-close" id="flyer-close" aria-label="Close flyer" onclick="closeFlyer()">&times;</button>
+        </div>
+        <div class="flyer-stage" id="flyer-stage"></div>
+    </div>
+    <div id="toast-notification" class="toast-notification" role="alert" aria-live="assertive" onclick="hideToast()">
         <div id="toast-title" class="toast-title">Notification</div>
         <div id="toast-message" class="toast-message">Message text...</div>
     </div>
@@ -726,12 +776,11 @@
                 <div class="chart-box" style="height: 170px;"><canvas id="stackedChart"></canvas></div>
             </section>
 
-            <details class="chart-card patterns" id="patterns-details">
-                <summary>Daily peak levels</summary>
-                <h5>Highest flagged dBA and dBC per day</h5>
+            <section class="chart-card" id="peaks-card">
+                <h4>Daily peak levels</h4>
+                <p class="chart-help">Highest flagged dBA and dBC each day. Days with no flagged events have no point.</p>
                 <div class="chart-box" style="height: 150px;"><canvas id="peakChart"></canvas></div>
-                <p class="chart-help" id="patterns-note"></p>
-            </details>
+            </section>
 
             <button class="action-btn btn-primary" id="btn-311" onclick="trigger311Report()">🚨 File Anonymous 311 Noise Report</button>
             <button class="action-btn btn-secondary" id="export-btn" onclick="exportStationCSV()">📥 Export Flagged Events (CSV)</button>
@@ -1019,6 +1068,7 @@
     // ========================================================================
     // How the sensors are described on the site and in reports. Change it here, in one place.
     const SENSOR_SPEC_TEXT = 'PCB Artists I2C sound level sensor, designed to IEC 61672 Class 2 guidelines, reporting A- and C-weighted levels';
+    const SENSOR_FOOTNOTE_SPEC = 'Sound level sensor designed to IEC 61672 Class 2 guidelines, reporting A- and C-weighted levels';
     // What the readings are for. Shown with the sensor description, in the PDF and in reports to the city.
     const SENSOR_PURPOSE_TEXT = "Community monitoring data for awareness, trends and advocacy. The readings are not legal measurements, and each unit's accuracy depends on its enclosure, mounting and windscreen.";
     const DEFAULT_SENSOR_DISTANCE_FT = 50;
@@ -1448,7 +1498,8 @@ Thank you,
             </div>
             <div class="info-card">
                 <h3>3. Spread the word</h3>
-                <p>A printable flyer with a QR code to the live map is coming soon.</p>
+                <p>A one-page flyer with a QR code that opens the live map. Print it, or save it as a PDF to share.</p>
+                <button type="button" class="action-btn btn-primary" id="open-flyer" onclick="openFlyer()">\uD83D\uDDA8\uFE0F Open printable flyer</button>
             </div>
             <div class="info-card">
                 <h3>4. Report what you hear</h3>
@@ -1482,8 +1533,7 @@ Thank you,
             </div>
             <div class="info-card">
                 <h3>Hardware</h3>
-                <p>${SENSOR_SPEC_TEXT}. Each monitor takes four A-weighted and C-weighted readings a second and typically sits about ${SENSOR_DISTANCE_FT} ft from the travel lane.</p>
-                <p class="fine">${SENSOR_PURPOSE_TEXT}</p>
+                <p>${SENSOR_FOOTNOTE_SPEC}. Each monitor takes four A-weighted and C-weighted readings a second and typically sits about ${SENSOR_DISTANCE_FT} ft from the travel lane.</p>
             </div>
             <div class="info-card">
                 <h3>Open data</h3>
@@ -1673,7 +1723,26 @@ Thank you,
         }
     }
 
+    // Keep --header-h equal to the real header height (it changes with the screen), so panels can stop just beneath it.
+    function syncHeaderHeight() {
+        const nav = document.querySelector ? document.querySelector('.navbar') : null;
+        if (nav && nav.offsetHeight && document.documentElement) document.documentElement.style.setProperty('--header-h', nav.offsetHeight + 'px');
+    }
+    syncHeaderHeight();
+    if (window.addEventListener) { window.addEventListener('resize', syncHeaderHeight); window.addEventListener('load', syncHeaderHeight); }
+
     function handleGlobalKeydown(e) {
+        if (flyerIsOpen()) {
+            if (e.key === 'Escape') { closeFlyer(); return; }
+            if (e.key === 'Tab') {
+                const ends = [document.getElementById('flyer-print'), document.getElementById('flyer-close')];
+                const at = ends.indexOf(document.activeElement);
+                const next = at === -1 ? 0 : (e.shiftKey ? (at + ends.length - 1) : (at + 1)) % ends.length;
+                if (e.preventDefault) e.preventDefault();
+                if (ends[next] && ends[next].focus) ends[next].focus();
+            }
+            return;
+        }
         if (e.key !== 'Escape') return;
         const links = document.getElementById('nav-links');
         if (links && links.classList.contains('open')) {
@@ -2557,6 +2626,7 @@ Thank you,
         lastHourly = model;
         renderHeatmap(model);
         renderDailyChart(model);
+        renderPeakChart(model);
     }
 
     // ---- Station baseline: what delta looks like in ordinary conditions ----
@@ -2915,7 +2985,7 @@ Thank you,
     }
     function renderFootnote() {
         const el = document.getElementById('sensor-footnote');
-        if (el) el.innerHTML = `<strong>About the sensors:</strong><br>${SENSOR_SPEC_TEXT}. Readings are taken four times a second, typically about ${SENSOR_DISTANCE_FT} ft from the center of the travel lane.<br>${SENSOR_PURPOSE_TEXT}`;
+        if (el) el.innerHTML = `<strong>About the sensors:</strong><br>${SENSOR_FOOTNOTE_SPEC}. Readings are taken four times a second, typically about ${SENSOR_DISTANCE_FT} ft from the center of the travel lane.`;
     }
 
 
@@ -3166,7 +3236,6 @@ Thank you,
         document.getElementById('hm-grid').innerHTML = ''; document.getElementById('hm-days').innerHTML = '';
         document.getElementById('audio-bars').innerHTML = '';
         document.getElementById('heatmap-status').hidden = true;
-        document.getElementById('patterns-details').open = false;
         document.getElementById('show-sirens').checked = showSirens;
         syncRangeButtons();
         syncHeatButtons();
@@ -3262,18 +3331,262 @@ Thank you,
             },
             plugins: [refLinesPlugin, demoMarkPlugin]
         });
-        document.getElementById('patterns-note').textContent = 'Days with no flagged events have no point.';
         describeCanvas('peakChart', 'Highest flagged dBA and dBC per day for the last 14 days. ' + model.dates.map((d, i) => model.peakDba[i] == null ? null : `${shortDate(d)}: ${model.peakDba[i]} dBA, ${model.peakDbc[i] == null ? 'no dBC' : model.peakDbc[i] + ' dBC'}`).filter(Boolean).join('; ') + '.');
     }
 
-    // Opening the collapsed section draws the peak-level chart
-    async function renderPatterns(station) {
-        const token = panelToken;
-        let model;
-        try { model = await getHourly(station); }
-        catch (err) { console.error('Could not load daily peaks:', err); return; }
-        if (token !== panelToken) return;
-        renderPeakChart(model);
+    // ========================================================================
+    // QR CODE ENCODER (byte mode, versions 1-10, error correction L/M/Q/H).
+    // Small and self-contained so the flyer's QR code always points at the site's current address.
+    // ========================================================================
+    const QR = (() => {
+        // Per version 1-10: [error-correction codewords per block, [blocks, data codewords per block], ...]
+        const EC = {
+            L: [[7, [1, 19]], [10, [1, 34]], [15, [1, 55]], [20, [1, 80]], [26, [1, 108]], [18, [2, 68]], [20, [2, 78]], [24, [2, 97]], [30, [2, 116]], [18, [2, 68], [2, 69]]],
+            M: [[10, [1, 16]], [16, [1, 28]], [26, [1, 44]], [18, [2, 32]], [24, [2, 43]], [16, [4, 27]], [18, [4, 31]], [22, [2, 38], [2, 39]], [22, [3, 36], [2, 37]], [26, [4, 43], [1, 44]]],
+            Q: [[13, [1, 13]], [22, [1, 22]], [18, [2, 17]], [26, [2, 24]], [18, [2, 15], [2, 16]], [24, [4, 19]], [18, [2, 14], [4, 15]], [22, [4, 18], [2, 19]], [20, [4, 16], [4, 17]], [24, [6, 19], [2, 20]]],
+            H: [[17, [1, 9]], [28, [1, 16]], [22, [2, 13]], [16, [4, 9]], [22, [2, 11], [2, 12]], [28, [4, 15]], [26, [4, 13], [1, 14]], [26, [4, 14], [2, 15]], [24, [4, 12], [4, 13]], [28, [6, 15], [2, 16]]]
+        };
+        const LEVEL_BITS = { L: 1, M: 0, Q: 3, H: 2 };
+        const ALIGN = [[], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50]];
+
+        const EXP = new Array(512), LOG = new Array(256);
+        for (let i = 0, x = 1; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 256) x ^= 0x11d; }
+        for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+        const gfMul = (a, b) => (a === 0 || b === 0 ? 0 : EXP[LOG[a] + LOG[b]]);
+        function rsRemainder(data, n) {
+            let gen = [1];
+            for (let i = 0; i < n; i++) {                       // multiply by (x - alpha^i)
+                const next = new Array(gen.length + 1).fill(0);
+                for (let j = 0; j < gen.length; j++) { next[j] ^= gen[j]; next[j + 1] ^= gfMul(gen[j], EXP[i]); }
+                gen = next;
+            }
+            const rem = new Array(n).fill(0);
+            for (const byte of data) {
+                const factor = byte ^ rem.shift(); rem.push(0);
+                for (let i = 0; i < n; i++) rem[i] ^= gfMul(gen[i + 1], factor);
+            }
+            return rem;
+        }
+        const dataCodewords = (v, ecc) => EC[ecc][v - 1].slice(1).reduce((sum, [blocks, per]) => sum + blocks * per, 0);
+
+        function codewords(text, ecc) {
+            const bytes = Array.from(new TextEncoder().encode(text));
+            let version = 0;
+            for (let v = 1; v <= 10 && !version; v++) if (4 + (v < 10 ? 8 : 16) + bytes.length * 8 <= dataCodewords(v, ecc) * 8) version = v;
+            if (!version) throw new Error('Too much text for the QR encoder');
+            const bits = [];
+            const push = (value, count) => { for (let i = count - 1; i >= 0; i--) bits.push((value >>> i) & 1); };
+            push(4, 4); push(bytes.length, version < 10 ? 8 : 16); bytes.forEach(b => push(b, 8));
+            const capacity = dataCodewords(version, ecc) * 8;
+            push(0, Math.min(4, capacity - bits.length)); while (bits.length % 8) bits.push(0);
+            const data = [];
+            for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+            for (let pad = 0xec; data.length < dataCodewords(version, ecc); pad ^= 0xec ^ 0x11) data.push(pad);
+            const [ecPer, ...groups] = EC[ecc][version - 1];
+            const blocks = []; let at = 0;
+            for (const [count, per] of groups) for (let b = 0; b < count; b++) { blocks.push(data.slice(at, at + per)); at += per; }
+            const ecBlocks = blocks.map(block => rsRemainder(block, ecPer));
+            const out = [];
+            for (let i = 0; i < Math.max(...blocks.map(b => b.length)); i++) blocks.forEach(b => { if (i < b.length) out.push(b[i]); });
+            for (let i = 0; i < ecPer; i++) ecBlocks.forEach(b => out.push(b[i]));
+            return { version, words: out };
+        }
+
+        function build(version, words, ecc, maskId) {
+            const size = 17 + 4 * version;
+            const m = Array.from({ length: size }, () => new Array(size).fill(false));
+            const fixed = Array.from({ length: size }, () => new Array(size).fill(false));
+            const set = (r, c, dark) => { m[r][c] = dark; fixed[r][c] = true; };
+            const finder = (r0, c0) => {
+                for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+                    const rr = r0 + r, cc = c0 + c; if (rr < 0 || cc < 0 || rr >= size || cc >= size) continue;
+                    const inside = r >= 0 && r <= 6 && c >= 0 && c <= 6;
+                    set(rr, cc, inside && (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)));
+                }
+            };
+            finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+            for (let i = 8; i < size - 8; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+            const pos = ALIGN[version - 1];
+            for (const r of pos) for (const c of pos) {
+                if ((r === 6 && c === 6) || (r === 6 && c === pos[pos.length - 1]) || (r === pos[pos.length - 1] && c === 6)) continue;
+                for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) set(r + dr, c + dc, Math.max(Math.abs(dr), Math.abs(dc)) !== 1);
+            }
+            for (let i = 0; i < 9; i++) { fixed[8][i] = fixed[i][8] = true; }
+            for (let i = 0; i < 8; i++) { fixed[8][size - 1 - i] = true; fixed[size - 1 - i][8] = true; }
+            set(size - 8, 8, true);                                                    // the always-dark module
+            if (version >= 7) {
+                let rem = version; for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1f25);
+                const info = (version << 12) | rem;
+                for (let i = 0; i < 18; i++) { const bit = ((info >> i) & 1) === 1, a = Math.floor(i / 3), b = (i % 3) + size - 11; set(a, b, bit); set(b, a, bit); }
+            }
+            // data bits, zig-zag from the bottom right
+            const bits = []; words.forEach(w => { for (let i = 7; i >= 0; i--) bits.push((w >> i) & 1); });
+            const maskFn = [(i, j) => (i + j) % 2 === 0, (i) => i % 2 === 0, (i, j) => j % 3 === 0, (i, j) => (i + j) % 3 === 0,
+                (i, j) => (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0, (i, j) => ((i * j) % 2) + ((i * j) % 3) === 0,
+                (i, j) => (((i * j) % 2) + ((i * j) % 3)) % 2 === 0, (i, j) => (((i + j) % 2) + ((i * j) % 3)) % 2 === 0][maskId];
+            let k = 0, up = true;
+            for (let col = size - 1; col > 0; col -= 2) {
+                if (col === 6) col--;
+                for (let step = 0; step < size; step++) {
+                    const r = up ? size - 1 - step : step;
+                    for (let c = col; c >= col - 1; c--) {
+                        if (fixed[r][c]) continue;
+                        const bit = k < bits.length ? bits[k++] === 1 : false;
+                        m[r][c] = bit !== maskFn(r, c);
+                    }
+                }
+                up = !up;
+            }
+            // format information (error-correction level + mask), BCH(15,5)
+            const data = (LEVEL_BITS[ecc] << 3) | maskId; let rem = data << 10;
+            for (let i = 4; i >= 0; i--) if ((rem >> (i + 10)) & 1) rem ^= 0x537 << i;
+            const format = ((data << 10) | rem) ^ 0x5412;
+            for (let i = 0; i < 15; i++) {
+                const bit = ((format >> i) & 1) === 1;
+                if (i < 6) m[i][8] = bit; else if (i < 8) m[i + 1][8] = bit; else m[size - 15 + i][8] = bit;
+                if (i < 8) m[8][size - i - 1] = bit; else if (i < 9) m[8][15 - i] = bit; else m[8][15 - i - 1] = bit;
+            }
+            m[size - 8][8] = true;
+            return m;
+        }
+
+        function penalty(m) {
+            const n = m.length; let score = 0;
+            const lineScore = get => {
+                for (let a = 0; a < n; a++) {
+                    let run = 1, line = '';
+                    for (let b = 0; b < n; b++) {
+                        line += get(a, b) ? '1' : '0';
+                        if (b > 0 && get(a, b) === get(a, b - 1)) { run++; if (run === 5) score += 3; else if (run > 5) score += 1; } else run = 1;
+                    }
+                    for (const pat of ['10111010000', '00001011101']) for (let i = line.indexOf(pat); i !== -1; i = line.indexOf(pat, i + 1)) score += 40;
+                }
+            };
+            lineScore((r, c) => m[r][c]); lineScore((r, c) => m[c][r]);
+            let dark = 0;
+            for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+                if (m[r][c]) dark++;
+                if (r < n - 1 && c < n - 1 && m[r][c] === m[r][c + 1] && m[r][c] === m[r + 1][c] && m[r][c] === m[r + 1][c + 1]) score += 3;
+            }
+            return score + 10 * Math.floor(Math.abs((dark * 100) / (n * n) - 50) / 5);
+        }
+
+        // The module matrix (true = dark) for `text`.
+        function matrix(text, ecc = 'M') {
+            const { version, words } = codewords(text, ecc);
+            let best = null, bestScore = Infinity;
+            for (let mask = 0; mask < 8; mask++) {
+                const m = build(version, words, ecc, mask), score = penalty(m);
+                if (score < bestScore) { best = m; bestScore = score; }
+            }
+            return best;
+        }
+        // An SVG with a 4-module quiet zone, black modules on white.
+        function svg(text, ecc = 'M', label = '') {
+            const m = matrix(text, ecc), n = m.length, q = 4; let d = '';
+            for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (m[r][c]) { let run = 1; while (c + run < n && m[r][c + run]) run++; d += `M${c + q},${r + q}h${run}v1h-${run}z`; c += run - 1; }
+            const total = n + 2 * q;
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges" role="img" aria-label="${label}"><rect width="${total}" height="${total}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+        }
+        return { matrix, svg };
+    })();
+
+    // ========================================================================
+    // PRINTABLE FLYER: a one-page preview with a QR code to this site. Edit the words in FLYER_TEXT.
+    // ========================================================================
+    const FLYER_W = 816, FLYER_H = 1056;   // US Letter at 96 px per inch
+    const FLYER_TEXT = {
+        headline: 'Loud vehicles. Measured.',
+        lead: 'Community sensors are recording vehicle noise on Denver streets around the clock, and the readings are public.',
+        points: [
+            ['The law', 'Colorado bans modifying an exhaust to be louder than the muffler it came with. Denver caps vehicles under 10,000 lb at 82 dB(A), measured at 25 ft.'],
+            ['The numbers', 'Our sensors log every event at 85 dBA or louder, plus bass-heavy sound that dBA understates. Watch them arrive live.'],
+            ['Your voice', 'Email your council member from the site, and report loud vehicles at fixdenvernoise.org. Every report adds to the record.']
+        ],
+        scanTitle: 'Scan to see the live map',
+        scanNote: 'Updated every few seconds from sensors on Denver streets.',
+        footer: 'Partner: Fix Denver Noise \u00B7 fixdenvernoise.org'
+    };
+    const FLYER_MARK = '<svg class="flyer-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="6" y="24.0" width="8" height="16" rx="4.0" fill="#00e676"/><rect x="17" y="18.0" width="8" height="28" rx="4.0" fill="#ffeb3b"/><rect x="28" y="10.0" width="8" height="44" rx="4.0" fill="#ff5252"/><rect x="39" y="18.0" width="8" height="28" rx="4.0" fill="#ffeb3b"/><rect x="50" y="24.0" width="8" height="16" rx="4.0" fill="#00e676"/></svg>';
+    const escapeHtml = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+    function flyerHtml(url = SITE_URL) {
+        const shownUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        const points = FLYER_TEXT.points.map(([title, text], i) =>
+            `<li><span class="flyer-num">${i + 1}</span><div><strong>${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></div></li>`).join('');
+        return `<div class="flyer-sheet" id="flyer-sheet">
+            <div class="flyer-banner">
+                ${FLYER_MARK}
+                <div class="flyer-brand"><div class="flyer-name">Mile High Noise Project</div><div class="flyer-tag">Community noise monitoring \u00B7 Denver, CO</div></div>
+                <div class="flyer-ridge" aria-hidden="true"></div>
+            </div>
+            <div class="flyer-body">
+                <h1 class="flyer-headline">${escapeHtml(FLYER_TEXT.headline)}</h1>
+                <p class="flyer-lead">${escapeHtml(FLYER_TEXT.lead)}</p>
+                <ol class="flyer-points">${points}</ol>
+                <div class="flyer-scan">
+                    <div class="flyer-qr">${QR.svg(url, 'M', 'QR code that opens the live noise map')}</div>
+                    <div class="flyer-scan-text">
+                        <div class="flyer-scan-title">${escapeHtml(FLYER_TEXT.scanTitle)}</div>
+                        <div class="flyer-url">${escapeHtml(shownUrl)}</div>
+                        <p>${escapeHtml(FLYER_TEXT.scanNote)}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flyer-foot">${escapeHtml(FLYER_TEXT.footer)}</div>
+        </div>`;
+    }
+
+    let flyerReturnFocus = null;
+    const flyerIsOpen = () => { const o = document.getElementById('flyer-overlay'); return !!o && o.classList.contains('open'); };
+    function fitFlyer() {
+        const stage = document.getElementById('flyer-stage'), fit = document.getElementById('flyer-fit'), sheet = document.getElementById('flyer-sheet');
+        if (!stage || !fit || !sheet) return;
+        const w = (stage.clientWidth || FLYER_W + 24) - 24, h = (stage.clientHeight || FLYER_H + 24) - 24;
+        const scale = Math.max(0.2, Math.min(1, w / FLYER_W, h / FLYER_H));
+        fit.style.width = Math.round(FLYER_W * scale) + 'px';
+        fit.style.height = Math.round(FLYER_H * scale) + 'px';
+        sheet.style.transform = `scale(${scale})`;
+    }
+    function openFlyer() {
+        const overlay = document.getElementById('flyer-overlay');
+        if (!overlay) return;
+        flyerReturnFocus = document.activeElement;
+        document.getElementById('flyer-stage').innerHTML = `<div class="flyer-fit" id="flyer-fit">${flyerHtml()}</div>`;
+        overlay.classList.add('open');
+        document.body.classList.add('flyer-open');
+        fitFlyer();
+        const print = document.getElementById('flyer-print');
+        if (print && print.focus) print.focus({ preventScroll: true });
+    }
+    function closeFlyer() {
+        const overlay = document.getElementById('flyer-overlay');
+        if (!overlay || !overlay.classList.contains('open')) return;
+        overlay.classList.remove('open');
+        document.body.classList.remove('flyer-open');
+        document.getElementById('flyer-stage').innerHTML = '';
+        const el = flyerReturnFocus;
+        flyerReturnFocus = null;
+        if (el && el.isConnected && el.focus) el.focus({ preventScroll: true });
+    }
+    function printFlyer() { window.print(); }
+    if (window.addEventListener) window.addEventListener('resize', fitFlyer);
+
+    // Confirmation and error messages: the #toast-notification element at the top of the page.
+    let toastTimer = null;
+    function showToast(title, message, isError = false) {
+        const el = document.getElementById('toast-notification');
+        if (!el) return;
+        document.getElementById('toast-title').textContent = title;
+        document.getElementById('toast-message').textContent = message;
+        el.classList.toggle('error', !!isError);
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(hideToast, isError ? 9000 : 6000);
+    }
+    function hideToast() {
+        const el = document.getElementById('toast-notification');
+        if (el) el.classList.remove('show');
     }
 
     async function trigger311Report() {
@@ -3419,9 +3732,6 @@ Thank you,
         showToast("PDF Downloaded", "Noise summary PDF generated.");
     }
 
-    document.getElementById('patterns-details').addEventListener('toggle', e => {
-        if (e.target.open && activeMarkerObj) renderPatterns(activeMarkerObj);
-    });
     document.getElementById('hm-grid').addEventListener('click', e => {
         const cell = e.target.closest ? e.target.closest('.hm-cell') : null;
         if (!cell || !lastHourly) return;
