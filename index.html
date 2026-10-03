@@ -351,6 +351,10 @@
         [hidden] { display: none !important; }
         .badge-muted { background-color: #5f6368; color: #e8eaed; }
         .badge-demo { border-style: dashed; border-color: #9aa0a6; }
+        .badge-host { background-color: #1a1a1a; color: #ffd54f; border: 2px dashed #ffd54f; }
+        .legend-host { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: #ccc; font-size: 0.78rem; }
+        .legend-host .host-swatch { display: inline-block; width: 22px; height: 12px; border: 2px dashed #ffd54f; border-radius: 4px; background: #1a1a1a; }
+        .host-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .lf-pip {
             position: absolute; top: -9px; right: -9px;
             background: #29b6f6; color: #00131f;
@@ -673,6 +677,7 @@
                 <label class="layer-toggle"><input type="checkbox" id="toggle-districts" checked onchange="toggleDistricts(this.checked)"> Council districts</label>
                 <div class="coverage-line" id="coverage-line" aria-live="polite"></div>
             </div>
+            <div class="legend-host" id="legend-host" hidden><span class="host-swatch" aria-hidden="true"></span>Host wanted: tap to help</div>
         </div>
 
         <div class="map-overlay-stats">
@@ -754,7 +759,7 @@
                 <h4>What the audio suggests</h4>
                 <p class="chart-help" id="audio-sentence"></p>
                 <div id="audio-bars"></div>
-                <p class="fine" style="margin-top:8px;">Each loud event is also run through an audio classifier on the monitor. It labels its best guess at the source from a few seconds of sound. Audio is analyzed on the monitor and never saved.</p>
+                <p class="fine" style="margin-top:8px;">Each loud event is also run through an audio classifier on the monitor. It labels its best guess at the source from a few seconds of sound. Cars, SUVs, pickups and unidentified vehicles are grouped together; &ldquo;heavy-duty&rdquo; means large trucks and buses. Audio is analyzed on the monitor and never saved.</p>
             </section>
 
             <section class="chart-card">
@@ -977,16 +982,20 @@
     // ========================================================================
     // AUDIO LABELS: what the monitor's audio classifier thinks made each flagged event
     // ========================================================================
+    // Cars, SUVs, light trucks and vehicles the model can't place are one group (they follow the same noise rules);
+    // motorcycles are kept apart; 'heavy-duty' means large trucks and buses.
     const AUDIO_GROUP_META = {
-        motorcycle: { label: 'Motorcycle',            color: '#ffb74d' },
-        car:        { label: 'Car',                   color: '#ef5350' },
-        truck_bus:  { label: 'Truck or bus',          color: '#9575cd' },
-        music:      { label: 'Music or bass',         color: '#f06292' },
-        rail_air:   { label: 'Train or aircraft',     color: '#4db6ac' },
-        vehicle:    { label: 'Vehicle, type unclear', color: '#90a4ae' },
-        unclear:    { label: 'Unclear',               color: '#616161' }
+        motorcycle: { label: 'Motorcycle',              color: '#ffb74d' },
+        car:        { label: 'Car, SUV or light truck', color: '#ef5350' },
+        truck_bus:  { label: 'Heavy-duty truck or bus', color: '#9575cd' },
+        music:      { label: 'Music or bass',           color: '#f06292' },
+        rail_air:   { label: 'Train or aircraft',       color: '#4db6ac' },
+        unclear:    { label: 'Unclear',                 color: '#616161' }
     };
-    const AUDIO_ORDER = ['motorcycle', 'car', 'truck_bus', 'music', 'rail_air', 'vehicle', 'unclear'];
+    const AUDIO_ORDER = ['motorcycle', 'car', 'truck_bus', 'music', 'rail_air', 'unclear'];
+    // Older events were labelled 'vehicle' (a vehicle of unclear type). They now count as cars.
+    const AUDIO_ALIAS = { vehicle: 'car' };
+    const audioGroupId = g => { const id = AUDIO_ALIAS[g] || g; return AUDIO_GROUP_META[id] ? id : null; };
     let audioColumnsRetryAt = 0; // if the database has no audio columns yet, don't ask for them until this time
 
     const pct = (n, d) => (d ? Math.round((100 * n) / d) : 0);
@@ -1007,10 +1016,10 @@
     // One sentence that states the shares, from counts of {group: n}.
     function audioShareSentence(counts, labelled, prefix) {
         const n = g => counts[g] || 0;
-        const cm = n('car') + n('motorcycle'), tb = n('truck_bus'), mu = n('music');
-        const rest = labelled - cm - tb - mu;
-        return `${prefix} ${pct(cm, labelled)}% sounded like a car or motorcycle, ${pct(tb, labelled)}% like a truck or bus, ` +
-            `${pct(mu, labelled)}% like music or bass, and ${pct(rest, labelled)}% like another or unclear source.`;
+        const car = n('car') + n('vehicle'), mc = n('motorcycle'), hv = n('truck_bus'), mu = n('music');   // an older 'vehicle' label counts as a car
+        const rest = labelled - car - mc - hv - mu;
+        return `${prefix} ${pct(car, labelled)}% sounded like a car, SUV or light truck, ${pct(mc, labelled)}% like a motorcycle, ` +
+            `${pct(hv, labelled)}% like a heavy-duty truck or bus, ${pct(mu, labelled)}% like music or bass, and ${pct(rest, labelled)}% like another or unclear source.`;
     }
 
     function renderAudio(data) {
@@ -1065,8 +1074,9 @@
         rows.forEach(r => {
             const a = Number(r.a_only) + Number(r.a_lf), l = Number(r.lf_only);
             if (r.audio_group === 'unlabeled') { unlabelled += a + l; return; }
-            all[r.audio_group] = (all[r.audio_group] || 0) + a + l;
-            lf[r.audio_group] = (lf[r.audio_group] || 0) + l;
+            const g = AUDIO_ALIAS[r.audio_group] || r.audio_group;
+            all[g] = (all[g] || 0) + a + l;
+            lf[g] = (lf[g] || 0) + l;
             labelled += a + l;
             lfLabelled += l;
         });
@@ -1387,7 +1397,7 @@ Thank you,
             </div>
             <div class="info-card">
                 <h3>Audio labels</h3>
-                <p>For each loud event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source: motorcycle, car, truck or bus, music or bass, train or aircraft, or a vehicle of unclear type. This helps separate a modified exhaust from a passing bus or a car stereo.</p>
+                <p>For each loud event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source: car, SUV or light truck; motorcycle; heavy-duty truck or bus; music or bass; or train or aircraft. Cars, SUVs, pickups and any vehicle the model can't place are grouped together, because they follow the same noise rules; motorcycles are kept apart. This helps separate a modified exhaust from a passing bus or a car stereo.</p>
                 <p class="fine">Audio is analyzed on the monitor and never saved; only the labels are kept.</p>
             </div>
             <div class="info-card">
@@ -1588,7 +1598,7 @@ Thank you,
     }
 
     function pageNight() {
-        const opts = METER_STATIONS.map(s => `<option value="${s.id}">${s.name}${s.state === 'demo' ? ' (demo)' : ''}</option>`).join('');
+        const opts = METER_STATIONS.filter(s => !s.recruiting).map(s => `<option value="${s.id}">${s.name}${s.state === 'demo' ? ' (demo)' : ''}</option>`).join('');
         return `
             <div class="panel-header">
                 <h2>\uD83C\uDF19 Night-Time Noise</h2>
@@ -1640,9 +1650,42 @@ Thank you,
             </div>`;
     }
 
+    // ---- hosting: the page behind a "Host wanted" marker, and the contact form pre-filled for a host ----
+    let hostDistrict = null;
+    function openHostPage(district) { hostDistrict = district || null; openInfoModal('host'); }
+    function startHostSignup(district) {
+        openInfoModal('contact');
+        const sel = document.getElementById('contact-district');
+        if (sel && district) sel.value = String(district);
+        const box = document.querySelector('.vol-cb[value="Host a monitor"]');
+        if (box) box.checked = true;
+        const name = document.getElementById('contact-name');
+        if (name && name.focus) name.focus();
+    }
+    function pageHost() {
+        const d = hostDistrict, rep = d ? districtRep(d) : '';
+        const where = d ? `District ${d}` : 'your part of Denver';
+        return `
+            <div class="panel-header">
+                <h2>\uD83D\uDCCD Host a monitor in ${where}</h2>
+                <p>${d ? `This spot on the map is a placeholder. No monitor is here yet, and we're looking for someone in District ${d}${rep ? ` (${rep}'s district)` : ''} to host one.` : "We're looking for hosts in every council district."}</p>
+            </div>
+            <div class="info-card">
+                <h3>What a host does</h3>
+                <p>A host gives a monitor a spot near a busy street, with power and Wi-Fi nearby. The monitor listens around the clock and posts its readings to the live map. Audio is analyzed on the monitor and never saved.</p>
+                <p>Tell us a little about your spot (a block-level location is plenty) and we'll get back to you.</p>
+                <div class="host-actions"><button type="button" class="action-btn btn-primary" onclick="startHostSignup(${d || 'null'})">Offer to host${d ? ' in District ' + d : ''}</button></div>
+            </div>
+            <div class="info-card">
+                <h3>Not a host?</h3>
+                <p>You can still help: tell your council member why vehicle noise matters${d ? ' in District ' + d : ''}, or share the map with a neighbor who lives on a busy street.</p>
+                <div class="host-actions"><button type="button" class="action-btn" onclick="openInfoModal('action')">Email your council member</button></div>
+            </div>`;
+    }
+
     const INFO_PAGES = {
         'dba-dbc': pageDbaDbc, gap: pageGap, myths: pageMyths, action: pageAction,
-        resources: pageResources, hotspots: pageHotspots, calculator: pageNight, contact: pageContact
+        resources: pageResources, hotspots: pageHotspots, calculator: pageNight, contact: pageContact, host: pageHost
     };
     const INFO_AFTER = {
         'dba-dbc': () => { fillFlaggedStats('live-stats-dba', 'dba-dbc'); fillAudioStats('live-audio-dba', 'dba-dbc'); },
@@ -1651,7 +1694,7 @@ Thank you,
         hotspots: () => { renderLeaderboard(); renderCoverage(); },
         calculator: () => {
             const sel = document.getElementById('night-station');
-            const firstLive = METER_STATIONS.find(s => s.state === 'live') || METER_STATIONS[0];
+            const firstLive = METER_STATIONS.find(s => s.state === 'live') || METER_STATIONS.find(s => !s.recruiting);
             if (sel && firstLive) sel.value = firstLive.id;
             renderNightNoise();
         }
@@ -1816,6 +1859,7 @@ Thank you,
         if (station.state === 'live') status = `${station.currentDba.toFixed(1)} dBA now, ${station.hourlyExceedances || 0} loud events in the last hour`;
         else if (station.state === 'stale') status = 'offline';
         else if (station.state === 'demo') status = 'not reporting yet';
+        else if (station.state === 'recruiting') return `${station.name}: host wanted${station.district ? ' in council district ' + station.district : ''}. Press Enter to learn how to host a monitor.`;
         else status = 'loading';
         return `${station.name}: ${status}. Press Enter for details.`;
     }
@@ -2030,7 +2074,7 @@ Thank you,
             const cls = classifyEvent(dba, dbc);
             if (!cls) continue;
             const g = rand();
-            const grp = g < 0.32 ? 'motorcycle' : g < 0.72 ? 'car' : g < 0.77 ? 'truck_bus' : g < 0.85 ? 'music' : g < 0.92 ? 'vehicle' : 'unclear';
+            const grp = g < 0.32 ? 'motorcycle' : g < 0.72 ? 'car' : g < 0.77 ? 'truck_bus' : g < 0.85 ? 'music' : 'unclear';
             events.push({ t: Math.round(since + rand() * range.ms), dba, dbc, delta: round1(dbc - dba), cls, siren: false, grp, top: null });
         }
         for (let i = 0; i < 2; i++) {
@@ -2082,7 +2126,7 @@ Thank you,
             const dbc = validDbc(r.dbc);
             const labels = r.audio_labels && typeof r.audio_labels === 'object' ? r.audio_labels : null;
             const ev = { t: new Date(r.timestamp).getTime(), dba, dbc, delta: dbc == null ? null : dbc - dba, cls: r.event_class, siren: !!r.is_siren,
-                         grp: AUDIO_GROUP_META[r.audio_group] ? r.audio_group : null, top: labels && Array.isArray(labels.top) ? labels.top : null };
+                         grp: audioGroupId(r.audio_group), top: labels && Array.isArray(labels.top) ? labels.top : null };
             (ev.siren ? sirens : events).push(ev);
         });
         return { stationId: station.id, rangeKey, since: sinceMs, until: Date.now(), events, sirens, truncated, demo: false };
@@ -2805,6 +2849,9 @@ Thank you,
         } else if (station.state === 'demo') {
             badgeClass = 'badge-muted badge-demo';
             text = 'demo';
+        } else if (station.state === 'recruiting') {
+            badgeClass = 'badge-host';
+            text = 'Host wanted';
         } else {
             badgeClass = 'badge-muted';
             text = '\u2026';
@@ -2817,8 +2864,8 @@ Thank you,
         return L.divIcon({
             className: 'custom-aqi-icon',
             html: `<div class="aqi-marker-badge ${badgeClass}" style="display:flex; align-items:center; justify-content:center; padding:3px 8px; position:relative;"><span>${text}</span>${pip}</div>`,
-            iconSize: [84, 26],
-            iconAnchor: [42, 13]
+            iconSize: station.state === 'recruiting' ? [100, 26] : [84, 26],
+            iconAnchor: station.state === 'recruiting' ? [50, 13] : [42, 13]
         });
     }
 
@@ -2893,6 +2940,8 @@ Thank you,
         districtLayers.forEach((layer, n) => layer.setStyle(districtStyle(n)));
         const el = document.getElementById('coverage-line');
         if (el) el.textContent = `Green: district with a monitor (${coveredDistricts().size} of ${COUNCIL_DISTRICT_COUNT})`;
+        const lh = document.getElementById('legend-host');
+        if (lh) lh.hidden = !METER_STATIONS.some(s => s.recruiting);
     }
     function toggleDistricts(on) {
         if (on) { districtGroup.addTo(map); districtLabelGroup.addTo(map); }
@@ -2931,7 +2980,8 @@ Thank you,
             // placeholders: only ever shown, labelled as demo, for a station that has not reported yet
             currentDba: Number(r.currentDba) || 70, currentDbc: Number(r.currentDbc) || 82,
             hourlyExceedances: Number(r.hourlyExceedances) || 0, todayExceedances: Number(r.todayExceedances) || 8, sirensCount: Number(r.sirensCount) || 0,
-            state: 'loading', lastSeen: null, hourlyLF: 0, todayLF: 0, iconHtml: ''
+            recruiting: r.status === 'recruiting',
+            state: r.status === 'recruiting' ? 'recruiting' : 'loading', lastSeen: null, hourlyLF: 0, todayLF: 0, iconHtml: ''
         };
     }
 
@@ -2973,6 +3023,11 @@ Thank you,
             if (!have) { METER_STATIONS.push(fresh); addStationMarker(fresh); continue; }
             const moved = have.lat !== fresh.lat || have.lng !== fresh.lng;
             Object.assign(have, { name: fresh.name, address: fresh.address, lat: fresh.lat, lng: fresh.lng, distanceFt: fresh.distanceFt });
+            if (have.recruiting !== fresh.recruiting) {          // a host signed up (or a spot went back to recruiting)
+                have.recruiting = fresh.recruiting;
+                have.state = fresh.recruiting ? 'recruiting' : 'loading';
+                if (activeMarkerObj && activeMarkerObj.id === have.id) closePanel(false);
+            }
             const marker = markersMap.get(have.id);
             if (moved && marker && marker.setLatLng) marker.setLatLng([have.lat, have.lng]);
         }
@@ -2984,10 +3039,22 @@ Thank you,
         if (activeMarkerObj) { renderStationDistrict(activeMarkerObj); renderStationDistance(activeMarkerObj); }
     }
 
+    // `status` ('active' or 'recruiting') comes from stations_host_wanted.sql. Until that is run the column does not exist and the
+    // request is refused, so ask without it rather than lose the whole list.
+    async function fetchStationRows() {
+        const cols = 'select=id,name,address,latitude,longitude,is_active,sensor_distance_ft';
+        try {
+            return await fetchSupabase('stations', `${cols},status&is_active=eq.true&order=id.asc`);
+        } catch (err) {
+            console.warn('Reading stations with the status column failed; trying without it.', err);
+            return fetchSupabase('stations', `${cols}&is_active=eq.true&order=id.asc`);
+        }
+    }
+
     async function loadStations() {
         let rows = null;
         try {
-            const data = await fetchSupabase('stations', 'select=id,name,address,latitude,longitude,is_active,sensor_distance_ft&is_active=eq.true&order=id.asc');
+            const data = await fetchStationRows();
             if (Array.isArray(data) && data.length) rows = data;
             else console.warn('The stations table returned no active stations. If you expected some, run stations_public.sql so the public key can read them. Using the built-in list.');
         } catch (err) {
@@ -3089,15 +3156,18 @@ Thank you,
         if (currentInfoTopic !== 'hotspots') return;
         refreshDistrictStyles();
         const covered = coveredDistricts();
-        summary.textContent = `${covered.size} of ${COUNCIL_DISTRICT_COUNT} council districts have a monitor. The goal is at least one in every district, placed where residents report the most problems.`;
+        summary.textContent = `${covered.size} of ${COUNCIL_DISTRICT_COUNT} council districts have a monitor. The goal is at least one in every district, placed where residents report the most problems.` +
+            (covered.size < COUNCIL_DISTRICT_COUNT ? ' Live in one of the others? Tap Host to offer a spot.' : '');
         list.innerHTML = COUNCIL_DISTRICTS.map(m => {
             const here = METER_STATIONS.filter(s => s.district === m.d);
             const reporting = here.filter(s => s.state === 'live' || s.state === 'stale');
             const planned = here.filter(s => s.state === 'demo');
+            const wanted = here.some(s => s.recruiting);
             const status = reporting.length ? reporting.map(s => `${s.name} (${s.state === 'live' ? 'live' : 'offline'})`).join(', ')
-                : planned.length ? `Planned: ${planned.map(s => s.name).join(', ')}` : 'No monitor yet';
+                : planned.length ? `Planned: ${planned.map(s => s.name).join(', ')}` : wanted ? 'Looking for a host' : 'No monitor yet';
+            const offer = reporting.length ? '' : `<button type="button" class="range-btn cov-btn" onclick="openHostPage(${m.d})" aria-label="Host a monitor in District ${m.d}">Host</button>`;
             return `<div class="lb-row"><div><strong>District ${m.d}</strong> \u00b7 ${m.name}<div class="fine">${status}</div></div>` +
-                `<button type="button" class="range-btn cov-btn" onclick="showDistrict(${m.d})" aria-label="Show District ${m.d} on the map">Show</button></div>`;
+                `<div class="host-actions" style="margin-top:0;">${offer}<button type="button" class="range-btn cov-btn" onclick="showDistrict(${m.d})" aria-label="Show District ${m.d} on the map">Show</button></div></div>`;
         }).join('');
     }
 
@@ -3135,6 +3205,7 @@ Thank you,
     // Latest reading decides the state: 'demo' (never reported), 'live', or 'stale' (went quiet).
     // Nothing is invented for a real station: on an error we simply keep what we had.
     async function refreshStation(station, wantCounts) {
+        if (station.recruiting) { station.state = 'recruiting'; return; }      // a spot waiting for a host has no readings to fetch
         try {
             const latest = await fetchSupabase('noise_logs',
                 `select=timestamp,dba,dbc&station_id=eq.${station.id}&order=timestamp.desc&limit=1`);
@@ -3254,6 +3325,7 @@ Thank you,
     }
 
     async function openDetailPanel(station) {
+        if (station.recruiting) { openHostPage(station.district); return; }
         dismissWelcome();
         closeInfoPanel(false);
         rememberFocus();
@@ -3724,7 +3796,7 @@ Thank you,
                     const dbc = validDbc(r.dbc);
                     const top = r.audio_labels && Array.isArray(r.audio_labels.top) && r.audio_labels.top[0] ? r.audio_labels.top[0] : null;
                     csv += `"${r.timestamp}",${dba},${dbc == null ? '' : dbc},${dbc == null ? '' : (dbc - dba).toFixed(2)},${r.event_class},${r.is_siren},` +
-                        `${r.audio_group || ''},${top ? q(top[0]) : ''},${top ? top[1] : ''}\n`;
+                        `${AUDIO_ALIAS[r.audio_group] || r.audio_group || ''},${top ? q(top[0]) : ''},${top ? top[1] : ''}\n`;
                 });
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
