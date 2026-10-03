@@ -675,7 +675,7 @@
         <div class="map-overlay-stats">
             <div>Active: <span class="stat-highlight" id="active-count">&ndash;</span></div>
             <div>Threshold: <span style="color:#ff9100; font-weight:bold;">85.0 dBA</span></div>
-            <div>&Delta; rule: <span style="color:#29b6f6; font-weight:bold;">&gt; 10 dB</span></div>
+            <div>&Delta; rule: <span style="color:#29b6f6; font-weight:bold;">&gt; 15 dB</span></div>
             <div>311 Reports: <span class="stat-highlight" id="total-311-count">0</span></div>
         </div>
         <section class="welcome-card" id="welcome-card" role="region" aria-label="Welcome" hidden>
@@ -1099,7 +1099,7 @@
     // The typical distance from sensor to the center of the travel lane. Replaced by the median of the
     // stations' own distances once they load; each station's panel shows its own.
     let SENSOR_DISTANCE_FT = DEFAULT_SENSOR_DISTANCE_FT;
-    const SITE_URL = 'https://byronboyle.github.io/';
+    const SITE_URL = 'https://milehighnoiseproject.org/';
     const CONTACT_FORM_VERSION = '2026-09';
 
     // Denver City Council, as listed on the city's contact page (checked September 2026).
@@ -1928,7 +1928,7 @@ Thank you,
     //   A_LF  dBA >= limit AND dBC - dBA > LF_DELTA_THRESHOLD
     //   LF    dBA < limit, dBC - dBA > LF_DELTA_THRESHOLD, and dBA or dBC >= LF_FLOOR_DB
     // ========================================================================
-    const LF_DELTA_THRESHOLD = 10.0;
+    const LF_DELTA_THRESHOLD = 15.0;
     const LF_FLOOR_DB = DECIBEL_THRESHOLD;
     const CLASS_META = {
         A: { label: `Very loud (${DECIBEL_THRESHOLD}+ dBA)`, desc: `Over ${DECIBEL_THRESHOLD} dBA`, color: '#ffb74d', text: '#ffcc80' },
