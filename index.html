@@ -536,7 +536,7 @@
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
             }
             .detail-panel.open { right: 0; transform: translateY(0); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s; }
-            .detail-panel.expanded { height: calc(100vh - var(--header-h, 66px)); height: calc(100dvh - var(--header-h, 66px)); }
+            .detail-panel.expanded { height: calc(100vh - var(--header-h, 92px)); height: calc(100dvh - var(--header-h, 92px)); }
             .sheet-bar { position: sticky; top: 0; z-index: 5; justify-content: space-between; background: #1a1a1a; margin: 0 -14px; padding: 0 6px 0 10px; min-height: 48px; }
             .sheet-handle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; background: none; border: none; color: #d0d0d0; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
             .sheet-grip { display: inline-block; width: 36px; height: 5px; border-radius: 3px; background: #666; }
@@ -554,14 +554,17 @@
             input, select, textarea { font-size: 16px !important; }
         }
 
-        /* ---- Ridgeline artwork (the "Mile High" theme): the file ridgeline.svg, kept in the same folder as this page, is stretched across the
-               whole header behind the text, and across the bottom of the flyer banner. To change the artwork, replace that file; browsers may
-               keep the old copy for up to ten minutes, so use a hard refresh. --ridge-strength fades it in the header (1 is as drawn, 0
-               removes it); it is 0.3 because the title and tagline need at least 4.5:1 contrast over it. ---- */
-        :root { --ridge-strength: 0.3; --ridge-art: url("ridgeline.svg"); }
-        .navbar { isolation: isolate; }
-        .navbar::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: var(--ridge-strength); background: var(--ridge-art) no-repeat center bottom / 100% 100%; }
-        @media (forced-colors: active) { .navbar::before { display: none; } }
+        /* ---- Ridgeline artwork (the "Mile High" theme): the file ridgeline.svg, kept in the same folder as this page, is stretched across a band
+               along the bottom of the header (below the title and buttons, like the banner on the flyer), and across the bottom of the flyer
+               banner. To change the artwork, replace that file; browsers may keep the old copy for up to ten minutes, so use a hard refresh.
+               --ridge-h is the band's height (it shrinks on smaller screens) and --ridge-strength fades it (1 is as drawn, 0 removes it). ---- */
+        :root { --ridge-strength: 1; --ridge-h: 52px; --ridge-art: url("ridgeline.svg"); }
+        @media (max-width: 1100px) { :root { --ridge-h: 40px; } }
+        @media (max-width: 600px) { :root { --ridge-h: 32px; } }
+        .navbar { isolation: isolate; padding-bottom: calc(var(--ridge-h) + 2px); }
+        .navbar::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: var(--ridge-h); z-index: -1; pointer-events: none; opacity: var(--ridge-strength); background: var(--ridge-art) no-repeat left bottom / 100% 100%; }
+        @media (forced-colors: active) { .navbar::before { display: none; } .navbar { padding-bottom: 8px; } }
+        @media (forced-colors: active) and (max-width: 600px) { .navbar { padding-bottom: 6px; } }
 
         /* ---- Printable flyer ---- */
         .flyer-overlay { display: none; position: fixed; inset: 0; z-index: 3500; flex-direction: column; background: rgba(10, 10, 10, 0.94); }
