@@ -20,17 +20,16 @@
     input { font: inherit; color: #fff; background: #2a2a2a; border: 1px solid #5a5a5a; border-radius: 8px; padding: 10px 12px; min-height: 48px; width: 12rem; }
     .clock { font-variant-numeric: tabular-nums; color: #c9c9c9; font-size: 0.95rem; padding-bottom: 12px; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
-    @media (min-width: 700px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 700px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     .kind { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; min-height: 88px; padding: 12px 14px; text-align: left;
             font: inherit; font-size: 1.15rem; font-weight: 800; color: #fff; background: #262626; border: 2px solid #4a4a4a; border-left-width: 10px; border-radius: 12px; cursor: pointer; touch-action: manipulation; }
     .kind:active { background: #343434; }
     .kind .n { font-size: 0.95rem; font-weight: 600; color: #cfcfcf; font-variant-numeric: tabular-nums; }
     .kind[data-kind="motorcycle"] { border-left-color: #ffb300; }
     .kind[data-kind="car"] { border-left-color: #ff5252; }
-    .kind[data-kind="suv_pickup"] { border-left-color: #ff8a65; }
-    .kind[data-kind="large_truck"] { border-left-color: #b388ff; }
-    .kind[data-kind="bus"] { border-left-color: #4dd0e1; }
+    .kind[data-kind="truck_bus"] { border-left-color: #b388ff; }
     .kind[data-kind="other"] { border-left-color: #b0bec5; }
+    .hint { margin: -2px 0 12px; color: #c9c9c9; font-size: 0.95rem; }
     button:focus-visible, input:focus-visible { outline: 3px solid #00e676; outline-offset: 2px; }
     #toast { min-height: 1.6em; margin: 0 0 10px; color: #00e676; font-weight: 700; }
     ol { margin: 0 0 8px; padding-left: 1.4em; color: #e4e4e4; font-variant-numeric: tabular-nums; }
@@ -44,7 +43,7 @@
 <body>
 <main>
     <h1>Spotter</h1>
-    <p class="lead">Sit or stand near a sensor and tap once for each loud vehicle as it passes. Your taps are matched to what the sensor heard, to check and improve its vehicle guesses. Thirty to sixty minutes at a busy time is plenty.</p>
+    <p class="lead">Sit or stand near a sensor and tap once for each loud vehicle as it passes. Your taps are matched to what the sensor heard, to check and improve its vehicle guesses (the same four groups the site uses). Thirty to sixty minutes at a busy time is plenty.</p>
 
     <div class="bar">
         <div>
@@ -56,12 +55,11 @@
 
     <div class="grid" role="group" aria-label="What just passed">
         <button type="button" class="kind" data-kind="motorcycle">Motorcycle <span class="n">0</span></button>
-        <button type="button" class="kind" data-kind="car">Car <span class="n">0</span></button>
-        <button type="button" class="kind" data-kind="suv_pickup">SUV or pickup <span class="n">0</span></button>
-        <button type="button" class="kind" data-kind="large_truck">Large truck <span class="n">0</span></button>
-        <button type="button" class="kind" data-kind="bus">Bus <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="car">Car, SUV or pickup <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="truck_bus">Heavy truck or bus <span class="n">0</span></button>
         <button type="button" class="kind" data-kind="other">Other loud sound <span class="n">0</span></button>
     </div>
+    <p class="hint">Cars, SUVs and pickups all count as &ldquo;Car&rdquo;. &ldquo;Heavy truck&rdquo; means semis, dump trucks, box trucks and buses.</p>
 
     <p id="toast" role="status" aria-live="polite"></p>
 
@@ -79,7 +77,8 @@
 </main>
 
 <script>
-    const KINDS = { motorcycle: 'Motorcycle', car: 'Car', suv_pickup: 'SUV or pickup', large_truck: 'Large truck', bus: 'Bus', other: 'Other loud sound' };
+    const KINDS = { motorcycle: 'Motorcycle', car: 'Car, SUV or pickup', truck_bus: 'Heavy truck or bus', other: 'Other loud sound' };
+    const LEGACY = { suv_pickup: 'car', large_truck: 'truck_bus', bus: 'truck_bus' };   // an earlier version had six buttons; saved taps are folded into the four
     const LOG_KEY = 'spotter-log-v1', STATION_KEY = 'spotter-station-v1', DEBOUNCE_MS = 350;
     let log = [];
 
@@ -88,7 +87,7 @@
     const clean = s => String(s).replace(/[",\r\n]+/g, ' ').trim();
 
     function load() {
-        try { const raw = JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); if (Array.isArray(raw)) log = raw.filter(e => e && Number.isFinite(e.t) && KINDS[e.kind]); } catch (e) { log = []; }
+        try { const raw = JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); if (Array.isArray(raw)) log = raw.map(e => (e && LEGACY[e.kind]) ? Object.assign({}, e, { kind: LEGACY[e.kind] }) : e).filter(e => e && Number.isFinite(e.t) && KINDS[e.kind]); } catch (e) { log = []; }
         try { const s = localStorage.getItem(STATION_KEY); if (s) el('station').value = s; } catch (e) { /* storage blocked: keep going in memory */ }
     }
     function save() { try { localStorage.setItem(LOG_KEY, JSON.stringify(log)); } catch (e) { /* storage blocked */ } }
