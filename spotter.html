@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1a1a">
+<title>Spotter | Mile High Noise Project</title>
+<style>
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: #1a1a1a; color: #f1f1f1; font: 18px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+           padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    main { max-width: 760px; margin: 0 auto; }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    h2 { margin: 0 0 8px; font-size: 1.1rem; }
+    .lead { margin: 0 0 14px; color: #c9c9c9; font-size: 1rem; }
+    .bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; margin-bottom: 14px; }
+    label { display: block; font-size: 0.95rem; color: #c9c9c9; margin-bottom: 4px; }
+    input { font: inherit; color: #fff; background: #2a2a2a; border: 1px solid #5a5a5a; border-radius: 8px; padding: 10px 12px; min-height: 48px; width: 12rem; }
+    .clock { font-variant-numeric: tabular-nums; color: #c9c9c9; font-size: 0.95rem; padding-bottom: 12px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+    @media (min-width: 700px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .kind { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; min-height: 88px; padding: 12px 14px; text-align: left;
+            font: inherit; font-size: 1.15rem; font-weight: 800; color: #fff; background: #262626; border: 2px solid #4a4a4a; border-left-width: 10px; border-radius: 12px; cursor: pointer; touch-action: manipulation; }
+    .kind:active { background: #343434; }
+    .kind .n { font-size: 0.95rem; font-weight: 600; color: #cfcfcf; font-variant-numeric: tabular-nums; }
+    .kind[data-kind="motorcycle"] { border-left-color: #ffb300; }
+    .kind[data-kind="car"] { border-left-color: #ff5252; }
+    .kind[data-kind="suv_pickup"] { border-left-color: #ff8a65; }
+    .kind[data-kind="large_truck"] { border-left-color: #b388ff; }
+    .kind[data-kind="bus"] { border-left-color: #4dd0e1; }
+    .kind[data-kind="other"] { border-left-color: #b0bec5; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #00e676; outline-offset: 2px; }
+    #toast { min-height: 1.6em; margin: 0 0 10px; color: #00e676; font-weight: 700; }
+    ol { margin: 0 0 8px; padding-left: 1.4em; color: #e4e4e4; font-variant-numeric: tabular-nums; }
+    .muted { color: #c9c9c9; font-size: 0.95rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .actions button { font: inherit; font-weight: 700; min-height: 48px; padding: 10px 16px; color: #fff; background: #333; border: 1px solid #6a6a6a; border-radius: 10px; cursor: pointer; touch-action: manipulation; }
+    .actions .primary { background: #00e676; color: #000; border-color: #00e676; }
+    textarea { width: 100%; min-height: 8rem; font: 0.85rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: #fff; background: #2a2a2a; border: 1px solid #5a5a5a; border-radius: 8px; padding: 10px; }
+</style>
+</head>
+<body>
+<main>
+    <h1>Spotter</h1>
+    <p class="lead">Sit or stand near a sensor and tap once for each loud vehicle as it passes. Your taps are matched to what the sensor heard, to check and improve its vehicle guesses. Thirty to sixty minutes at a busy time is plenty.</p>
+
+    <div class="bar">
+        <div>
+            <label for="station">Sensor you are next to</label>
+            <input id="station" type="text" value="meter-01" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="clock" id="clock" aria-label="Phone clock in Denver time"></div>
+    </div>
+
+    <div class="grid" role="group" aria-label="What just passed">
+        <button type="button" class="kind" data-kind="motorcycle">Motorcycle <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="car">Car <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="suv_pickup">SUV or pickup <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="large_truck">Large truck <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="bus">Bus <span class="n">0</span></button>
+        <button type="button" class="kind" data-kind="other">Other loud sound <span class="n">0</span></button>
+    </div>
+
+    <p id="toast" role="status" aria-live="polite"></p>
+
+    <h2>Latest taps <span class="muted" id="total"></span></h2>
+    <ol id="recent"></ol>
+    <p class="muted" id="awake"></p>
+
+    <div class="actions">
+        <button type="button" id="undo">Undo last</button>
+        <button type="button" id="copy" class="primary">Copy CSV</button>
+        <button type="button" id="download">Download CSV</button>
+        <button type="button" id="clear">Clear all</button>
+    </div>
+    <textarea id="csvbox" readonly hidden aria-label="CSV to copy by hand"></textarea>
+</main>
+
+<script>
+    const KINDS = { motorcycle: 'Motorcycle', car: 'Car', suv_pickup: 'SUV or pickup', large_truck: 'Large truck', bus: 'Bus', other: 'Other loud sound' };
+    const LOG_KEY = 'spotter-log-v1', STATION_KEY = 'spotter-station-v1', DEBOUNCE_MS = 350;
+    let log = [];
+
+    const el = id => document.getElementById(id);
+    const denver = ms => new Date(ms).toLocaleString('sv-SE', { timeZone: 'America/Denver' });          // 2026-10-03 13:22:14
+    const clean = s => String(s).replace(/[",\r\n]+/g, ' ').trim();
+
+    function load() {
+        try { const raw = JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); if (Array.isArray(raw)) log = raw.filter(e => e && Number.isFinite(e.t) && KINDS[e.kind]); } catch (e) { log = []; }
+        try { const s = localStorage.getItem(STATION_KEY); if (s) el('station').value = s; } catch (e) { /* storage blocked: keep going in memory */ }
+    }
+    function save() { try { localStorage.setItem(LOG_KEY, JSON.stringify(log)); } catch (e) { /* storage blocked */ } }
+
+    function toast(msg) { el('toast').textContent = msg; }
+
+    function render() {
+        const counts = {}; log.forEach(e => { counts[e.kind] = (counts[e.kind] || 0) + 1; });
+        document.querySelectorAll('.kind').forEach(b => { b.querySelector('.n').textContent = counts[b.dataset.kind] || 0; });
+        el('total').textContent = log.length ? `(${log.length} in all)` : '';
+        const recent = log.slice(-6).reverse();
+        el('recent').innerHTML = recent.length ? recent.map(e => `<li>${denver(e.t).slice(11)} ${KINDS[e.kind]}</li>`).join('') : '<li class="muted">Nothing yet.</li>';
+    }
+
+    function add(kind) {
+        const now = Date.now(), last = log[log.length - 1];
+        if (last && last.kind === kind && now - last.t < DEBOUNCE_MS) return;                    // a double tap is one vehicle
+        log.push({ t: now, kind, station: clean(el('station').value) || 'unknown' });
+        save(); render(); toast(`Logged ${KINDS[kind]} at ${denver(now).slice(11)}`);
+        if (navigator.vibrate) navigator.vibrate(25);
+        keepAwake();
+    }
+    function undo() {
+        const gone = log.pop(); save(); render();
+        toast(gone ? `Removed ${KINDS[gone.kind]} from ${denver(gone.t).slice(11)}` : 'Nothing to undo.');
+    }
+    function csv() {
+        const rows = log.map(e => `${new Date(e.t).toISOString()},${denver(e.t)},${clean(e.station)},${e.kind}`);
+        return ['time_utc,time_denver,station,kind'].concat(rows).join('\n') + '\n';
+    }
+    async function copy() {
+        const text = csv(), box = el('csvbox');
+        try { await navigator.clipboard.writeText(text); toast(`Copied ${log.length} rows. Paste them into a message or a file.`); box.hidden = true; }
+        catch (e) { box.hidden = false; box.value = text; box.focus(); box.select(); toast('Select the text below and copy it.'); }
+    }
+    function download() {
+        const blob = new Blob([csv()], { type: 'text/csv' }), a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `spotter_${new Date().toISOString().slice(0, 16).replace(/[-:]/g, '').replace('T', '_')}Z.csv`;
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        toast(`Downloaded ${log.length} rows.`);
+    }
+    function clearAll() {
+        if (!log.length || !confirm(`Delete all ${log.length} taps? Copy or download them first if you need them.`)) return;
+        log = []; save(); render(); toast('Cleared.');
+    }
+
+    let lock = null;
+    async function keepAwake() {
+        try {
+            if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => { lock = null; el('awake').textContent = 'The screen may turn off; tap anything to keep it on.'; }); }
+            el('awake').textContent = lock ? 'The screen will stay on while this page is open.' : 'Keep the screen on yourself; this phone did not allow the page to.';
+        } catch (e) { el('awake').textContent = 'Keep the screen on yourself; this phone did not allow the page to.'; }
+    }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && log.length) keepAwake(); });
+
+    function tickClock() { el('clock').textContent = `Phone clock (Denver): ${denver(Date.now()).slice(11)}`; }
+
+    document.querySelectorAll('.kind').forEach(b => b.addEventListener('click', () => add(b.dataset.kind)));
+    el('undo').addEventListener('click', undo); el('copy').addEventListener('click', copy);
+    el('download').addEventListener('click', download); el('clear').addEventListener('click', clearAll);
+    el('station').addEventListener('input', () => { try { localStorage.setItem(STATION_KEY, el('station').value); } catch (e) { /* storage blocked */ } });
+    load(); render(); tickClock(); setInterval(tickClock, 500);
+</script>
+</body>
+</html>
