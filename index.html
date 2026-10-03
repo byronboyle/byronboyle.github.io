@@ -3052,6 +3052,7 @@ Thank you,
     }
 
     async function loadStations() {
+        lastStationsAt = Date.now();
         let rows = null;
         try {
             const data = await fetchStationRows();
@@ -3274,6 +3275,62 @@ Thank you,
         }
     }
 
+    // ========================================================================
+    // HOW OFTEN THE PAGE ASKS FOR NEW DATA. Every request counts against the database host's monthly transfer allowance, so the
+    // page only works as hard as the person looking at it needs:
+    //   a station panel is open ......... a new reading every activeMs (5 s): someone is watching the live chart
+    //   only the map is showing ......... every mapMs (15 s): the badges barely change
+    //   no touch, click or key for 10 min  every idleMs (60 s)
+    //   the tab is in the background .... nothing at all; one refresh the moment the person comes back
+    // Event counts (the badge colours and the panel summary) change slowly, so they refresh every 3 minutes, or every minute for the
+    // station whose panel is open. The 311 total refreshes every 3 minutes and the station list every 10.
+    // ========================================================================
+    const POLL = { activeMs: 5000, mapMs: 15000, idleMs: 60000, idleAfterMs: 10 * 60000, countsMs: 180000, countsActiveMs: 60000, statsMs: 180000, minGapMs: 3000 };
+    let pollTimer = null, lastPollAt = 0, lastInteraction = Date.now(), lastStationsAt = 0;
+    const tabHidden = () => document.visibilityState === 'hidden';
+    const watchingStation = () => !!activeMarkerObj && isPanelOpen('detail-panel');
+
+    // Milliseconds until the next poll, or null when the tab is in the background and nothing should run.
+    function pollDelay(now = Date.now()) {
+        if (tabHidden()) return null;
+        if (now - lastInteraction > POLL.idleAfterMs) return POLL.idleMs;
+        return watchingStation() ? POLL.activeMs : POLL.mapMs;
+    }
+    function schedulePoll() {
+        clearTimeout(pollTimer); pollTimer = null;
+        const delay = pollDelay();
+        if (delay !== null) pollTimer = setTimeout(pollTick, delay);
+    }
+    async function pollTick() {
+        clearTimeout(pollTimer); pollTimer = null;        // whoever called this, there must never be a second timer waiting
+        lastPollAt = Date.now();
+        try {
+            if (stationsReady && lastPollAt - lastStationsAt > STATION_REFRESH_MS) await loadStations();
+            await fetchLiveMeters();
+        } catch (err) {
+            console.warn('Poll failed:', err);
+        } finally {
+            schedulePoll();
+        }
+    }
+    // Poll now (unless one just ran), then carry on at the right pace. Used when the person comes back to the tab, touches an idle
+    // page, or opens or closes a station panel.
+    function wakePoll() {
+        if (tabHidden()) { schedulePoll(); return; }
+        if (Date.now() - lastPollAt >= POLL.minGapMs) pollTick(); else schedulePoll();
+    }
+    function noteInteraction() {
+        const wasIdle = Date.now() - lastInteraction > POLL.idleAfterMs;
+        lastInteraction = Date.now();
+        if (wasIdle) wakePoll();
+    }
+    function startPolling() {
+        document.addEventListener('visibilitychange', () => { if (tabHidden()) schedulePoll(); else wakePoll(); });
+        if (window.addEventListener) window.addEventListener('pageshow', e => { if (e && e.persisted) wakePoll(); });
+        ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(ev => document.addEventListener(ev, noteInteraction, { passive: true, capture: true }));
+        loadStations().then(() => { lastPollAt = Date.now(); return fetchLiveMeters(); }).finally(schedulePoll);
+    }
+
     let polling = false;
     let lastStatsFetch = 0;
     async function fetchLiveMeters() {
@@ -3282,7 +3339,8 @@ Thank you,
         try {
             const now = Date.now();
             for (const station of METER_STATIONS.slice()) {
-                const wantCounts = !station.countsAt || now - station.countsAt > 60000;
+                const viewing = !!activeMarkerObj && activeMarkerObj.id === station.id && isPanelOpen('detail-panel');
+                const wantCounts = !station.countsAt || now - station.countsAt > (viewing ? POLL.countsActiveMs : POLL.countsMs);
                 await refreshStation(station, wantCounts);
 
                 refreshMarker(station);
@@ -3300,7 +3358,7 @@ Thank you,
             document.getElementById('active-count').innerText = METER_STATIONS.filter(s => s.state === 'live').length;
             refreshDistrictStyles();
 
-            if (now - lastStatsFetch > 60000) {
+            if (now - lastStatsFetch > POLL.statsMs) {
                 lastStatsFetch = now;
                 const statsData = await fetchSupabase('report_stats', 'select=total_submitted');
                 if (Array.isArray(statsData) && statsData.length > 0) {
@@ -3351,6 +3409,7 @@ Thank you,
         syncPanelState();
         centerOnStation(station);
         focusPanel('detail-panel');
+        schedulePoll();                                    // someone is watching now: the live pace
 
         destroyPanelCharts();
         lastEventsData = null; lastHourly = null; lastBaseline = null;
@@ -3367,6 +3426,8 @@ Thank you,
             if (token !== panelToken) return;
             renderLiveHeader(station);
             renderBanner(station);
+        } else {                                           // the map may have last polled up to 15 s (or, if idle, 60 s) ago
+            refreshStation(station, false).then(() => { refreshMarker(station); if (token === panelToken) { renderLiveHeader(station); renderBanner(station); } });   // keep the map badge in step with the panel
         }
         await Promise.all([loadLive(station, token), loadEvents(station, token), loadHeatmap(station, token), loadBaseline(station, token)]);
     }
@@ -3379,6 +3440,7 @@ Thank you,
         destroyPanelCharts();
         activeMarkerObj = null;
         if (restore && wasOpen) restoreFocus();
+        if (wasOpen) schedulePoll();                       // back to the map's slower pace
     }
 
     // 14-day charts, built from the same hourly data as the heatmap
@@ -3882,9 +3944,7 @@ Thank you,
     renderRuleText();
 
     renderFootnote();
-    setInterval(fetchLiveMeters, 5000);
-    setInterval(loadStations, STATION_REFRESH_MS);
-    loadStations().then(fetchLiveMeters);
+    startPolling();
     </script>
 </body>
 </html>
