@@ -1133,7 +1133,11 @@
         { d: 10, name: 'Chris Hinds',           email: 'district10@denvergov.org' },
         { d: 11, name: 'Stacie Gilmore',        email: 'stacie.gilmore@denvergov.org' }
     ];
-    const COUNCIL_EMAIL_SUBJECT = 'Request: a measurable enforcement standard for loud vehicle noise in Denver';
+    const COUNCIL_STORY_MAX = 240;   // keeps the whole link under the roughly 4,096 characters Gmail accepts, even with long names
+    // What the Mile High Noise Project has confirmed with city staff. If this changes, change it here (and keep the date in step with the Methods page).
+    const CITY_CONFIRMATION = 'The Mile High Noise Project has confirmed with city staff that the Denver Police Department enforces vehicle noise as an equipment violation (D.R.M.C. sec. 54-74 and C.R.S. 42-4-225) without decibel meters, and that the Department of Public Health & Environment (DDPHE), which oversees the Chapter 36 Noise Code, does not conduct routine traffic enforcement. That leaves no single office clearly accountable for measuring roadside vehicle noise and acting on it.';
+    // From the city's open 2024 311 file, analysed in denver_311_noise_2024.xlsx (Summary sheet).
+    const COUNCIL_311_FACT = 'The 2024 311 data has no vehicle-noise category, and 213 of the 323 police noise complaints filed through 311 were closed as "Out of Jurisdiction."';
 
     let currentInfoTopic = null;
 
@@ -1185,39 +1189,120 @@
     }
     function councilRecipient(district) {
         const m = COUNCIL_DISTRICTS.find(x => x.d === Number(district));
-        return m ? { to: m.email, label: `District ${m.d}, ${m.name}`, district: m.d }
-                 : { to: COUNCIL_FALLBACK_EMAIL, label: 'Denver City Council', district: null };
+        return m ? { to: m.email, label: `District ${m.d}, ${m.name}`, district: m.d, member: m.name }
+                 : { to: COUNCIL_FALLBACK_EMAIL, label: 'Denver City Council', district: null, member: null };
     }
-    function councilEmailBody(recipient) {
-        return `Dear ${recipient.district ? 'Council Member' : 'Council Members'},
 
-I live in Denver and I'm writing about loud vehicle noise and the gap in how it is regulated and enforced.
-
-- Denver's noise code (D.R.M.C. sec. 36-8, Table B) limits motor vehicles under 10,000 lb to 82 dB(A) measured at 25 ft. State law (C.R.S. 42-4-225) requires working mufflers but sets no decibel number.
-- Responsibility for vehicle noise appears to be divided between the Department of Public Health & Environment and the Denver Police Department, with no single office clearly responsible for measuring and acting on it.
-- Community sensors run by the Mile High Noise Project (${SITE_URL}) regularly record vehicle noise at or above 85 dBA about ${SENSOR_DISTANCE_FT} ft from the roadway. New York City's noise cameras issue violations at that same level (85 dB at 50 ft).
-- The city closed the Congress Park pickleball courts over about 70 dB measured at nearby homes. Vehicle noise at 85 dB is at least 30 times that sound energy, yet I'm not aware of any comparable enforcement.
-
-Please consider: (1) a clear standard that can be measured at the roadside, (2) one office responsible for vehicle noise complaints, and (3) a pilot of automated noise cameras like New York City's.
-
-Thank you,
-[Your name]
-[Your neighborhood${recipient.district ? ', District ' + recipient.district : ''}]`;
+    // ---- the council email: one builder, so the link, the preview and the copy button always say the same thing ----
+    const oneLine = (v, max = 120) => String(v || '').replace(/\s+/g, ' ').trim().slice(0, max);
+    function readCouncilFields() {
+        const get = id => { const e = document.getElementById(id); return e && typeof e.value === 'string' ? e.value : ''; };
+        const host = document.getElementById('council-host');
+        return { name: oneLine(get('council-name'), 80), hood: oneLine(get('council-hood'), 80), story: oneLine(get('council-story'), COUNCIL_STORY_MAX), host: !!(host && host.checked) };
     }
-    function councilMailtoUrl(district) {
-        const r = councilRecipient(district);
+    const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+    // Monitors that are really reporting (never demo stations or "host wanted" spots), in a district or everywhere.
+    function reportingStations(district) {
+        return METER_STATIONS.filter(s => !s.recruiting && (s.state === 'live' || s.state === 'stale') && (!district || s.district === Number(district)));
+    }
+    function emailStatsSentence(stats, district) {
+        const generic = `Community sensors run by the Mile High Noise Project (${SITE_URL}) record vehicle noise around the clock, and their readings are public.`;
+        if (!stats || (!stats.a && !stats.lf)) return generic;
+        const scope = stats.scopeDistrict ? `the Mile High Noise Project's monitor in District ${stats.scopeDistrict} (${SITE_URL})` : `the Mile High Noise Project's monitors (${SITE_URL})`;
+        const loud = stats.a ? `${plural(stats.a, 'event')} at or above ${DECIBEL_THRESHOLD} dBA${stats.peakA ? ` (loudest ${Math.round(stats.peakA)} dBA)` : ''}` : `no events at or above ${DECIBEL_THRESHOLD} dBA`;
+        return `In the last ${stats.days} days ${scope} logged ${loud} and ${plural(stats.lf, 'deep-rumble event')} where dBC ran more than ${LF_DELTA_THRESHOLD} dB above dBA.`;
+    }
+    function councilEmailParts(district, f = readCouncilFields(), stats = null) {
+        const r = councilRecipient(district), d = r.district;
+        const place = d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood ? `${f.hood}, Denver` : 'Denver');
+        const subject = `Addressing Denver's vehicle noise enforcement gap in ${d ? (f.hood ? `${f.hood} (District ${d})` : `District ${d}`) : (f.hood || 'Denver')}`;
+        const greeting = d ? `Dear Council Member ${r.member} (and At-Large Council Members),` : 'Dear Council Members,';
+        const noMonitor = d && !reportingStations(d).length;
+        const hostLine = noMonitor && f.host ? ` There is no monitor in District ${d} yet, and I'd welcome the chance to host one.` : '';
+        const body = `${greeting}
+
+I live in ${place} and I'm asking you to support a clear, measurable standard for vehicle noise and one city office accountable for enforcing it.${f.story ? ' ' + oneLine(f.story, COUNCIL_STORY_MAX) : ''}
+
+- The rule exists but is hard to enforce. Denver's noise code (D.R.M.C. sec. 36-8, Table B) limits motor vehicles under 10,000 lb to 82 dB(A) measured at 25 ft. State law (C.R.S. 42-4-225) requires a muffler in constant operation and prohibits modifying an exhaust system to make a vehicle louder than its original muffler.
+- No single office owns it. ${CITY_CONFIRMATION} ${COUNCIL_311_FACT}
+- Measurements show the problem. ${emailStatsSentence(stats, d)} The sensors sit about ${SENSOR_DISTANCE_FT} ft from the road; at the code's 25 ft reference distance, those readings would be roughly 3 to 6 dB higher. New York City's noise cameras activate at 85 dB(A) at 50 ft.${hostLine}
+- Unequal enforcement. In 2023 the city permanently closed the Congress Park pickleball courts after inspectors measured over 70 dB at nearby homes (the residential limit is 55 dB). 85 dB carries more than 30 times the sound energy of 70 dB, yet I'm not aware of comparable enforcement along our major corridors.
+
+Please consider: (1) a standard that can be measured at the roadside; (2) one department accountable for vehicle noise complaints and enforcement; (3) studying whether Denver could pilot automated noise cameras like New York City's, including any state authority it would need.
+
+Thank you for your leadership on this.
+
+Sincerely,
+${f.name || '[Your name]'}
+${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[Your neighborhood]')}`;
         const cc = [COUNCIL_AT_LARGE.email];
         if (r.to !== COUNCIL_FALLBACK_EMAIL) cc.push(COUNCIL_FALLBACK_EMAIL);
-        return `mailto:${r.to}?cc=${cc.join(',')}&subject=${encodeURIComponent(COUNCIL_EMAIL_SUBJECT)}&body=${encodeURIComponent(councilEmailBody(r))}`;
+        const mailto = `mailto:${r.to}?cc=${cc.join(',')}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const text = `To: ${r.to}\nCc: ${cc.join(', ')}\nSubject: ${subject}\n\n${body}`;
+        return { recipient: r, to: r.to, cc, subject, body, mailto, text };
     }
-    function updateCouncilEmail() {
+    function councilMailtoUrl(district, fields, stats) { return councilEmailParts(district, fields, stats === undefined ? cachedEmailStats(district) : stats).mailto; }
+    function councilEmailBody(recipient, fields, stats) { return councilEmailParts(recipient.district, fields, stats === undefined ? cachedEmailStats(recipient.district) : stats).body; }
+
+    // ---- the live numbers in the email: this district's monitor if it has one, otherwise all the monitors ----
+    const emailStatsCache = new Map(), emailStatsPending = new Set();
+    const emailStatsKey = district => String(district || 'city');
+    function cachedEmailStats(district) {
+        const hit = emailStatsCache.get(emailStatsKey(district));
+        return hit && Date.now() - hit.at < 600000 ? hit.value : null;
+    }
+    async function loadEmailStats(district) {
+        await Promise.all(METER_STATIONS.map(ensureStationState));
+        const local = district ? reportingStations(district) : [];
+        const used = local.length ? local : reportingStations(null);
+        if (!used.length) return null;
+        const since = new Date(Date.now() - 30 * 864e5).toISOString();
+        const base = `is_siren=eq.false&timestamp=gte.${since}&station_id=in.(${used.map(s => encodeURIComponent(s.id)).join(',')})`;
+        const [a, lf, top] = await Promise.all([
+            countSupabase('noise_logs', `${base}&event_class=in.(A,A_LF)`),
+            countSupabase('noise_logs', `${base}&event_class=eq.LF`),
+            fetchSupabase('noise_logs', `select=dba&${base}&event_class=in.(A,A_LF)&order=dba.desc&limit=1`)
+        ]);
+        return { days: 30, a, lf, peakA: Array.isArray(top) && top[0] ? Number(top[0].dba) : null, scopeDistrict: local.length ? Number(district) : null };
+    }
+    async function ensureEmailStats(district) {
+        const key = emailStatsKey(district);
+        if (cachedEmailStats(district) !== null || emailStatsPending.has(key)) return;
+        emailStatsPending.add(key);
+        try {
+            const value = await loadEmailStats(district);
+            emailStatsCache.set(key, { at: Date.now(), value: value || { days: 30, a: 0, lf: 0, peakA: null, scopeDistrict: null } });
+        } catch (err) {
+            console.warn('Could not load the numbers for the council email; using the general sentence.', err);
+        } finally { emailStatsPending.delete(key); }
+        const sel = document.getElementById('council-district');
+        if (sel && emailStatsKey(sel.value) === key) updateCouncilEmail(true);
+    }
+    function updateCouncilEmail(fromStats) {
         const sel = document.getElementById('council-district');
         const link = document.getElementById('council-email-link');
         const to = document.getElementById('council-email-to');
         if (!sel || !link || !to) return;
-        const r = councilRecipient(sel.value);
-        link.href = councilMailtoUrl(sel.value);
-        to.textContent = `To: ${r.label} <${r.to}>. Copied: ${COUNCIL_AT_LARGE.name} (At-Large)` + (r.district ? ' and the council office.' : '.');
+        const district = sel.value, fields = readCouncilFields(), parts = councilEmailParts(district, fields, cachedEmailStats(district));
+        link.href = parts.mailto;
+        to.textContent = `To: ${parts.recipient.label} <${parts.to}>. Copied: ${COUNCIL_AT_LARGE.name} (At-Large)` + (parts.recipient.district ? ' and the council office.' : '.');
+        const pre = document.getElementById('council-preview'); if (pre) pre.textContent = parts.text;
+        const wrap = document.getElementById('council-host-wrap');
+        if (wrap) wrap.style.display = district && !reportingStations(district).length ? 'block' : 'none';
+        if (!fromStats) ensureEmailStats(district);
+    }
+    async function copyCouncilEmail() {
+        const sel = document.getElementById('council-district'), status = document.getElementById('council-copy-status');
+        const parts = councilEmailParts(sel ? sel.value : '', readCouncilFields(), cachedEmailStats(sel ? sel.value : ''));
+        try {
+            await navigator.clipboard.writeText(parts.text);
+            if (status) status.textContent = `Copied. Paste it into a new email: the To, Cc and Subject lines are at the top.`;
+        } catch (err) {
+            const det = document.querySelector('details.council-preview'), pre = document.getElementById('council-preview');
+            if (det) det.open = true;
+            if (pre && window.getSelection) { const range = document.createRange(); range.selectNodeContents(pre); const sel2 = window.getSelection(); sel2.removeAllRanges(); sel2.addRange(range); }
+            if (status) status.textContent = 'Your browser blocked copying. The email is selected in the preview below: copy it with Ctrl+C (Command+C on a Mac).';
+        }
     }
 
     // ---- live numbers from the database ----
@@ -1522,11 +1607,23 @@ Thank you,
             <div class="info-card">
                 <h3>1. Email your City Council member <span class="start-badge">Start here</span></h3>
                 <p>Choose your district and we'll open a pre-written email to your council member. You can edit it before you send it. Not sure of your district? <a href="${COUNCIL_LOOKUP_URL}" target="_blank" rel="noopener" style="color:#29b6f6;">Look it up by address</a>.</p>
-                <select id="council-district" onchange="updateCouncilEmail()" style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; margin:6px 0;">${councilOptionsHtml()}</select>
+                <select id="council-district" onchange="updateCouncilEmail()" aria-label="Your council district" style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; margin:6px 0; min-height:44px; box-sizing:border-box;">${councilOptionsHtml()}</select>
                 <button type="button" class="action-btn btn-secondary" onclick="findMyDistrict()">\uD83D\uDCCD Use my location to find my district</button>
                 <p class="fine" id="district-locate-status" aria-live="polite">Your location is only used in your browser to pick the district. It isn't sent or stored.</p>
+                <label class="fine" for="council-name" style="display:block;">Your name (goes in the signature)</label>
+                <input id="council-name" type="text" autocomplete="name" oninput="updateCouncilEmail()" style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; margin:2px 0 8px; font:inherit; min-height:44px; box-sizing:border-box;">
+                <label class="fine" for="council-hood" style="display:block;">Your neighborhood (optional)</label>
+                <input id="council-hood" type="text" autocomplete="off" oninput="updateCouncilEmail()" style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; margin:2px 0 8px; font:inherit; min-height:44px; box-sizing:border-box;">
+                <label class="fine" for="council-story" style="display:block;">One sentence about how the noise affects you (optional, the most persuasive line)</label>
+                <textarea id="council-story" rows="2" maxlength="${COUNCIL_STORY_MAX}" oninput="updateCouncilEmail()" style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; margin:2px 0 8px; font:inherit; min-height:44px; box-sizing:border-box;"></textarea>
+                <label class="fine" id="council-host-wrap" for="council-host" style="display:none; margin:0 0 8px;"><input type="checkbox" id="council-host" onchange="updateCouncilEmail()"> There's no monitor in my district yet. I'd be willing to host one.</label>
                 <p class="fine" id="council-email-to"></p>
-                <a id="council-email-link" class="action-btn btn-primary" href="#" style="display:block; text-align:center; text-decoration:none;">\u2709\uFE0F Open email</a>
+                <div class="host-actions">
+                    <a id="council-email-link" class="action-btn btn-primary" href="#" style="flex:1 1 12rem; text-align:center; text-decoration:none; min-height:44px; display:flex; align-items:center; justify-content:center; box-sizing:border-box;">\u2709\uFE0F Open in my email app</a>
+                    <button type="button" class="action-btn btn-secondary" id="council-copy" style="flex:1 1 12rem; min-height:44px;" onclick="copyCouncilEmail()">\uD83D\uDCCB Copy the email</button>
+                </div>
+                <p class="fine" id="council-copy-status" aria-live="polite">The email is long. If your email app opens it cut off, or doesn't open, use Copy the email and paste it into a new message.</p>
+                <details class="council-preview"><summary>Preview the email</summary><pre id="council-preview" style="white-space:pre-wrap; word-break:break-word; font:inherit; font-size:0.85rem; color:#ddd; margin:8px 0 0;"></pre></details>
                 <p class="fine">Council contact details checked September 2026. The At-Large seat B is vacant until the November 3 special election.</p>
             </div>
         <div class="info-card">
