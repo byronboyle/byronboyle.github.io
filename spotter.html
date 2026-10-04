@@ -14,14 +14,15 @@
     main { max-width: 760px; margin: 0 auto; }
     h1 { margin: 0 0 4px; font-size: 1.6rem; }
     h2 { margin: 0 0 8px; font-size: 1.1rem; }
-    .lead { margin: 0 0 14px; color: #c9c9c9; font-size: 1rem; }
+    .lead { margin: 0 0 10px; color: #c9c9c9; font-size: 1rem; }
+    details.how { margin: 0 0 12px; } details.how summary { cursor: pointer; color: #00e676; font-weight: 700; min-height: 32px; padding: 4px 0; }
     .bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; margin-bottom: 14px; }
     label { display: block; font-size: 0.95rem; color: #c9c9c9; margin-bottom: 4px; }
     input { font: inherit; color: #fff; background: #2a2a2a; border: 1px solid #5a5a5a; border-radius: 8px; padding: 10px 12px; min-height: 48px; width: 12rem; }
     .clock { font-variant-numeric: tabular-nums; color: #c9c9c9; font-size: 0.95rem; padding-bottom: 12px; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
     @media (min-width: 700px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-    .kind { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; min-height: 88px; padding: 12px 14px; text-align: left;
+    .kind { line-height: 1.2; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; min-height: 88px; padding: 12px 14px; text-align: left;
             font: inherit; font-size: 1.15rem; font-weight: 800; color: #fff; background: #262626; border: 2px solid #4a4a4a; border-left-width: 10px; border-radius: 12px; cursor: pointer; touch-action: manipulation; }
     .kind:active { background: #343434; }
     .kind .n { font-size: 0.95rem; font-weight: 600; color: #cfcfcf; font-variant-numeric: tabular-nums; }
@@ -37,21 +38,57 @@
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
     .actions button { font: inherit; font-weight: 700; min-height: 48px; padding: 10px 16px; color: #fff; background: #333; border: 1px solid #6a6a6a; border-radius: 10px; cursor: pointer; touch-action: manipulation; }
     .actions .primary { background: #00e676; color: #000; border-color: #00e676; }
+    .live { background: #222; border: 2px solid #4a4a4a; border-radius: 12px; padding: 10px 14px 12px; margin: 0 0 14px; }
+    .live.A { border-color: #ffb74d; } .live.A_LF { border-color: #ef5350; } .live.LF { border-color: #29b6f6; }
+    .live-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 0.95rem; color: #c9c9c9; }
+    .live-head .age.warn { color: #ffcc80; } .live-head .age.bad { color: #ff8a80; }
+    .nums { display: flex; gap: 8px 22px; margin: 4px 0 2px; }
+    .num { display: flex; flex-direction: column; min-width: 0; }
+    .num .n { font-size: 2.1rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .num .u { font-size: 0.95rem; color: #c9c9c9; }
+    .verdict { font-weight: 700; font-size: 1.02rem; min-height: 1.4em; color: #c9c9c9; }
+    .verdict.A { color: #ffcc80; } .verdict.A_LF { color: #ff8a80; } .verdict.LF { color: #81d4fa; }
+    .rule { font-size: 0.95rem; color: #c9c9c9; margin-top: 2px; }
+    .note { font-size: 0.95rem; color: #ffcc80; margin: 4px 0 0; }
+    .tap-ev { color: #c9c9c9; } .tap-ev.hit { color: #a5d6a7; font-weight: 700; } .tap-ev.A { color: #ffcc80; } .tap-ev.A_LF { color: #ff8a80; } .tap-ev.LF { color: #81d4fa; }
+    #events li.fresh { animation: flash 2.5s ease-out; }
+    @keyframes flash { from { background: #3a3a1a; } to { background: transparent; } }
+    @media (prefers-reduced-motion: reduce) { #events li.fresh { animation: none; font-weight: 700; } }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     textarea { width: 100%; min-height: 8rem; font: 0.85rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: #fff; background: #2a2a2a; border: 1px solid #5a5a5a; border-radius: 8px; padding: 10px; }
+    /* small screens: these come last on purpose, so they override the rules above */
+    @media (max-width: 360px) { .kind { font-size: 0.95rem; gap: 0; padding: 8px 8px; border-left-width: 7px; min-height: 72px; } .live { padding: 8px 12px 10px; } .live-head { gap: 2px 8px; } }
+    @media (max-height: 700px) { .kind { min-height: 72px; padding: 8px 12px; } .num .n { font-size: 1.8rem; } .bar { margin-bottom: 8px; } .live { margin-bottom: 10px; } }
 </style>
 </head>
 <body>
 <main>
     <h1>Spotter</h1>
-    <p class="lead">Sit or stand near a sensor and tap once for each loud vehicle as it passes. Your taps are matched to what the sensor heard, to check and improve its vehicle guesses (the same four groups the site uses). Thirty to sixty minutes at a busy time is plenty.</p>
+    <details class="how"><summary>How this works</summary>
+        <p class="lead">Sit or stand near a sensor and tap once for each loud vehicle as it passes. Your taps are matched to what the sensor heard, to check and improve its vehicle guesses (the same four groups the site uses). Thirty to sixty minutes at a busy time is plenty.</p>
+        <p class="lead">The card shows the sensor's newest reading (it updates about every 5 seconds while it is quiet). Readings pause while a loud sound is going on, and that sound&rsquo;s event appears in the list at the bottom when it ends, so you can check there which of your taps the sensor counted. An event is 85 or more dBA, or dBC more than 15 dB above dBA with 85 or more on either.</p>
+    </details>
 
     <div class="bar">
         <div>
             <label for="station">Sensor you are next to</label>
-            <input id="station" type="text" value="meter-01" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <input id="station" type="text" value="meter-01" list="stations" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <datalist id="stations"></datalist>
         </div>
         <div class="clock" id="clock" aria-label="Phone clock in Denver time"></div>
     </div>
+
+    <section class="live" id="live" aria-label="Live reading from the sensor">
+        <div class="live-head"><span>Sensor <strong id="live-station">meter-01</strong></span><span class="age" id="live-age">connecting&hellip;</span></div>
+        <div class="nums">
+            <div class="num"><span class="n" id="live-dba">&ndash;</span><span class="u">dBA</span></div>
+            <div class="num"><span class="n" id="live-dbc">&ndash;</span><span class="u">dBC</span></div>
+            <div class="num"><span class="n" id="live-delta">&ndash;</span><span class="u">dBC &minus; dBA</span></div>
+        </div>
+        <div class="verdict" id="live-verdict"></div>
+        <div class="rule" id="live-rule"></div>
+        <p class="note" id="live-note" hidden></p>
+    </section>
 
     <div class="grid" role="group" aria-label="What just passed">
         <button type="button" class="kind" data-kind="motorcycle">Motorcycle <span class="n">0</span></button>
@@ -65,6 +102,12 @@
 
     <h2>Latest taps <span class="muted" id="total"></span></h2>
     <ol id="recent"></ol>
+    <p class="muted" id="matchsum"></p>
+
+    <h2>Sensor events <span class="muted">(what the monitor logged)</span></h2>
+    <ol id="events"><li class="muted">Waiting for the sensor feed.</li></ol>
+    <p class="muted">A tap is matched to a sensor event within 4 seconds either side. Events appear a few seconds after a sound ends (up to about 35 s for a long one), so wait a minute after your last tap before you copy the CSV.</p>
+    <div class="sr-only" id="announce" aria-live="polite"></div>
     <p class="muted" id="awake"></p>
 
     <div class="actions">
@@ -82,6 +125,22 @@
     const LOG_KEY = 'spotter-log-v1', STATION_KEY = 'spotter-station-v1', DEBOUNCE_MS = 350;
     let log = [];
 
+    // ---- the live feed from the sensor: the same public, read-only data the website shows ----
+    const SUPABASE_URL = 'https://canlnrismlirrnfqpqmv.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p';              // the public key the website itself uses
+    const RULE = { limitDba: 85, deltaDb: 15, floorDb: 85 };                            // keep in step with the monitor (main.py) and the website
+    const FEED = { pollMs: 4000, staleAfterS: 12, offlineAfterS: 90, waitAfterTapS: 45, matchBeforeS: 4, matchAfterS: 4, overlapS: 60, lookbackH: 24, firstLoadMin: 60, shown: 6 };
+    const CLASS_LABEL = { A: 'Very loud (85+ dBA)', A_LF: 'Very loud + deep rumble', LF: 'Deep rumble only' };
+    const CLASS_SHORT = { A: 'very loud', A_LF: 'very loud + rumble', LF: 'deep rumble only' };
+    const feed = { events: [], latest: null, everOk: false, lastOkMs: 0, error: null, busy: false, timer: null, gen: 0, seen: new Set(), firstLoad: true };
+
+    // the monitor's own rule (main.py classify_event), so the page can say what it would count
+    function classify(dba, dbc) {
+        const over = dba >= RULE.limitDba;
+        const lf = dbc != null && (dbc - dba) > RULE.deltaDb && Math.max(dba, dbc) >= RULE.floorDb;
+        return over && lf ? 'A_LF' : over ? 'A' : lf ? 'LF' : null;
+    }
+
     const el = id => document.getElementById(id);
     const denver = ms => new Date(ms).toLocaleString('sv-SE', { timeZone: 'America/Denver' });          // 2026-10-03 13:22:14
     const clean = s => String(s).replace(/[",\r\n]+/g, ' ').trim();
@@ -94,12 +153,129 @@
 
     function toast(msg) { el('toast').textContent = msg; }
 
+    // the sensor event closest to a moment, within the matching window (or null)
+    function eventFor(ms) {
+        let best = null, gap = Infinity;
+        for (const ev of feed.events) {
+            const d = (ev.ms - ms) / 1000;
+            if (d < -FEED.matchBeforeS || d > FEED.matchAfterS) continue;
+            if (Math.abs(d) < gap) { best = ev; gap = Math.abs(d); }
+        }
+        return best;
+    }
+    function tapStatus(tap) {
+        const ev = eventFor(tap.t);
+        if (ev) return { state: 'event', ev };
+        const ageS = (Date.now() - tap.t) / 1000;
+        if (ageS > FEED.lookbackH * 3600) return { state: 'old' };
+        if (!feed.everOk) return { state: 'nofeed' };
+        return { state: ageS < FEED.waitAfterTapS ? 'wait' : 'none' };
+    }
+    const evText = ev => `${ev.dba.toFixed(1)} / ${ev.dbc.toFixed(1)} dB`;
+
     function render() {
         const counts = {}; log.forEach(e => { counts[e.kind] = (counts[e.kind] || 0) + 1; });
         document.querySelectorAll('.kind').forEach(b => { b.querySelector('.n').textContent = counts[b.dataset.kind] || 0; });
         el('total').textContent = log.length ? `(${log.length} in all)` : '';
         const recent = log.slice(-6).reverse();
-        el('recent').innerHTML = recent.length ? recent.map(e => `<li>${denver(e.t).slice(11)} ${KINDS[e.kind]}</li>`).join('') : '<li class="muted">Nothing yet.</li>';
+        el('recent').innerHTML = recent.length ? recent.map(e => {
+            const st = tapStatus(e); let tail = '';
+            if (st.state === 'event') tail = ` <span class="tap-ev hit ${st.ev.cls}">&#10003; sensor event ${evText(st.ev)}, ${st.ev.siren ? 'siren' : CLASS_SHORT[st.ev.cls] || st.ev.cls}</span>`;
+            else if (st.state === 'wait') tail = ' <span class="tap-ev">checking the sensor&hellip;</span>';
+            else if (st.state === 'none') tail = ' <span class="tap-ev">no sensor event</span>';
+            else if (st.state === 'old') tail = ' <span class="tap-ev">too old to check</span>';
+            return `<li>${denver(e.t).slice(11)} ${KINDS[e.kind]}${tail}</li>`;
+        }).join('') : '<li class="muted">Nothing yet.</li>';
+        const states = log.map(tapStatus), settled = states.filter(x => x.state === 'event' || x.state === 'none'), hit = settled.filter(x => x.state === 'event').length;
+        el('matchsum').textContent = feed.everOk && settled.length ? `The sensor logged an event for ${hit} of ${settled.length} tap${settled.length === 1 ? '' : 's'}.` : '';
+        renderEvents(); renderLive();
+    }
+
+    function renderEvents() {
+        const rows = feed.events.slice(-FEED.shown).reverse();
+        el('events').innerHTML = rows.length ? rows.map(ev =>
+            `<li class="${ev.fresh ? 'fresh' : ''}">${denver(ev.ms).slice(11)} &nbsp;<strong>${evText(ev)}</strong> &nbsp;<span class="tap-ev ${ev.cls}">${ev.siren ? 'siren (not counted)' : CLASS_LABEL[ev.cls] || ev.cls}</span></li>`).join('')
+            : `<li class="muted">${feed.everOk ? 'No events from this sensor in the period checked.' : 'Waiting for the sensor feed.'}</li>`;
+    }
+    function setNote(text) { const n = el('live-note'); n.hidden = !text; n.textContent = text || ''; }
+    function renderLive() {
+        const station = currentStation(), L = feed.latest, age = el('live-age'), card = el('live');
+        el('live-station').textContent = station || '(none)';
+        el('live-rule').textContent = `Event: ${RULE.limitDba}+ dBA, or dBC over dBA by more than ${RULE.deltaDb} dB (with ${RULE.floorDb}+).`;
+        card.className = 'live'; age.className = 'age'; el('live-verdict').className = 'verdict'; setNote('');
+        if (!station) { age.textContent = 'type a sensor name above'; return; }
+        if (feed.error && !L) { age.textContent = 'cannot reach the sensor feed'; age.className = 'age bad'; setNote('Taps are still saved on this phone.'); return; }
+        if (!L) { age.textContent = feed.everOk ? 'no readings from this sensor yet' : 'connecting\u2026'; return; }
+        el('live-dba').textContent = L.dba.toFixed(1); el('live-dbc').textContent = L.dbc.toFixed(1);
+        const d = L.dbc - L.dba; el('live-delta').textContent = (d >= 0 ? '+' : '\u2212') + Math.abs(d).toFixed(1);
+        const cls = L.cls || classify(L.dba, L.dbc), ageS = (Date.now() - L.ms) / 1000;
+        if (cls) { card.classList.add(cls); el('live-verdict').classList.add(cls); el('live-verdict').textContent = `Event: ${CLASS_LABEL[cls]}`; }
+        else el('live-verdict').textContent = 'Below the rule';
+        if (feed.error) { age.textContent = 'feed interrupted (last reading)'; age.className = 'age bad'; }
+        else if (ageS < -3) { age.textContent = 'just now'; setNote(`Your phone's clock looks about ${Math.round(-ageS)} s behind the sensor's, so tap times will be off by that much. Set the phone's clock to automatic.`); }
+        else if (ageS <= FEED.staleAfterS) age.textContent = `${Math.max(0, Math.round(ageS))} s ago`;
+        else if (ageS < FEED.offlineAfterS) { age.textContent = `no new reading for ${Math.round(ageS)} s`; age.className = 'age warn'; setNote('Readings pause while a loud sound is going on. Its event shows up below when it ends.'); }
+        else { age.textContent = `no reading for ${Math.round(ageS / 60)} min`; age.className = 'age bad'; setNote('The sensor may be offline, or its Pi is not uploading.'); }
+    }
+
+    // ---- fetching: the latest reading, and the events (only new ones after the first load) ----
+    const currentStation = () => el('station').value.trim();
+    async function sbGet(path) {
+        const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, signal: ctl.signal });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        } finally { clearTimeout(t); }
+    }
+    const rowToEvent = r => ({ ms: Date.parse(r.timestamp), ts: r.timestamp, dba: Number(r.dba), dbc: Number(r.dbc), cls: r.event_class, siren: r.is_siren === true });
+    async function pollOnce() {
+        const station = currentStation();
+        if (!station || feed.busy) return;
+        feed.busy = true; const gen = feed.gen;
+        try {
+            const sid = encodeURIComponent(station);
+            const newest = feed.events.length ? feed.events[feed.events.length - 1].ms : null;
+            const firstTap = log.length ? log[0].t : Date.now();
+            const sinceMs = newest !== null ? newest - FEED.overlapS * 1000
+                : Math.max(Math.min(Date.now() - FEED.firstLoadMin * 60000, firstTap - 60000), Date.now() - FEED.lookbackH * 3600000);
+            const [lat, evs] = await Promise.all([
+                sbGet(`noise_logs?select=timestamp,dba,dbc,event_class&station_id=eq.${sid}&order=timestamp.desc&limit=1`),
+                sbGet(`noise_logs?select=timestamp,dba,dbc,delta,event_class,is_siren&station_id=eq.${sid}&event_class=not.is.null&timestamp=gte.${encodeURIComponent(new Date(sinceMs).toISOString())}&order=timestamp.desc&limit=1000`)
+            ]);
+            if (gen !== feed.gen) return;                                   // the sensor name was changed while this was in flight
+            feed.latest = lat.length ? rowToEvent(lat[0]) : null;
+            const fresh = [];
+            for (const r of evs.slice().reverse()) {
+                if (feed.seen.has(r.timestamp)) continue;
+                feed.seen.add(r.timestamp); const ev = rowToEvent(r); ev.fresh = !feed.firstLoad; feed.events.push(ev); if (!feed.firstLoad) fresh.push(ev);
+            }
+            feed.events.sort((a, b) => a.ms - b.ms);
+            feed.everOk = true; feed.lastOkMs = Date.now(); feed.error = null; feed.firstLoad = false;
+            if (fresh.length) {
+                const last = fresh[fresh.length - 1];
+                el('announce').textContent = `Sensor event: ${last.siren ? 'siren' : CLASS_LABEL[last.cls] || last.cls}, ${last.dba.toFixed(0)} dBA, ${last.dbc.toFixed(0)} dBC.`;
+                setTimeout(() => feed.events.forEach(e => { e.fresh = false; }), 2600);
+            }
+        } catch (err) {
+            if (gen === feed.gen) feed.error = String(err && err.message || err);
+        } finally { feed.busy = false; render(); }
+    }
+    function schedulePoll() {
+        clearTimeout(feed.timer); feed.timer = null;
+        if (document.visibilityState === 'hidden') return;                  // no polling in a background tab
+        feed.timer = setTimeout(async () => { await pollOnce(); schedulePoll(); }, FEED.pollMs);
+    }
+    function resetFeed() {
+        feed.gen++; feed.events = []; feed.latest = null; feed.everOk = false; feed.error = null; feed.seen = new Set(); feed.firstLoad = true; feed.busy = false;
+        render(); pollOnce().then(schedulePoll);
+    }
+    async function loadStations() {
+        try {
+            const rows = await sbGet('stations?select=id,name&is_active=eq.true&order=id.asc');
+            const dl = el('stations'); dl.textContent = '';
+            rows.filter(r => !/^host-/.test(r.id)).forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = r.name || r.id; dl.appendChild(o); });
+        } catch (e) { /* the box still takes any sensor name typed in */ }
     }
 
     function add(kind) {
@@ -107,6 +283,7 @@
         if (last && last.kind === kind && now - last.t < DEBOUNCE_MS) return;                    // a double tap is one vehicle
         log.push({ t: now, kind, station: clean(el('station').value) || 'unknown' });
         save(); render(); toast(`Logged ${KINDS[kind]} at ${denver(now).slice(11)}`);
+        pollSoon();
         if (navigator.vibrate) navigator.vibrate(25);
         keepAwake();
     }
@@ -115,8 +292,12 @@
         toast(gone ? `Removed ${KINDS[gone.kind]} from ${denver(gone.t).slice(11)}` : 'Nothing to undo.');
     }
     function csv() {
-        const rows = log.map(e => `${new Date(e.t).toISOString()},${denver(e.t)},${clean(e.station)},${e.kind}`);
-        return ['time_utc,time_denver,station,kind'].concat(rows).join('\n') + '\n';
+        // the last four columns say whether the sensor logged an event for the tap (blank when it did not, or when the feed was not available)
+        const rows = log.map(e => {
+            const ev = eventFor(e.t), match = ev ? [ev.siren ? 'siren' : ev.cls, ev.dba.toFixed(1), ev.dbc.toFixed(1), new Date(ev.ms).toISOString()] : ['', '', '', ''];
+            return [new Date(e.t).toISOString(), denver(e.t), clean(e.station), e.kind].concat(match).join(',');
+        });
+        return ['time_utc,time_denver,station,kind,sensor_event_class,sensor_dba,sensor_dbc,sensor_event_utc'].concat(rows).join('\n') + '\n';
     }
     async function copy() {
         const text = csv(), box = el('csvbox');
@@ -142,15 +323,23 @@
             el('awake').textContent = lock ? 'The screen will stay on while this page is open.' : 'Keep the screen on yourself; this phone did not allow the page to.';
         } catch (e) { el('awake').textContent = 'Keep the screen on yourself; this phone did not allow the page to.'; }
     }
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && log.length) keepAwake(); });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') { if (log.length) keepAwake(); pollOnce().then(schedulePoll); } else schedulePoll();
+    });
 
-    function tickClock() { el('clock').textContent = `Phone clock (Denver): ${denver(Date.now()).slice(11)}`; }
+    function tickClock() { el('clock').textContent = `Phone clock (Denver): ${denver(Date.now()).slice(11)}`; renderLive(); }
+    let soonTimer = null;   // right after a tap, look sooner than the next scheduled poll, so a short event shows up quickly
+    function pollSoon() { clearTimeout(soonTimer); soonTimer = setTimeout(() => { pollOnce().then(schedulePoll); }, 12000); }
 
     document.querySelectorAll('.kind').forEach(b => b.addEventListener('click', () => add(b.dataset.kind)));
     el('undo').addEventListener('click', undo); el('copy').addEventListener('click', copy);
     el('download').addEventListener('click', download); el('clear').addEventListener('click', clearAll);
-    el('station').addEventListener('input', () => { try { localStorage.setItem(STATION_KEY, el('station').value); } catch (e) { /* storage blocked */ } });
-    load(); render(); tickClock(); setInterval(tickClock, 500);
+    let stationTimer = null;
+    el('station').addEventListener('input', () => {
+        try { localStorage.setItem(STATION_KEY, el('station').value); } catch (e) { /* storage blocked */ }
+        clearTimeout(stationTimer); stationTimer = setTimeout(resetFeed, 700);
+    });
+    load(); render(); tickClock(); setInterval(tickClock, 500); loadStations(); pollOnce().then(schedulePoll);
 </script>
 </body>
 </html>
