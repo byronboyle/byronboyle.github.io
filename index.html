@@ -1264,6 +1264,12 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         const local = district ? reportingStations(district) : [];
         const used = local.length ? local : reportingStations(null);
         if (!used.length) return null;
+        const summary = await loadSummary();
+        const rowsOf = summary && used.map(s => summary.stations.find(r => r && r.id === s.id));
+        if (rowsOf && rowsOf.every(Boolean)) {
+            const peaks = rowsOf.map(r => r.peak_a).filter(v => v != null).map(Number);
+            return { days: 30, a: rowsOf.reduce((t, r) => t + (Number(r.a) || 0), 0), lf: rowsOf.reduce((t, r) => t + (Number(r.lf) || 0), 0), peakA: peaks.length ? Math.max(...peaks) : null, scopeDistrict: local.length ? Number(district) : null };
+        }
         const since = new Date(Date.now() - 30 * 864e5).toISOString();
         const base = `is_siren=eq.false&timestamp=gte.${since}&station_id=in.(${used.map(s => encodeURIComponent(s.id)).join(',')})`;
         const [a, lf, top] = await Promise.all([
@@ -1313,8 +1319,61 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         }
     }
 
+    // ---- the Cloudflare cache: /api/live and /api/summary ----
+    // They return the numbers this page used to fetch from Supabase itself, in one request each, shared by every visitor (see
+    // functions/api and edge_snapshot.sql). If either is unavailable (not deployed yet, over its limit, an error), the page quietly asks
+    // Supabase directly, exactly as before, and tries the cache again a minute later.
+    const EDGE = { liveUrl: '/api/live', summaryUrl: '/api/summary', timeoutMs: 6000, retryAfterMs: 60000, summaryKeepMs: 5 * 60000 };
+    let edgeDownUntil = 0, summaryMemo = null, summaryInFlight = null;
+    async function edgeGet(url, valid) {
+        if (Date.now() < edgeDownUntil) return null;
+        const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+        const timer = ctl ? setTimeout(() => ctl.abort(), EDGE.timeoutMs) : null;
+        try {
+            const res = await fetch(url, ctl ? { signal: ctl.signal } : undefined);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            if (!valid(data)) throw new Error('unexpected answer');
+            return data;
+        } catch (err) {
+            edgeDownUntil = Date.now() + EDGE.retryAfterMs;
+            console.warn(`${url} is not available; asking Supabase directly for a minute.`, err && err.message || err);
+            return null;
+        } finally { if (timer) clearTimeout(timer); }
+    }
+    const loadSnapshot = () => edgeGet(EDGE.liveUrl, d => !!d && typeof d === 'object' && Array.isArray(d.stations));
+    function loadSummary() {
+        if (summaryMemo && Date.now() - summaryMemo.at < EDGE.summaryKeepMs) return Promise.resolve(summaryMemo.value);
+        if (summaryInFlight) return summaryInFlight;      // several places ask at once when a page opens: one request answers them all
+        summaryInFlight = edgeGet(EDGE.summaryUrl, d => !!d && typeof d === 'object' && !!d.flagged && !!d.loud && Array.isArray(d.stations))
+            .then(value => { if (value) summaryMemo = { at: Date.now(), value }; return value; })
+            .finally(() => { summaryInFlight = null; });
+        return summaryInFlight;
+    }
+    // One station's row from the live snapshot, applied the way refreshStation applies its own queries.
+    function applySnapshotRow(station, snap) {
+        if (station.recruiting) { station.state = 'recruiting'; return; }
+        const row = snap.stations.find(r => r && r.id === station.id);
+        if (!row || row.ts == null) { station.state = 'demo'; station.lastSeen = null; return; }
+        const isNewRow = row.ts !== station.lastRowTs;
+        station.lastRowTs = row.ts;
+        station.currentDba = Number(row.dba);
+        station.currentDbc = validDbc(row.dbc);
+        station.lastSeen = new Date(row.ts).getTime();
+        station.state = Date.now() - station.lastSeen > STALE_AFTER_MS ? 'stale' : 'live';
+        if (isNewRow && station.state === 'live' && activeMarkerObj && activeMarkerObj.id === station.id) {
+            updateLiveHistory(station.currentDba, station.currentDbc);
+        }
+        const n = v => Number(v) || 0;
+        Object.assign(station, { hourlyExceedances: n(row.hour_a), hourlyLF: n(row.hour_lf), todayExceedances: n(row.day_a), todayLF: n(row.day_lf), sirensCount: n(row.sirens) });
+    }
+
     // ---- live numbers from the database ----
     async function loadFlaggedStats(days = 30) {
+        if (days === 30) {
+            const summary = await loadSummary();
+            if (summary) return { days, a: Number(summary.flagged.a) || 0, lf: Number(summary.flagged.lf) || 0, latest: summary.flagged.latest_lf || null };
+        }
         const since = new Date(Date.now() - days * 864e5).toISOString();
         const base = `is_siren=eq.false&timestamp=gte.${since}`;
         const [a, lf, latest] = await Promise.all([
@@ -1339,6 +1398,13 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
     }
     // Loudest readings across all monitors, for the pickleball comparison on The Gap page.
     async function loadLoudStats(days = 30) {
+        if (days === 30) {
+            const summary = await loadSummary();
+            if (summary) {
+                const num = v => (v == null ? null : Number(v));
+                return { days, flagged: Number(summary.loud.flagged) || 0, n100: Number(summary.loud.n100) || 0, maxDba: num(summary.loud.max_dba), maxDbc: num(summary.loud.max_dbc) };
+            }
+        }
         const since = new Date(Date.now() - days * 864e5).toISOString();
         const base = `is_siren=eq.false&event_class=not.is.null&timestamp=gte.${since}`;
         const top = col => fetchSupabase('noise_logs', `select=${col}&${base}&order=${col}.desc&limit=1`);
@@ -1390,7 +1456,16 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         await Promise.all(METER_STATIONS.map(ensureStationState));
         const now = Date.now(), since = new Date(now - 30 * 864e5).toISOString();
         const rows = [];
+        const summary = await loadSummary();
         for (const s of METER_STATIONS.filter(x => x.state === 'live' || x.state === 'stale')) {
+            const cached = summary && summary.stations.find(r => r && r.id === s.id);
+            if (cached) {
+                const firstMs = cached.first_reading ? new Date(cached.first_reading).getTime() : now;
+                const days = Math.min(30, Math.max(1, (now - firstMs) / 864e5));
+                const a = Number(cached.a) || 0, lf = Number(cached.lf) || 0;
+                rows.push({ station: s, a, lf, days, perDay: (a + lf) / days });
+                continue;
+            }
             try {
                 const base = `station_id=eq.${s.id}&is_siren=eq.false&timestamp=gte.${since}`;
                 const [a, lf, first] = await Promise.all([
@@ -2301,7 +2376,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
 
     async function fetchLiveHistory(station) {
         const rows = await fetchSupabase('noise_logs',
-            `select=timestamp,dba,dbc&station_id=eq.${station.id}&order=timestamp.desc&limit=300`);
+            `select=timestamp,dba,dbc&station_id=eq.${station.id}&order=timestamp.desc&limit=${MAX_LIVE_POINTS}`);   // the strip's whole length: about 25 minutes of 15-second readings
         if (!Array.isArray(rows)) throw new Error('Unexpected response from noise_logs');
         rows.reverse();
         return {
@@ -3495,10 +3570,12 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         polling = true;
         try {
             const now = Date.now();
+            const snap = await loadSnapshot();      // every station in one shared request; null means ask Supabase station by station, as before
             for (const station of METER_STATIONS.slice()) {
                 const viewing = !!activeMarkerObj && activeMarkerObj.id === station.id && isPanelOpen('detail-panel');
                 const wantCounts = !station.countsAt || now - station.countsAt > (viewing ? POLL.countsActiveMs : POLL.countsMs);
-                await refreshStation(station, wantCounts);
+                if (snap) { applySnapshotRow(station, snap); if (wantCounts) station.countsAt = Date.now(); }
+                else await refreshStation(station, wantCounts);
 
                 refreshMarker(station);
 
@@ -3515,7 +3592,9 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             document.getElementById('active-count').innerText = METER_STATIONS.filter(s => s.state === 'live').length;
             refreshDistrictStyles();
 
-            if (now - lastStatsFetch > POLL.statsMs) {
+            if (snap && snap.total_311 != null) {
+                document.getElementById('total-311-count').innerText = Number(snap.total_311) || 0;
+            } else if (now - lastStatsFetch > POLL.statsMs) {
                 lastStatsFetch = now;
                 const statsData = await fetchSupabase('report_stats', 'select=total_submitted');
                 if (Array.isArray(statsData) && statsData.length > 0) {
@@ -3972,10 +4051,9 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify({
-                    station_id: targetStationId,
-                    timestamp: new Date().toISOString()
-                })
+                // Only the station: the table fills in the time and the status itself. (The API refuses a field the table does not have,
+                // and pending_reports has no "timestamp" column, so sending one made every request fail with HTTP 400.)
+                body: JSON.stringify({ station_id: targetStationId })
             });
 
             if (response.ok) {
