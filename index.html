@@ -1931,24 +1931,10 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
     // compares them with main.py and the retention schedule, so the page cannot quietly drift from what the monitors do.
     // ========================================================================
     // The project's email address. Cloudflare forwards it to the owner's own inbox. It is put together here rather than written out whole,
-    // so a bot that only reads the page's source does not find it; anyone using the site sees it as a normal link.
+    // so a bot that only reads the page's source does not find it; anyone using the site sees it as a normal mail link.
     const CONTACT_EMAIL_PARTS = ['contact', 'milehighnoiseproject.org'];
     const contactEmail = () => CONTACT_EMAIL_PARTS.join('@');
-    function contactEmailHtml() {
-        const addr = contactEmail();
-        return `<span style="display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px 10px;">` +
-            `<a href="mailto:${addr}?subject=${encodeURIComponent('Mile High Noise Project')}" style="color:#00e676;">${addr}</a>` +
-            `<button type="button" class="range-btn" style="min-height:44px; min-width:64px; border:1px solid #777; border-radius:6px; padding:0 14px; background:#222; color:#e8e8e8; font:inherit; font-size:0.85rem;" onclick="copyContactEmail()" aria-label="Copy the email address ${addr}">Copy</button></span>`;
-    }
-    async function copyContactEmail() {
-        const addr = contactEmail();
-        try {
-            await navigator.clipboard.writeText(addr);
-            showToast('Email address copied', addr);
-        } catch (err) {
-            showToast("Couldn't copy it", `Select the address and copy it by hand: ${addr}`, true);
-        }
-    }
+    const contactEmailHtml = () => `<a href="mailto:${contactEmail()}?subject=${encodeURIComponent('Mile High Noise Project')}" style="color:#00e676;">${contactEmail()}</a>`;
     const pageLink = (topic, text) => `<a href="#" onclick="openInfoModal('${topic}'); return false;" style="color:#00e676;">${text}</a>`;
     function pageMethods() {
         return `
@@ -1991,7 +1977,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <h3>What this data is</h3>
-                <p>These are community measurements, meant to show patterns: how loud, how often and when, along a corridor. They are not official enforcement readings. The same sensors and the same rules apply to every vehicle.</p>
+                <p>These are community measurements, meant to show patterns: how loud, how often and when, along a corridor. The same sensors and the same rules apply to every vehicle.</p>
             </div>
             <div class="info-card">
                 <h3>Questions or corrections</h3>
@@ -2040,7 +2026,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <h3>How it's run</h3>
-                <p>The Mile High Noise Project is independent and self-funded: I pay for the monitors, the hosting and the time myself. There are no ads, and the data is free to download. I hope to turn it into a nonprofit someday.</p>
+                <p>The Mile High Noise Project is independent and self-funded: I pay for the monitors, the hosting, and the time myself. There are no ads, and the data is free to download.</p>
             </div>
             <div class="info-card">
                 <h3>Get involved</h3>
