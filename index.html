@@ -982,7 +982,7 @@
     let peakChartInstance = null;
     let liveMinuteChartInstance = null;
 
-    const MAX_LIVE_POINTS = 300;
+    const MAX_LIVE_POINTS = 100;         // about 25 minutes of 15-second readings
     let liveDbHistory = [];
     let liveDbcHistory = [];
     let liveTimeLabels = [];
@@ -2660,7 +2660,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
     // ========================================================================
     const STATION_TZ = 'America/Denver'; // the stations table has no timezone column yet
     const HEATMAP_DAYS = 14;
-    const MIN_BASELINE_N = 720;          // about an hour of 5-second readings
+    const MIN_BASELINE_N = 240;          // about an hour of 15-second readings (the monitors send a routine reading every 15 s)
     const BASELINE_BAND = { min: 55, max: DECIBEL_THRESHOLD };
     const HEAT_METRICS = {
         all: { label: 'All loud events', noun: 'loud events', color: [255, 112, 67] },
