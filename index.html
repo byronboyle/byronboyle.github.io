@@ -253,6 +253,14 @@
             font-size: 0.95rem;
             color: #00e676;
         }
+        .info-card h4 { margin: 0 0 8px 0; font-size: 0.95rem; color: #00e676; }
+        .myth-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; }
+        .myth-jump a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid #3a3a3a; border-radius: 999px; background: #242424; color: #29b6f6; font-size: 0.85rem; text-decoration: none; }
+        .myth-jump a:hover, .myth-jump a:focus-visible { border-color: #29b6f6; }
+        .myth-section { margin: 22px 0 2px; padding-top: 14px; border-top: 1px solid #333; font-size: 1.08rem; color: #fff; scroll-margin-top: 60px; }
+        .myth-section:focus { outline: none; }
+        .myth-section:focus-visible { outline: 2px solid #29b6f6; outline-offset: 4px; }
+        .myth-section-intro { margin: 0 0 10px; }
         .info-card p, .info-card li {
             font-size: 0.83rem;
             color: #ccc;
@@ -1562,40 +1570,91 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                 <h2>\u2753 Myths vs. Facts</h2>
                 <p>Common misconceptions about vehicle noise.</p>
             </div>
+            <nav class="myth-jump" aria-label="Jump to a group of myths">
+                <a href="#myths-health" onclick="jumpToMyths('myths-health'); return false;">Health &amp; community</a>
+                <a href="#myths-drivers" onclick="jumpToMyths('myths-drivers'); return false;">Drivers &amp; physics</a>
+                <a href="#myths-policy" onclick="jumpToMyths('myths-policy'); return false;">Policy &amp; Denver</a>
+            </nav>
+            <h3 class="myth-section" id="myths-health" tabindex="-1">Health &amp; Community Impact</h3>
+            <p class="fine myth-section-intro">What noise does to people, to neighborhoods and to home values.</p>
             <div class="info-card">
-                <h3>Myth 1: "It's just an annoyance."</h3>
+                <h4>Myth 1: "It's just an annoyance."</h4>
                 <p><strong>Fact:</strong> The World Health Organization's 2018 noise guidelines for Europe reviewed the evidence and link long-term road-traffic noise to heart disease, sleep disturbance and annoyance, and report effects on children's reading comprehension and memory. WHO recommends road-traffic noise stay below 53 dB (24-hour average) and 45 dB at night outside homes.</p>
                 <p class="fine"><a href="https://www.who.int/europe/news-room/fact-sheets/item/noise" target="_blank" rel="noopener">WHO fact sheet</a> \u00B7 <a href="https://www.ncbi.nlm.nih.gov/books/NBK535301/table/ch8.tab11/" target="_blank" rel="noopener">WHO recommendations</a></p>
             </div>
             <div class="info-card">
-                <h3>Myth 2: "If I don't wake up, my sleep isn't affected."</h3>
+                <h4>Myth 2: "If I don't wake up, my sleep isn't affected."</h4>
                 <p><strong>Fact:</strong> Noise can pull you into lighter sleep or cause brief arousals you won't remember. WHO's night guideline for road traffic is based on effects on sleep. It is a nightly average, while our monitors count individual loud events, so they measure different things, but repeated loud events are what push a night's noise up.</p>
             </div>
             <div class="info-card">
-                <h3>Myth 3: "Noise is an unavoidable part of city living."</h3>
+                <h4>Myth 3: "Noise affects every neighborhood equally."</h4>
+                <p><strong>Fact:</strong> It doesn't, and researchers keep finding the same pattern.</p>
+                <ul>
+                    <li>National studies covering every US census block group or tract found more road and traffic noise where incomes are lower and more residents are Black, Hispanic or Asian.</li>
+                    <li>In one, estimated nighttime noise in cities was about 4 dB higher (roughly 2.5 times the sound energy) where 75% of residents are Black than where none are.</li>
+                    <li>It reaches children too. In a study of 49.7 million public school students, those at the noisiest schools were more likely to be low-income and to be Hispanic, Black or Asian.</li>
+                    <li>Colorado's own EnviroScreen tool, which the state uses to identify disproportionately impacted communities, counts noise as one of nine environmental exposures.</li>
+                </ul>
+                <p class="fine"><a href="https://doi.org/10.1289/EHP898" target="_blank" rel="noopener">Casey et al. 2017</a> \u00B7 <a href="https://doi.org/10.1016/j.jtrangeo.2019.102604" target="_blank" rel="noopener">Collins et al. 2020</a> \u00B7 <a href="https://doi.org/10.1016/j.envres.2019.05.024" target="_blank" rel="noopener">Collins et al. 2019 (schools)</a> \u00B7 <a href="https://cdphe.colorado.gov/colorado-enviroscreen-20-about-the-methods-and-data" target="_blank" rel="noopener">Colorado EnviroScreen</a> \u00B7 <a href="https://odphp.health.gov/healthypeople/priority-areas/social-determinants-health/literature-summaries/environmental-conditions" target="_blank" rel="noopener">Healthy People 2030</a></p>
+            </div>
+            <div class="info-card">
+                <h4>Myth 4: "Traffic noise has no economic cost."</h4>
+                <p><strong>Fact:</strong> Buyers pay for quiet, and the amounts are large.</p>
+                <ul>
+                    <li>A 2025 study of about 600,000 Florida home sales found that when highway sound barriers cut noise by an estimated 7 dB, homes within 100 meters gained roughly 7% to 10% in value.</li>
+                    <li>By the authors' estimate, a 10 dB drop in traffic noise is worth about 9% of a home's price, which is about $45,000 on a $500,000 home.</li>
+                    <li>Scaled up, they put the cost of traffic noise to American homeowners at about $110 billion in lost home value, or about $974 for the average vehicle over its lifetime. They note that louder vehicles should cost more.</li>
+                    <li>Relative to incomes and home values, the burden is heavier in lower-income neighborhoods and those with more Black residents.</li>
+                </ul>
+                <p class="fine">NBER working paper, not yet peer-reviewed: <a href="https://www.nber.org/papers/w34298" target="_blank" rel="noopener">Moretti and Wheeler, NBER Working Paper 34298</a></p>
+            </div>
+            <h3 class="myth-section" id="myths-drivers" tabindex="-1">Urban Physics &amp; Driver Claims</h3>
+            <p class="fine myth-section-intro">What drivers say, and what the physics of sound says back.</p>
+            <div class="info-card">
+                <h4>Myth 5: "Noise is an unavoidable part of city living."</h4>
                 <p><strong>Fact:</strong> Ordinary traffic has a background level, but some of the loudest events come from individual vehicles, and those can be measured and enforced. New York City has issued hundreds of violations to drivers with modified mufflers.</p>
             </div>
             <div class="info-card">
-                <h3>Myth 4: "Loud pipes save lives."</h3>
+                <h4>Myth 6: "Loud pipes save lives."</h4>
                 <p><strong>Fact:</strong> Exhaust sound is aimed backward, so drivers ahead of a motorcycle hear little until it has passed. The Hurt Report (1981), the classic US study of motorcycle crashes, found the most common multi-vehicle crash is a car turning into a motorcycle's path, ahead of the bike. A study by a Romanian motorcycle association and a university found loud pipes made no difference when the motorcycle was in front of the car.</p>
             </div>
             <div class="info-card">
-                <h3>Myth 5: "Closing the windows solves it."</h3>
+                <h4>Myth 7: "Closing the windows solves it."</h4>
                 <p><strong>Fact:</strong> Glass blocks high frequencies much better than deep bass. Low-frequency rumble passes through windows and walls more easily, so double glazing helps but doesn't remove it.</p>
             </div>
+            <h3 class="myth-section" id="myths-policy" tabindex="-1">Policy, Laws, &amp; Denver Enforcement</h3>
+            <p class="fine myth-section-intro">What the law says, what other cities do, and how Denver compares.</p>
             <div class="info-card">
-                <h3>Myth 6: "Noise laws can't be enforced without a police stop."</h3>
+                <h4>Myth 8: "Noise laws can't be enforced without a police stop."</h4>
                 <p><strong>Fact:</strong> New York City's Department of Environmental Protection tested a roadside meter and camera that triggers at 85 dB or more at 50 ft or more, records the license plate and mails the owner a notice. The City Council approved a citywide program in late 2023.</p>
                 <p class="fine"><a href="https://www.nyc.gov/site/dep/news/22-005/roadside-sound-meter-camera-is-activated-loud-mufflers-now-sending-notices-vehicle" target="_blank" rel="noopener">NYC DEP announcement</a></p>
             </div>
             <div class="info-card">
-                <h3>Myth 8: "The city enforces noise limits the same way everywhere."</h3>
-                <p><strong>Fact:</strong> In 2023 Denver closed the Congress Park pickleball courts over sound of about 70 dB at nearby homes. The vehicle noise our monitors record is far louder, and we haven't found a record of enforcement at those levels. See <a href="#" onclick="openInfoModal('gap'); return false;" style="color:#29b6f6;">The Enforcement Gap</a>.</p>
+                <h4>Myth 9: "Denver already has this covered."</h4>
+                <p><strong>Fact:</strong> Denver's code does set a number for vehicles, 82 dB(A) at 25 ft for those under 10,000 lb, but it is hard to check in the field, state law has no number, and responsibility is divided between two agencies. See <a href="#" onclick="openInfoModal('gap'); return false;" style="color:#29b6f6;">The Enforcement Gap</a>.</p>
             </div>
             <div class="info-card">
-                <h3>Myth 7: "Denver already has this covered."</h3>
-                <p><strong>Fact:</strong> Denver's code does set a number for vehicles, 82 dB(A) at 25 ft for those under 10,000 lb, but it is hard to check in the field, state law has no number, and responsibility is divided between two agencies. See <a href="#" onclick="openInfoModal('gap'); return false;" style="color:#29b6f6;">The Enforcement Gap</a>.</p>
+                <h4>Myth 10: "The city enforces noise limits the same way everywhere."</h4>
+                <p><strong>Fact:</strong> In 2023 Denver closed the Congress Park pickleball courts over sound of about 70 dB at nearby homes. The vehicle noise our monitors record is far louder, and we haven't found a record of enforcement at those levels. See <a href="#" onclick="openInfoModal('gap'); return false;" style="color:#29b6f6;">The Enforcement Gap</a>.</p>
             </div>`;
+    }
+    // Jump to a group of myths. Only the panel scrolls (scrollIntoView would also nudge the page behind it), the heading is left clear of the
+    // panel's sticky top bar, there is no animation if the visitor prefers less motion, and keyboard focus moves to the heading.
+    function jumpToMyths(id) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        const calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const behavior = calm ? 'auto' : 'smooth';
+        const panel = document.getElementById('info-panel');
+        if (panel && panel.contains(target)) {
+            const bar = panel.querySelector('.sheet-bar');
+            const barH = bar && getComputedStyle(bar).position === 'sticky' ? bar.getBoundingClientRect().height : 0;
+            const top = panel.scrollTop + target.getBoundingClientRect().top - panel.getBoundingClientRect().top - barH - 8;
+            panel.scrollTo({ top: Math.max(0, top), behavior });
+        } else {
+            target.scrollIntoView({ block: 'start', behavior });
+        }
+        target.focus({ preventScroll: true });
     }
 
     function pageAction() {
@@ -1641,6 +1700,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
     `;
     }
+
 
     function pageResources() {
         return `
