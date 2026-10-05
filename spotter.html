@@ -66,7 +66,7 @@
     <h1>Spotter</h1>
     <details class="how"><summary>How this works</summary>
         <p class="lead">Sit or stand near a sensor and tap once for each loud vehicle as it passes. Your taps are matched to what the sensor heard, to check and improve its vehicle guesses (the same four groups the site uses). Thirty to sixty minutes at a busy time is plenty.</p>
-        <p class="lead">The card shows the sensor's newest reading (it updates about every 5 seconds while it is quiet). Readings pause while a loud sound is going on, and that sound&rsquo;s event appears in the list at the bottom when it ends, so you can check there which of your taps the sensor counted. An event is 85 or more dBA, or dBC more than 15 dB above dBA with 85 or more on either.</p>
+        <p class="lead">The card shows the sensor's newest reading (it updates about every 15 seconds while it is quiet). Readings pause while a loud sound is going on, and that sound&rsquo;s event appears in the list at the bottom when it ends, so you can check there which of your taps the sensor counted. An event is 85 or more dBA, or dBC more than 15 dB above dBA with 85 or more on either.</p>
     </details>
 
     <div class="bar">
@@ -129,7 +129,7 @@
     const SUPABASE_URL = 'https://canlnrismlirrnfqpqmv.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_kmsN-gDTrMOuhLIBPOMEdA_pi-LqN3p';              // the public key the website itself uses
     const RULE = { limitDba: 85, deltaDb: 15, floorDb: 85 };                            // keep in step with the monitor (main.py) and the website
-    const FEED = { pollMs: 4000, staleAfterS: 12, offlineAfterS: 90, waitAfterTapS: 45, matchBeforeS: 4, matchAfterS: 4, overlapS: 60, lookbackH: 24, firstLoadMin: 60, shown: 6 };
+    const FEED = { pollMs: 4000, staleAfterS: 30, offlineAfterS: 90, waitAfterTapS: 45, matchBeforeS: 4, matchAfterS: 4, overlapS: 60, lookbackH: 24, firstLoadMin: 60, shown: 6 };
     const CLASS_LABEL = { A: 'Very loud (85+ dBA)', A_LF: 'Very loud + deep rumble', LF: 'Deep rumble only' };
     const CLASS_SHORT = { A: 'very loud', A_LF: 'very loud + rumble', LF: 'deep rumble only' };
     const feed = { events: [], latest: null, everOk: false, lastOkMs: 0, error: null, busy: false, timer: null, gen: 0, seen: new Set(), firstLoad: true };
