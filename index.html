@@ -663,12 +663,14 @@
 
         <nav class="nav-links" id="nav-links" aria-label="Site sections">
             <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
+            <button class="nav-btn" onclick="openInfoModal('methods')">How it works</button>
             <button class="nav-btn" onclick="openInfoModal('gap')">The Gap</button>
             <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
             <button class="nav-btn" onclick="openInfoModal('action')">Take Action</button>
             <button class="nav-btn" onclick="openInfoModal('resources')">Resources</button>
             <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
             <button class="nav-btn" onclick="openInfoModal('calculator')">Night Noise</button>
+            <button class="nav-btn" onclick="openInfoModal('about')">About</button>
             <button class="nav-btn" onclick="openInfoModal('contact')">Contact</button>
         </nav>
     </div>
@@ -721,7 +723,7 @@
             </div>
             <div class="panel-header">
                 <h2 id="panel-title">Station Location</h2>
-                <p id="panel-address">Address details...</p>
+                <p id="panel-corridor">Corridor</p>
                 <p class="fine" id="panel-district"></p>
                 <p class="fine" id="panel-distance"></p>
             </div>
@@ -767,7 +769,7 @@
                 <h4>What the audio suggests</h4>
                 <p class="chart-help" id="audio-sentence"></p>
                 <div id="audio-bars"></div>
-                <p class="fine" style="margin-top:8px;">Each loud event is also run through an audio classifier on the monitor. It labels its best guess at the source from a few seconds of sound. Cars, SUVs, pickups and unidentified vehicles are grouped together; &ldquo;heavy-duty&rdquo; means large trucks and buses. Audio is analyzed on the monitor and never saved.</p>
+                <p class="fine" style="margin-top:8px;">Each loud event is also run through an audio classifier on the monitor, which gives its best guess at the source from a few seconds of sound. Vehicles under 10,000 lb (cars, SUVs, pickups and motorcycles) share one limit in Denver&rsquo;s noise code; heavy-duty trucks and buses, 10,000 lb and over, have another. The classifier can&rsquo;t reliably tell vehicle types apart, so every guess is approximate. Audio is analyzed on the monitor and never saved.</p>
             </section>
 
             <section class="chart-card">
@@ -909,6 +911,14 @@
         return res.json();
     }
 
+    // A monitor is shown by the street it is on ("Federal Blvd"), never by its address. The database keeps the exact address
+    // privately (the 311 filing needs it); the public columns hold a `corridor` label, and this works one out from an address
+    // if a database has not been given one yet (stations_corridor.sql).
+    function corridorFromAddress(addr) {
+        const first = String(addr || '').split(',')[0].trim();
+        return first.replace(/^\d+[A-Za-z]?(?:-\d+)?\s+/, '').trim();
+    }
+
     // --- STATIONS DATA ---
     // The reading and count values below are placeholders. They are only shown (clearly labelled as demo)
     // for a station that has never reported; a station with real rows always uses its real data.
@@ -916,9 +926,9 @@
         {
             id: "meter-01",
             name: "Federal Blvd Monitor",
-            address: "3265 Federal Blvd, Denver, CO 80211",
-            lat: 39.76285,
-            lng: -105.02506,
+            corridor: "Federal Blvd",
+            lat: 39.763,
+            lng: -105.025,
             currentDba: 64.2,
             currentDbc: 82.5,
             hourlyExceedances: 0,
@@ -928,9 +938,9 @@
         {
             id: "meter-02",
             name: "W Colfax & Sheridan",
-            address: "5300 W Colfax Ave, Denver, CO 80214",
-            lat: 39.7400,
-            lng: -105.0531,
+            corridor: "W Colfax Ave",
+            lat: 39.740,
+            lng: -105.053,
             currentDba: 88.2,
             currentDbc: 98.6,
             hourlyExceedances: 4,
@@ -940,9 +950,9 @@
         {
             id: "meter-03",
             name: "RiNo Arts District",
-            address: "2901 Blake St, Denver, CO 80205",
-            lat: 39.7635,
-            lng: -104.9785,
+            corridor: "Blake St",
+            lat: 39.764,
+            lng: -104.979,
             currentDba: 76.4,
             currentDbc: 90.1,
             hourlyExceedances: 1,
@@ -952,9 +962,9 @@
         {
             id: "meter-04",
             name: "S Broadway & Evans",
-            address: "2090 S Broadway, Denver, CO 80210",
-            lat: 39.6785,
-            lng: -104.9878,
+            corridor: "S Broadway",
+            lat: 39.679,
+            lng: -104.988,
             currentDba: 71.8,
             currentDbc: 81.2,
             hourlyExceedances: 0,
@@ -990,19 +1000,19 @@
     // ========================================================================
     // AUDIO LABELS: what the monitor's audio classifier thinks made each flagged event
     // ========================================================================
-    // Cars, SUVs, light trucks and vehicles the model can't place are one group (they follow the same noise rules);
-    // motorcycles are kept apart; 'heavy-duty' means large trucks and buses.
+    // Four groups, drawn where Denver's noise code draws its line (Table B: vehicles under 10,000 lb share one limit, vehicles of
+    // 10,000 lb and over have another). The model cannot reliably tell one kind of vehicle from another at this distance, so cars,
+    // SUVs, pickups and motorcycles are NOT split apart here.
     const AUDIO_GROUP_META = {
-        motorcycle: { label: 'Motorcycle',              color: '#ffb74d' },
-        car:        { label: 'Car, SUV or light truck', color: '#ef5350' },
-        truck_bus:  { label: 'Heavy-duty truck or bus', color: '#9575cd' },
-        music:      { label: 'Music or bass',           color: '#f06292' },
-        rail_air:   { label: 'Train or aircraft',       color: '#4db6ac' },
-        unclear:    { label: 'Unclear',                 color: '#616161' }
+        light:   { label: 'Cars, light trucks and motorcycles', color: '#ef5350' },
+        heavy:   { label: 'Heavy-duty trucks and buses',        color: '#9575cd' },
+        music:   { label: 'Music or bass',                      color: '#f06292' },
+        unclear: { label: 'Other or unclear',                   color: '#616161' }
     };
-    const AUDIO_ORDER = ['motorcycle', 'car', 'truck_bus', 'music', 'rail_air', 'unclear'];
-    // Older events were labelled 'vehicle' (a vehicle of unclear type). They now count as cars.
-    const AUDIO_ALIAS = { vehicle: 'car' };
+    const AUDIO_ORDER = ['light', 'heavy', 'music', 'unclear'];
+    // The monitor still records finer labels (motorcycle, car, an older 'vehicle', train or aircraft). They stay in the database
+    // but are shown as the four groups above.
+    const AUDIO_ALIAS = { motorcycle: 'light', car: 'light', vehicle: 'light', truck_bus: 'heavy', rail_air: 'unclear' };
     const audioGroupId = g => { const id = AUDIO_ALIAS[g] || g; return AUDIO_GROUP_META[id] ? id : null; };
     let audioColumnsRetryAt = 0; // if the database has no audio columns yet, don't ask for them until this time
 
@@ -1024,10 +1034,10 @@
     // One sentence that states the shares, from counts of {group: n}.
     function audioShareSentence(counts, labelled, prefix) {
         const n = g => counts[g] || 0;
-        const car = n('car') + n('vehicle'), mc = n('motorcycle'), hv = n('truck_bus'), mu = n('music');   // an older 'vehicle' label counts as a car
-        const rest = labelled - car - mc - hv - mu;
-        return `${prefix} ${pct(car, labelled)}% sounded like a car, SUV or light truck, ${pct(mc, labelled)}% like a motorcycle, ` +
-            `${pct(hv, labelled)}% like a heavy-duty truck or bus, ${pct(mu, labelled)}% like music or bass, and ${pct(rest, labelled)}% like another or unclear source.`;
+        const light = n('light'), heavy = n('heavy'), mu = n('music');
+        const rest = labelled - light - heavy - mu;
+        return `${prefix} ${pct(light, labelled)}% sounded like cars, light trucks or motorcycles, ${pct(heavy, labelled)}% like heavy-duty trucks or buses, ` +
+            `${pct(mu, labelled)}% like music or bass, and ${pct(rest, labelled)}% like another or unclear source.`;
     }
 
     function renderAudio(data) {
@@ -1069,8 +1079,7 @@
     function audioTooltipLine(ev) {
         const meta = ev.grp && AUDIO_GROUP_META[ev.grp];
         if (!meta) return null;
-        const top = ev.top && ev.top[0] ? ` (top class: ${ev.top[0][0]} ${Number(ev.top[0][1]).toFixed(2)})` : '';
-        return ` Audio guess: ${meta.label}${top}`;
+        return ` Audio guess: ${meta.label}`;
     }
 
     // ---- totals across all stations for the info pages ----
@@ -1112,7 +1121,7 @@
     // INFO PAGES: shared data and helpers
     // ========================================================================
     // How the sensors are described on the site and in reports. Change it here, in one place.
-    const SENSOR_SPEC_TEXT = 'PCB Artists I2C sound level sensor, designed to IEC 61672 Class 2 guidelines, reporting A- and C-weighted levels';
+    const SENSOR_SPEC_TEXT = 'digital sound level sensor, designed to IEC 61672 Class 2 guidelines, reporting A- and C-weighted levels';
     const SENSOR_FOOTNOTE_SPEC = 'Sound level sensor designed to IEC 61672 Class 2 guidelines, reporting A- and C-weighted levels';
     // What the readings are for. Shown with the sensor description, in the PDF and in reports to the city.
     const SENSOR_PURPOSE_TEXT = "Community monitoring data for awareness, trends and advocacy. The readings are not legal measurements, and each unit's accuracy depends on its enclosure, mounting and windscreen.";
@@ -1485,7 +1494,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         const idle = METER_STATIONS.filter(x => x.state === 'demo');
         el.innerHTML = (rows.length ? rows.map((r, i) => `
             <div class="lb-row">
-                <div><strong>${i + 1}. ${r.station.name}</strong><div class="fine">${r.station.address}</div></div>
+                <div><strong>${i + 1}. ${r.station.name}</strong><div class="fine">${r.station.corridor || 'Denver'}</div></div>
                 <div class="lb-num"><strong>${r.perDay.toFixed(1)}</strong>/day<div class="fine">${r.a} dBA + ${r.lf} \u0394-only in ${Math.round(r.days)} day${Math.round(r.days) === 1 ? '' : 's'}</div></div>
             </div>`).join('') : '<p class="fine">No monitor has reported yet.</p>') +
             (idle.length ? `<p class="fine" style="margin-top:12px;">Not reporting yet: ${idle.map(x => x.name).join(', ')}.</p>` : '');
@@ -1565,7 +1574,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <h3>Audio labels</h3>
-                <p>For each loud event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source: car, SUV or light truck; motorcycle; heavy-duty truck or bus; music or bass; or train or aircraft. Cars, SUVs, pickups and any vehicle the model can't place are grouped together, because they follow the same noise rules; motorcycles are kept apart. This helps separate a modified exhaust from a passing bus or a car stereo.</p>
+                <p>For each loud event the monitor also runs a sound-recognition model over the few seconds around it and records its best guess at the source. The page shows that guess in four groups: cars, light trucks and motorcycles (vehicles under 10,000 lb, which share one limit in Denver's noise code); heavy-duty trucks and buses (10,000 lb and over, which have a separate limit); music or bass; and other or unclear. The model can't reliably tell one kind of vehicle from another at this distance, so the first group is not split further, and every guess is approximate. It does help separate road vehicles from a car stereo. Sirens are left out of the counts.</p>
                 <p class="fine">Audio is analyzed on the monitor and never saved; only the labels are kept.</p>
             </div>
             <div class="info-card">
@@ -1858,6 +1867,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                 <p>Want a monitor on your street, or want to help? Tell us.</p>
             </div>
             <div class="info-card">
+                <p class="fine" style="margin:0 0 4px;">Prefer email? Write to ${contactEmailHtml()}</p>
                 <form id="contact-project-form" onsubmit="submitProjectContact(event)">
                     <label style="${lab}" for="contact-name">Name *</label>
                     <input type="text" id="contact-name" maxlength="120" required style="${field}">
@@ -1915,14 +1925,162 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>`;
     }
 
+    // ========================================================================
+    // HOW THE DATA WORKS and ABOUT
+    // The numbers in the first page (85 dBA, 15 dB, 6 dB, 30 s, 72 h, 140 dB, every 15 s) are the ones the monitor's code uses; a test
+    // compares them with main.py and the retention schedule, so the page cannot quietly drift from what the monitors do.
+    // ========================================================================
+    // The project's email address. Cloudflare forwards it to the owner's own inbox. It is put together here rather than written out whole,
+    // so a bot that only reads the page's source does not find it; anyone using the site sees it as a normal link.
+    const CONTACT_EMAIL_PARTS = ['contact', 'milehighnoiseproject.org'];
+    const contactEmail = () => CONTACT_EMAIL_PARTS.join('@');
+    function contactEmailHtml() {
+        const addr = contactEmail();
+        return `<span style="display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px 10px;">` +
+            `<a href="mailto:${addr}?subject=${encodeURIComponent('Mile High Noise Project')}" style="color:#00e676;">${addr}</a>` +
+            `<button type="button" class="range-btn" style="min-height:44px; min-width:64px; border:1px solid #777; border-radius:6px; padding:0 14px; background:#222; color:#e8e8e8; font:inherit; font-size:0.85rem;" onclick="copyContactEmail()" aria-label="Copy the email address ${addr}">Copy</button></span>`;
+    }
+    async function copyContactEmail() {
+        const addr = contactEmail();
+        try {
+            await navigator.clipboard.writeText(addr);
+            showToast('Email address copied', addr);
+        } catch (err) {
+            showToast("Couldn't copy it", `Select the address and copy it by hand: ${addr}`, true);
+        }
+    }
+    const pageLink = (topic, text) => `<a href="#" onclick="openInfoModal('${topic}'); return false;" style="color:#00e676;">${text}</a>`;
+    function pageMethods() {
+        return `
+            <div class="panel-header">
+                <h2>\uD83D\uDD0D How the data works</h2>
+                <p>What the monitors measure, what counts as a loud event, and what is left out.</p>
+            </div>
+            <div class="info-card">
+                <h3>What each monitor is</h3>
+                <p>Each monitor is a small computer connected to a digital sound-level sensor, installed near a busy street. The sensor is designed to IEC 61672 Class 2 guidelines and measures in dBA and dBC at the same time. ${pageLink('dba-dbc', 'dBA vs dBC')} explains the two.</p>
+            </div>
+            <div class="info-card">
+                <h3>What a reading is</h3>
+                <p>Four times a second the sensor reports the sound level averaged over a quarter of a second. The monitor groups those into one-second windows and keeps the loudest quarter-second of each. A routine reading is sent every 15 seconds or so, and a loud event is sent as soon as it ends. The monitor does not smooth, correct or adjust the values the sensor reports.</p>
+            </div>
+            <div class="info-card">
+                <h3>What counts as a loud event</h3>
+                <p>An event is logged when a reading is ${DECIBEL_THRESHOLD} dBA or louder, or when the deep, low-frequency part of the sound stands out: dBC more than ${LF_DELTA_THRESHOLD} dB above dBA, with ${DECIBEL_THRESHOLD} or more on either. The site calls these <em>${CLASS_META.A.label}</em> and <em>${CLASS_META.LF.label}</em>.</p>
+                <p>Each sound is logged once, however long it lasts, and the record shows its loudest second. A sound that goes on for more than 30 seconds is logged in 30-second pieces. If the level drops by at least 6 dB and then rises by at least 6 dB, the monitor treats that as a second vehicle. ${pageLink('dba-dbc', 'dBA vs dBC')} says more about the thresholds.</p>
+            </div>
+            <div class="info-card">
+                <h3>What is left out</h3>
+                <p><strong>Sirens.</strong> The monitor's audio classifier recognizes emergency sirens, and they are left out of every count and total.</p>
+                <p><strong>Invalid readings.</strong> If the sensor reports nothing valid, or an impossible value (zero, or above 140 dB), that second is skipped and nothing is stored for it.</p>
+                <p>Nothing else is removed. We don't discard a reading for being too loud, or for any other reason.</p>
+            </div>
+            <div class="info-card">
+                <h3>Where the monitors are</h3>
+                <p>Each monitor is shown by the street it is on, not its address. We aim to place the sensor at least 50 feet from the nearest travel lane, and the distance for each monitor is listed below.</p>
+                <p>Denver's limit for vehicles is written for a measurement taken 25 feet away. Sound drops as you move away from it, so a reading at 50 feet is typically 3 to 6 dB lower than the same sound at 25 feet.</p>
+                <div id="methods-stations" aria-live="polite"><p class="fine">Loading the monitors&hellip;</p></div>
+            </div>
+            <div class="info-card">
+                <h3>The audio guess</h3>
+                <p>A microphone on each monitor feeds a sound-recognition model that makes a best guess at what caused each loud event. The site shows that guess in four groups, which ${pageLink('dba-dbc', 'dBA vs dBC')} explains. It is approximate, it does not try to tell one kind of vehicle from another, and the audio itself is never saved.</p>
+            </div>
+            <div class="info-card">
+                <h3>What you see on the site</h3>
+                <p>The map shows each monitor's latest reading, usually within a minute of when it was taken. If a monitor goes offline, the gap stays a gap: missing time is never filled in. Routine readings are kept for 72 hours and then summarized by the hour. Loud events are kept. Every station's panel has a button to download its events as a spreadsheet.</p>
+            </div>
+            <div class="info-card">
+                <h3>What this data is</h3>
+                <p>These are community measurements, meant to show patterns: how loud, how often and when, along a corridor. They are not official enforcement readings. The same sensors and the same rules apply to every vehicle.</p>
+            </div>
+            <div class="info-card">
+                <h3>Questions or corrections</h3>
+                <p>If something looks wrong, tell me on the ${pageLink('contact', 'Contact')} page or at ${contactEmailHtml()} and I'll look into it. More about the project is on the ${pageLink('about', 'About')} page.</p>
+            </div>`;
+    }
+    async function renderMethodsStations() {
+        const box = document.getElementById('methods-stations');
+        if (!box) return;
+        await Promise.all(METER_STATIONS.map(ensureStationState));
+        if (currentInfoTopic !== 'methods') return;
+        const rows = METER_STATIONS.filter(s => !s.recruiting && (s.state === 'live' || s.state === 'stale'));
+        box.innerHTML = rows.length ? rows.map(s => {
+            const where = [s.corridor || 'Denver', s.district ? `District ${s.district}` : ''].filter(Boolean).join(' \u00b7 ');
+            const dist = s.distanceFt ? `${s.distanceFt} ft from the nearest lane` : 'distance not recorded';
+            return `<div class="lb-row"><div><strong>${s.name}</strong><div class="fine">${where}</div></div><div class="fine" style="text-align:right;">${dist}<br>${s.state === 'live' ? 'reporting' : 'offline'}</div></div>`;
+        }).join('') : '<p class="fine">No monitors are reporting right now.</p>';
+    }
+
+    function pageAbout() {
+        return `
+            <div class="panel-header">
+                <h2>\uD83D\uDC4B About the Mile High Noise Project</h2>
+                <p>Independent sensors measuring vehicle noise along Denver's corridors.</p>
+            </div>
+            <div class="info-card">
+                <h3>Why I started this</h3>
+                <p>When I moved near Federal Boulevard, the volume surprised me. Day and night, extremely loud vehicles roared past, loud enough to cut a conversation in half. I even installed acoustic-grade windows, and the low rumble came straight through.</p>
+                <p>So I read Denver's rules. State and city law ban modified exhausts that make a vehicle louder, and Denver's noise code sets a decibel limit for vehicles. The rules were already on the books, and what I was hearing appeared to be well over them. The World Health Organization links this kind of noise to heart disease and poor sleep, so it matters well beyond annoyance.</p>
+                <p><strong>Hitting a wall.</strong> I contacted the Mayor's Office, the Denver Police Department, City Council and the Department of Public Health &amp; Environment. Every office acknowledged the problem. But I was passed from one to the next, or told there was nothing they could do, and none of them took ownership.</p>
+                <p><strong>Turning frustration into data.</strong> Rather than argue about how loud it feels, I decided to measure it. The Mile High Noise Project is a set of sensors along residential corridors that record how loud vehicles get, how often and when, with the results open for anyone to see. I hope it helps move the conversation from passing responsibility to shared action: coalition building, and a standard the city can measure and enforce.</p>
+            </div>
+            <div class="info-card">
+                <h3>What this project asks for</h3>
+                <ul>
+                    <li>A clear, measurable standard for vehicle noise that can be checked at the roadside.</li>
+                    <li>One city office accountable for vehicle noise complaints and enforcement.</li>
+                    <li>A study of whether Denver could pilot automated noise cameras like New York City's, including any state authority it would need.</li>
+                </ul>
+                <p>This isn't about any one kind of vehicle or driver. It's about one standard, measured the same way for everyone. ${pageLink('gap', 'The Gap')} lays out what the rules say and who enforces them.</p>
+            </div>
+            <div class="info-card">
+                <h3>Where things stand</h3>
+                <p id="about-live">The map shows what the monitors are recording right now.</p>
+                <p>${pageLink('methods', 'How the data works')} explains what the monitors measure and what is left out.</p>
+            </div>
+            <div class="info-card">
+                <h3>How it's run</h3>
+                <p>The Mile High Noise Project is independent and self-funded: I pay for the monitors, the hosting and the time myself. There are no ads, and the data is free to download. I hope to turn it into a nonprofit someday.</p>
+            </div>
+            <div class="info-card">
+                <h3>Get involved</h3>
+                <p>Want a monitor on your street, or want to help? Every council district needs one.</p>
+                <div class="host-actions">
+                    <button type="button" class="action-btn btn-primary" style="min-height:44px;" onclick="openInfoModal('host')">Host a monitor</button>
+                    <button type="button" class="action-btn btn-secondary" style="min-height:44px;" onclick="openInfoModal('action')">Email your council member</button>
+                    <button type="button" class="action-btn btn-secondary" style="min-height:44px;" onclick="openInfoModal('contact')">Contact me</button>
+                </div>
+                <p class="fine">Press, hosts and corrections: write to ${contactEmailHtml()}</p>
+            </div>
+            <div class="info-card">
+                <h3>Privacy</h3>
+                <p>The contact form, and email to the project address, reach me. If you tick the first box on the form, I'll also send you occasional project updates. I never sell your details or share your email address. If you tick the second box on the form, I may pass your message along, without your email, to city officials or the media. Monitors are shown by corridor, never by address.</p>
+            </div>`;
+    }
+    async function fillAboutLive() {
+        const el = document.getElementById('about-live');
+        if (!el) return;
+        await Promise.all(METER_STATIONS.map(ensureStationState));
+        const reporting = METER_STATIONS.filter(s => !s.recruiting && (s.state === 'live' || s.state === 'stale')).length;
+        let text = reporting ? `${reporting} monitor${reporting === 1 ? ' is' : 's are'} reporting right now.` : '';
+        try {
+            const f = await loadFlaggedStats(30);
+            if (f && f.a + f.lf > 0) text += ` In the last 30 days the monitors logged ${f.a + f.lf} loud events: ${f.a} at or above ${DECIBEL_THRESHOLD} dBA and ${f.lf} deep-rumble-only.`;
+        } catch (err) { console.warn('About page: could not load the live numbers.', err); }
+        if (text.trim() && currentInfoTopic === 'about' && document.getElementById('about-live') === el) el.textContent = text.trim();
+    }
+
     const INFO_PAGES = {
         'dba-dbc': pageDbaDbc, gap: pageGap, myths: pageMyths, action: pageAction,
-        resources: pageResources, hotspots: pageHotspots, calculator: pageNight, contact: pageContact, host: pageHost
+        resources: pageResources, hotspots: pageHotspots, calculator: pageNight, contact: pageContact, host: pageHost,
+        methods: pageMethods, about: pageAbout
     };
     const INFO_AFTER = {
         'dba-dbc': () => { fillFlaggedStats('live-stats-dba', 'dba-dbc'); fillAudioStats('live-audio-dba', 'dba-dbc'); },
         gap: () => { fillFlaggedStats('live-stats-gap', 'gap'); fillAudioStats('live-audio-gap', 'gap'); fillLoudStats('live-loud-gap', 'gap'); },
         action: () => updateCouncilEmail(),
+        methods: () => renderMethodsStations(),
+        about: () => fillAboutLive(),
         hotspots: () => { renderLeaderboard(); renderCoverage(); },
         calculator: () => {
             const sel = document.getElementById('night-station');
@@ -2306,8 +2464,8 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             const cls = classifyEvent(dba, dbc);
             if (!cls) continue;
             const g = rand();
-            const grp = g < 0.32 ? 'motorcycle' : g < 0.72 ? 'car' : g < 0.77 ? 'truck_bus' : g < 0.85 ? 'music' : 'unclear';
-            events.push({ t: Math.round(since + rand() * range.ms), dba, dbc, delta: round1(dbc - dba), cls, siren: false, grp, top: null });
+            const grp = g < 0.72 ? 'light' : g < 0.77 ? 'heavy' : g < 0.85 ? 'music' : 'unclear';
+            events.push({ t: Math.round(since + rand() * range.ms), dba, dbc, delta: round1(dbc - dba), cls, siren: false, grp });
         }
         for (let i = 0; i < 2; i++) {
             const dba = round1(between(86, 96)), dbc = round1(dba + between(2, 6));
@@ -2343,7 +2501,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         let rows;
         if (Date.now() >= audioColumnsRetryAt) {
             try {
-                rows = await fetchSupabase('noise_logs', query(`${base},audio_group,audio_labels`));
+                rows = await fetchSupabase('noise_logs', query(`${base},audio_group`));
             } catch (err) {
                 if (!/\(400\)/.test(String(err.message))) throw err;
                 audioColumnsRetryAt = Date.now() + 10 * 60 * 1000; // no audio columns yet: carry on without them
@@ -2356,9 +2514,8 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         rows.reverse().forEach(r => {
             const dba = Number(r.dba);
             const dbc = validDbc(r.dbc);
-            const labels = r.audio_labels && typeof r.audio_labels === 'object' ? r.audio_labels : null;
             const ev = { t: new Date(r.timestamp).getTime(), dba, dbc, delta: dbc == null ? null : dbc - dba, cls: r.event_class, siren: !!r.is_siren,
-                         grp: audioGroupId(r.audio_group), top: labels && Array.isArray(labels.top) ? labels.top : null };
+                         grp: audioGroupId(r.audio_group) };
             (ev.siren ? sirens : events).push(ev);
         });
         return { stationId: station.id, rangeKey, since: sinceMs, until: Date.now(), events, sirens, truncated, demo: false };
@@ -3207,7 +3364,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         }
         const dist = Number(r.sensor_distance_ft ?? r.distanceFt);
         return {
-            id: String(r.id), name: r.name || String(r.id), address: r.address || '', lat, lng,
+            id: String(r.id), name: r.name || String(r.id), corridor: String(r.corridor || corridorFromAddress(r.address) || '').trim(), lat, lng,
             distanceFt: Number.isFinite(dist) && dist > 0 ? dist : null,
             // placeholders: only ever shown, labelled as demo, for a station that has not reported yet
             currentDba: Number(r.currentDba) || 70, currentDbc: Number(r.currentDbc) || 82,
@@ -3254,7 +3411,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             const have = METER_STATIONS.find(s => s.id === fresh.id);
             if (!have) { METER_STATIONS.push(fresh); addStationMarker(fresh); continue; }
             const moved = have.lat !== fresh.lat || have.lng !== fresh.lng;
-            Object.assign(have, { name: fresh.name, address: fresh.address, lat: fresh.lat, lng: fresh.lng, distanceFt: fresh.distanceFt });
+            Object.assign(have, { name: fresh.name, corridor: fresh.corridor, lat: fresh.lat, lng: fresh.lng, distanceFt: fresh.distanceFt });
             if (have.recruiting !== fresh.recruiting) {          // a host signed up (or a spot went back to recruiting)
                 have.recruiting = fresh.recruiting;
                 have.state = fresh.recruiting ? 'recruiting' : 'loading';
@@ -3273,14 +3430,22 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
 
     // `status` ('active' or 'recruiting') comes from stations_host_wanted.sql. Until that is run the column does not exist and the
     // request is refused, so ask without it rather than lose the whole list.
+    // It asks for the public `corridor` column first (stations_corridor.sql). A database that has not been updated yet is asked the
+    // older way, for `address`, and the corridor is worked out from it here, so the page works whichever order the steps are done in.
     async function fetchStationRows() {
-        const cols = 'select=id,name,address,latitude,longitude,is_active,sensor_distance_ft';
-        try {
-            return await fetchSupabase('stations', `${cols},status&is_active=eq.true&order=id.asc`);
-        } catch (err) {
-            console.warn('Reading stations with the status column failed; trying without it.', err);
-            return fetchSupabase('stations', `${cols}&is_active=eq.true&order=id.asc`);
+        const tail = '&is_active=eq.true&order=id.asc';
+        const attempts = [
+            'select=id,name,corridor,latitude,longitude,is_active,sensor_distance_ft,status',
+            'select=id,name,corridor,latitude,longitude,is_active,sensor_distance_ft',
+            'select=id,name,address,latitude,longitude,is_active,sensor_distance_ft,status',
+            'select=id,name,address,latitude,longitude,is_active,sensor_distance_ft'
+        ];
+        let lastErr = null;
+        for (const cols of attempts) {
+            try { return await fetchSupabase('stations', cols + tail); }
+            catch (err) { lastErr = err; console.warn(`Reading stations with "${cols.slice(7)}" failed; trying a simpler request.`, err); }
         }
+        throw lastErr;
     }
 
     async function loadStations() {
@@ -3631,7 +3796,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         liveTimeLabels = [];
 
         document.getElementById('panel-title').innerText = station.name;
-        document.getElementById('panel-address').innerText = station.address;
+        document.getElementById('panel-corridor').innerText = station.corridor || 'Denver';
         renderStationDistrict(station);
         renderStationDistance(station);
         renderLiveHeader(station);
@@ -4080,20 +4245,20 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             const csvQuery = cols => `select=${cols}&station_id=eq.${activeMarkerObj.id}&event_class=not.is.null&order=timestamp.desc&limit=${EVENT_LIMIT}`;
             let rows;
             try {
-                rows = await fetchSupabase("noise_logs", csvQuery("timestamp,dba,dbc,event_class,is_siren,audio_group,audio_labels"));
+                rows = await fetchSupabase("noise_logs", csvQuery("timestamp,dba,dbc,event_class,is_siren,audio_group"));
             } catch (err) {
                 if (!/\(400\)/.test(String(err.message))) throw err;
                 rows = await fetchSupabase("noise_logs", csvQuery("timestamp,dba,dbc,event_class,is_siren"));   // no audio columns yet
             }
             if (Array.isArray(rows) && rows.length > 0) {
-                let csv = "Timestamp,dBA,dBC,Delta_dB,Event_Class,Is_Siren,Audio_Group,Audio_Top_Label,Audio_Top_Score\n";
+                let csv = "Timestamp,dBA,dBC,Delta_dB,Event_Class,Is_Siren,Audio_Group\n";
                 const q = v => `"${String(v).replace(/"/g, '""')}"`;
                 rows.forEach(r => {
                     const dba = Number(r.dba);
                     const dbc = validDbc(r.dbc);
-                    const top = r.audio_labels && Array.isArray(r.audio_labels.top) && r.audio_labels.top[0] ? r.audio_labels.top[0] : null;
+                    const group = audioGroupId(r.audio_group);
                     csv += `"${r.timestamp}",${dba},${dbc == null ? '' : dbc},${dbc == null ? '' : (dbc - dba).toFixed(2)},${r.event_class},${r.is_siren},` +
-                        `${AUDIO_ALIAS[r.audio_group] || r.audio_group || ''},${top ? q(top[0]) : ''},${top ? top[1] : ''}\n`;
+                        `${group ? q(AUDIO_GROUP_META[group].label) : ''}\n`;
                 });
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -4141,7 +4306,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         doc.setFontSize(10);
         doc.setTextColor(170, 170, 170);
         doc.text(`Station Name: ${activeMarkerObj.name}`, 14, 46);
-        doc.text(`Location Address: ${activeMarkerObj.address}`, 14, 53);
+        doc.text(`Corridor: ${activeMarkerObj.corridor || 'Denver'}`, 14, 53);
         doc.text(`Report Generated: ${new Date().toLocaleString()}`, 14, 60);
         doc.text(doc.splitTextToSize(`Sensor: ${SENSOR_SPEC_TEXT}`, 180), 14, 67);
         doc.text(activeMarkerObj.distanceFt ? `Sensor distance from the travel lane: about ${fmtFt(activeMarkerObj.distanceFt)} ft` : 'Sensor distance from the travel lane: not recorded', 14, 76);
