@@ -107,6 +107,17 @@
             font-weight: 700;
             border-color: #00e676;
         }
+        /* ---- Grouped menu: wide screens show dropdowns, the phone/tablet menu shows each group as a labelled set ---- */
+        .nav-links { overflow: visible; }
+        .nav-group { position: relative; flex-shrink: 0; }
+        .nav-parent::after { content: ""; display: inline-block; margin-left: 6px; vertical-align: 2px; border: 4px solid transparent; border-top-color: currentColor; border-bottom: 0; }
+        .nav-group.open > .nav-parent { background: #00e676; color: #000; }
+        .nav-sub { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 2200; min-width: 180px; padding: 6px;
+            background: #1a1a1a; border: 1px solid #333; border-radius: 6px; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.55); flex-direction: column; gap: 4px; }
+        .nav-sub-end { left: auto; right: 0; }
+        .nav-group.open > .nav-sub { display: flex; }
+        .nav-sub .nav-btn { width: 100%; text-align: left; border-color: #2f2f2f; font-size: 0.82rem; padding: 8px 12px; }
+        .nav-sub .nav-btn:hover, .nav-sub .nav-btn.active { border-color: #00e676; }
 
         .stat-highlight { color: #00e676; font-weight: 700; }
 
@@ -515,6 +526,7 @@
         .layer-toggle { display: flex; align-items: center; gap: 8px; color: #ddd; font-size: 0.8rem; cursor: pointer; min-height: 24px; }
         .layer-toggle input { width: 16px; height: 16px; accent-color: #00e676; cursor: pointer; }
         .coverage-line { color: #9a9a9a; font-size: 0.75rem; margin-top: 4px; }
+        .cov-actions { margin-top: 0; flex-wrap: nowrap; flex-shrink: 0; }
         .cov-btn { border: 1px solid #00e676; color: #00e676; border-radius: 4px; min-height: 32px; flex-shrink: 0; }
 
         /* ---- Accessibility ---- */
@@ -548,9 +560,17 @@
             .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 2100; width: auto; background: #1a1a1a; border-bottom: 1px solid #333; padding: 10px 12px 14px; overflow: visible; white-space: normal; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.55); }
             .nav-links.open { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
             .nav-btn { min-height: 44px; font-size: 0.9rem; padding: 8px 12px; }
+            .nav-top { order: 0; }
+            .nav-group { order: 1; grid-column: 1 / -1; }
+            .nav-parent { pointer-events: none; background: none; border: none; color: #9a9a9a; min-height: 0; padding: 6px 2px 2px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+            .nav-parent::after { display: none; }
+            .nav-group.open > .nav-parent { background: none; color: #9a9a9a; }
+            .nav-sub, .nav-group.open > .nav-sub { display: grid; position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; min-width: 0; padding: 0; background: none; border: none; box-shadow: none; }
+            .nav-sub .nav-btn { text-align: center; border-color: #00e676; font-size: 0.9rem; }
         }
         @media (min-width: 700px) and (max-width: 1100px) {
-            .nav-links.open { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .nav-links.open { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .nav-sub, .nav-group.open > .nav-sub { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
 
         /* ---- Phones: panels become bottom sheets so the map stays in view ---- */
@@ -680,17 +700,32 @@
         <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" onclick="toggleMenu()"><span aria-hidden="true">&#9776;</span><span class="menu-label">Menu</span></button>
 
         <nav class="nav-links" id="nav-links" aria-label="Site sections">
-            <button class="nav-btn" onclick="openInfoModal('findings')">Key Findings</button>
-            <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
-            <button class="nav-btn" onclick="openInfoModal('methods')">How it works</button>
-            <button class="nav-btn" onclick="openInfoModal('gap')">The Gap</button>
-            <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
-            <button class="nav-btn" onclick="openInfoModal('action')">Take Action</button>
-            <button class="nav-btn" onclick="openInfoModal('resources')">Resources</button>
-            <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
-            <button class="nav-btn" onclick="openInfoModal('calculator')">Night Noise</button>
-            <button class="nav-btn" onclick="openInfoModal('about')">About</button>
-            <button class="nav-btn" onclick="openInfoModal('contact')">Contact</button>
+            <button class="nav-btn nav-top" onclick="openInfoModal('findings')">Key Findings</button>
+            <div class="nav-group">
+                <button class="nav-btn nav-parent" type="button" aria-expanded="false" aria-controls="nav-sub-problem" onclick="toggleNavGroup(this)">The Problem</button>
+                <div class="nav-sub" id="nav-sub-problem">
+                    <button class="nav-btn" onclick="openInfoModal('gap')">The Gap</button>
+                    <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
+                    <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
+                </div>
+            </div>
+            <div class="nav-group">
+                <button class="nav-btn nav-parent" type="button" aria-expanded="false" aria-controls="nav-sub-data" onclick="toggleNavGroup(this)">The Data</button>
+                <div class="nav-sub" id="nav-sub-data">
+                    <button class="nav-btn" onclick="openInfoModal('hotspots')">Hotspots</button>
+                    <button class="nav-btn" onclick="openInfoModal('calculator')">Night Noise</button>
+                    <button class="nav-btn" onclick="openInfoModal('methods')">How it works</button>
+                </div>
+            </div>
+            <button class="nav-btn nav-top" onclick="openInfoModal('action')">Take Action</button>
+            <div class="nav-group">
+                <button class="nav-btn nav-parent" type="button" aria-expanded="false" aria-controls="nav-sub-about" onclick="toggleNavGroup(this)">About</button>
+                <div class="nav-sub nav-sub-end" id="nav-sub-about">
+                    <button class="nav-btn" onclick="openInfoModal('about')">About the project</button>
+                    <button class="nav-btn" onclick="openInfoModal('resources')">Resources</button>
+                    <button class="nav-btn" onclick="openInfoModal('contact')">Contact</button>
+                </div>
+            </div>
         </nav>
     </div>
 
@@ -2224,6 +2259,9 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(`'${topic}'`));
         if (activeBtn) activeBtn.classList.add('active');
+        const parent = activeBtn && activeBtn.closest('.nav-group') && activeBtn.closest('.nav-group').querySelector('.nav-parent');
+        if (parent) parent.classList.add('active');
+        closeNavGroups();
 
         const build = INFO_PAGES[topic];
         container.innerHTML = build ? build() : 'Select a topic from the navigation bar.';
@@ -2282,6 +2320,23 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         setSheetExpanded(id, !(p && p.classList.contains('expanded')));
     }
 
+    const navIsMenu = () => { const t = document.getElementById('menu-toggle'); return !!t && getComputedStyle(t).display !== 'none'; };
+    function closeNavGroups(except) {
+        document.querySelectorAll('.nav-group.open').forEach(g => {
+            if (g === except) return;
+            g.classList.remove('open');
+            const b = g.querySelector('.nav-parent'); if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    }
+    function toggleNavGroup(btn) {
+        if (navIsMenu()) return;                      // in the phone/tablet menu every group is already open
+        const group = btn.closest('.nav-group');
+        const open = !group.classList.contains('open');
+        closeNavGroups(group);
+        group.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', String(open));
+        if (open) { const first = group.querySelector('.nav-sub .nav-btn'); if (first && first.focus) first.focus(); }
+    }
     function toggleMenu(force) {
         const links = document.getElementById('nav-links');
         const btn = document.getElementById('menu-toggle');
@@ -2345,6 +2400,12 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             return;
         }
         if (e.key !== 'Escape') return;
+        const openGroup = document.querySelector('.nav-group.open');
+        if (openGroup) {
+            closeNavGroups();
+            const b = openGroup.querySelector('.nav-parent'); if (b && b.focus) b.focus();
+            return;
+        }
         const links = document.getElementById('nav-links');
         if (links && links.classList.contains('open')) {
             toggleMenu(false);
@@ -2356,6 +2417,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         if (isPanelOpen('detail-panel')) closePanel();
     }
     function handleDocumentClick(e) {
+        if (!(e.target && e.target.closest && e.target.closest('.nav-group'))) closeNavGroups();
         const links = document.getElementById('nav-links');
         if (!links || !links.classList.contains('open')) return;
         const insideNav = e.target && e.target.closest ? e.target.closest('.navbar') : null;
@@ -3721,9 +3783,10 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             const wanted = here.some(s => s.recruiting);
             const status = reporting.length ? reporting.map(s => `${s.name} (${s.state === 'live' ? 'live' : 'offline'})`).join(', ')
                 : planned.length ? `Planned: ${planned.map(s => s.name).join(', ')}` : wanted ? 'Looking for a host' : 'No monitor yet';
-            const offer = reporting.length ? '' : `<button type="button" class="range-btn cov-btn" onclick="openHostPage(${m.d})" aria-label="Host a monitor in District ${m.d}">Host</button>`;
+            // Host is offered until a district has a monitor that is live right now; an offline one may need replacing.
+            const offer = reporting.some(s => s.state === 'live') ? '' : `<button type="button" class="range-btn cov-btn" onclick="openHostPage(${m.d})" aria-label="Host a monitor in District ${m.d}">Host</button>`;
             return `<div class="lb-row"><div><strong>District ${m.d}</strong> \u00b7 ${m.name}<div class="fine">${status}</div></div>` +
-                `<div class="host-actions" style="margin-top:0;">${offer}<button type="button" class="range-btn cov-btn" onclick="showDistrict(${m.d})" aria-label="Show District ${m.d} on the map">Show</button></div></div>`;
+                `<div class="host-actions cov-actions">${offer}<button type="button" class="range-btn cov-btn" onclick="showDistrict(${m.d})" aria-label="Show District ${m.d} on the map">Show</button></div></div>`;
         }).join('');
     }
 
