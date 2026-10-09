@@ -26,6 +26,7 @@
             width: 100%;
             height: 100%;
             height: 100dvh;
+            height: var(--app-h, 100dvh);   /* the real visible height, kept current by syncAppHeight() */
             overflow: hidden;
             position: fixed;
             top: 0;
@@ -577,8 +578,10 @@
         /* ---- Phones: panels become bottom sheets so the map stays in view ---- */
         @media (max-width: 600px) {
             .detail-panel {
+                position: fixed;   /* anchored to the screen, not to the map area, so iPhone sizing quirks can't shrink it */
                 top: auto; left: 0; right: 0; bottom: 0; width: 100%; max-width: 100vw;
-                height: 60vh; height: 60dvh;
+                height: 60vh; height: 60dvh; height: calc(var(--app-h, 100dvh) * 0.6);
+                max-height: calc(var(--app-h, 100dvh) - var(--header-h, 92px));
                 padding: 0 14px calc(28px + env(safe-area-inset-bottom, 0px)) 14px;
                 border-left: none; border-top: 1px solid #333; border-radius: 16px 16px 0 0;
                 box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.55);
@@ -586,7 +589,7 @@
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
             }
             .detail-panel.open { right: 0; transform: translateY(0); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s; }
-            .detail-panel.expanded { height: calc(100vh - var(--header-h, 92px)); height: calc(100dvh - var(--header-h, 92px)); }
+            .detail-panel.expanded { height: calc(100vh - var(--header-h, 92px)); height: calc(100dvh - var(--header-h, 92px)); height: calc(var(--app-h, 100dvh) - var(--header-h, 92px)); }
             .sheet-bar { position: sticky; top: 0; z-index: 5; justify-content: space-between; background: #1a1a1a; margin: 0 -14px; padding: 0 6px 0 10px; min-height: 48px; }
             .sheet-handle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; background: none; border: none; color: #d0d0d0; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
             .sheet-grip { display: inline-block; width: 36px; height: 5px; border-radius: 3px; background: #666; }
@@ -2388,8 +2391,19 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         const nav = document.querySelector ? document.querySelector('.navbar') : null;
         if (nav && nav.offsetHeight && document.documentElement) document.documentElement.style.setProperty('--header-h', nav.offsetHeight + 'px');
     }
+    // iPhone browsers can report 100vh/100dvh differently from the area actually on screen, which left the panels short.
+    // Use the measured visible height instead.
+    function syncAppHeight() {
+        const h = window.innerHeight;   // not visualViewport: that also shrinks for pinch-zoom and the keyboard
+        if (h && document.documentElement) document.documentElement.style.setProperty('--app-h', Math.round(h) + 'px');
+    }
+    syncAppHeight();
     syncHeaderHeight();
-    if (window.addEventListener) { window.addEventListener('resize', syncHeaderHeight); window.addEventListener('load', syncHeaderHeight); }
+    if (window.addEventListener) {
+        window.addEventListener('resize', () => { syncAppHeight(); syncHeaderHeight(); });
+        window.addEventListener('orientationchange', () => setTimeout(() => { syncAppHeight(); syncHeaderHeight(); }, 300));
+        window.addEventListener('load', () => { syncAppHeight(); syncHeaderHeight(); });
+    }
 
     // The first-visit welcome card. Dismissing it (or opening any panel) is remembered in this browser.
     const WELCOME_KEY = 'mhnp-welcome-dismissed';
