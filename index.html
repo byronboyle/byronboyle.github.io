@@ -245,14 +245,9 @@
 
         .panel-header h2 { margin: 0 0 4px 0; color: #fff; font-size: 1.25rem; }
         .panel-header p { margin: 0 0 16px 0; color: #9a9a9a; font-size: 0.85rem; }
-        /* Compact station line that stays on screen once the panel header scrolls away. It takes no
-           space (negative margin), so showing it never makes the panel jump. */
-        .panel-sticky { position: sticky; top: -20px; z-index: 4; flex-shrink: 0; height: 34px; margin: 0 -20px -34px; padding: 8px 20px;
-            box-sizing: border-box; background: rgba(26, 26, 26, 0.96); border-bottom: 1px solid #333; color: #e0e0e0;
-            font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            opacity: 0; pointer-events: none; transition: opacity 0.15s; }
-        .panel-sticky.show { opacity: 1; }
-        .panel-sticky .fine { font-weight: 400; }
+        /* Station name in the panel's top bar once the panel header has scrolled away (phones, where that bar already
+           stays put). Deliberately no separate sticky element: iPhone browsers stopped drawing the panel below one. */
+        .sheet-station { display: none; }
         .next-steps .host-actions .action-btn { flex: 1 1 12rem; min-height: 44px; }
         .report-preview { background: #222; border: 1px solid #3a3a3a; border-radius: 8px; padding: 12px 14px; margin: -4px 0 12px; font-size: 0.85rem; color: #ddd; }
         .report-preview-lead { margin: 0 0 6px; }
@@ -596,7 +591,9 @@
             .sheet-handle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; background: none; border: none; color: #d0d0d0; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
             .sheet-grip { display: inline-block; width: 36px; height: 5px; border-radius: 3px; background: #666; }
             .panel-header { padding-right: 0; }
-            .panel-sticky { top: 48px; margin: 0 -14px -34px; padding: 8px 14px; }
+            .sheet-station { display: block; flex: 1 1 auto; min-width: 0; margin: 0 6px; color: #e0e0e0; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; visibility: hidden; }
+            .sheet-station.show { visibility: visible; }
+            .sheet-station .fine { font-weight: 400; }
             .map-overlay-legend { padding: 6px 10px; }
             .legend-title { font-size: 0.72rem; margin-bottom: 4px; }
             .legend-scale { flex-direction: row; flex-wrap: wrap; gap: 4px 12px; }
@@ -791,6 +788,7 @@
         <div class="detail-panel" id="detail-panel" role="dialog" aria-modal="false" aria-labelledby="panel-title" tabindex="-1">
             <div class="sheet-bar">
                 <button class="sheet-handle" type="button" aria-expanded="false" aria-label="Expand panel" onclick="toggleSheet('detail-panel')"><span class="sheet-grip" aria-hidden="true"></span><span class="sheet-label">Expand</span></button>
+                <span class="sheet-station" id="panel-sticky" aria-hidden="true"></span>
                 <button class="close-btn" type="button" aria-label="Close station panel" onclick="closePanel()">&times;</button>
             </div>
             <div class="panel-header">
@@ -799,7 +797,6 @@
                 <p class="fine" id="panel-district"></p>
                 <p class="fine" id="panel-distance"></p>
             </div>
-            <div class="panel-sticky" id="panel-sticky" aria-hidden="true"></div>
 
             <div id="panel-banner" class="panel-banner" hidden></div>
 
