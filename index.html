@@ -618,6 +618,16 @@
         .navbar::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: var(--ridge-h); z-index: -1; pointer-events: none; opacity: var(--ridge-strength); background: var(--ridge-art) no-repeat left bottom / 100% 100%; }
         @media (forced-colors: active) { .navbar::before { display: none; } .navbar { padding-bottom: 8px; } }
         @media (forced-colors: active) and (max-width: 600px) { .navbar { padding-bottom: 6px; } }
+        /* iPhone notch / home indicator: the page uses viewport-fit=cover, so keep the header and side panels clear of the
+           rounded corners and notch (matters in landscape, and anywhere the page is shown full-screen). */
+        @supports (padding: max(0px)) {
+            .navbar { padding-top: max(8px, env(safe-area-inset-top)); padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+            .detail-panel { padding-right: max(20px, env(safe-area-inset-right)); }
+            @media (max-width: 600px) {
+                .navbar { padding-top: max(6px, env(safe-area-inset-top)); padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+                .detail-panel { padding-right: max(14px, env(safe-area-inset-right)); }
+            }
+        }
 
         /* ---- Printable flyer ---- */
         .flyer-overlay { display: none; position: fixed; inset: 0; z-index: 3500; flex-direction: column; background: rgba(10, 10, 10, 0.94); }
