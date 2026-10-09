@@ -445,6 +445,9 @@
         .rule-note { margin: 6px 0 0; font-size: 0.72rem; color: #9a9a9a; line-height: 1.4; }
         .rule-note a { color: #29b6f6; }
 
+        .timeline-quiet { margin: 4px 0 6px; font-size: 0.82rem; color: #e0e0e0; line-height: 1.4; }
+        .timeline-quiet strong { color: #b39ddb; }
+        .quiet-swatch { display: inline-block; width: 12px; height: 10px; margin: 0 4px 0 2px; border-radius: 2px; background: rgba(124, 77, 255, 0.45); vertical-align: -1px; }
         .chart-help { margin: 4px 0 8px; color: #9a9a9a; font-size: 0.72rem; line-height: 1.35; }
         .chart-sub { margin: 8px 0 2px; color: #9a9a9a; font-size: 0.72rem; }
         .chart-box { position: relative; width: 100%; }
@@ -852,6 +855,7 @@
 
             <section class="chart-card">
                 <h4>When loud events happen</h4>
+                <p class="timeline-quiet" id="timeline-quiet"></p>
                 <p class="chart-help" id="timeline-help"></p>
                 <div class="chart-sub">dBA</div>
                 <div class="chart-box" style="height: 150px;"><canvas id="timelineChart"></canvas></div>
@@ -880,7 +884,7 @@
                     </div>
                 </div>
                 <div class="hm-foot"><span id="hm-detail" aria-live="polite">Tap a square, or use the arrow keys, for details.</span><span class="hm-legend" id="hm-legend"></span></div>
-                <p class="hm-note">Last 14 days, station local time. Darker columns are 10 pm to 6 am.</p>
+                <p class="hm-note">Last 14 days, station local time. Darker columns are Denver's quiet hours, 10 PM to 7 AM.</p>
             </section>
 
             <section class="chart-card" id="daily-card">
@@ -1614,7 +1618,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         for (let i = 0; i < model.dates.length - 1; i++) {  // the newest date's night is still under way
             let n = 0;
             for (const h of [22, 23]) n += model.cells[i][h].a + model.cells[i][h].lf;
-            for (let h = 0; h < 6; h++) n += model.cells[i + 1][h].a + model.cells[i + 1][h].lf;
+            for (let h = 0; h < QUIET_END_H; h++) n += model.cells[i + 1][h].a + model.cells[i + 1][h].lf;
             nights.push({ date: model.dates[i], events: n });
         }
         return nights;
@@ -1647,7 +1651,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                 <div class="stat"><div class="stat-num">${worst.events}</div><div class="stat-label">on the worst night (${dayLabel(worst.date)})</div></div>
                 <div class="stat"><div class="stat-num">${withEvents} of ${nights.length}</div><div class="stat-label">nights with at least one</div></div>
             </div>
-            <p class="fine" style="margin-top:8px;">Nights run 10 pm to 6 am, station local time, over the last ${nights.length} complete nights.</p>`;
+            <p class="fine" style="margin-top:8px;">Nights are Denver's quiet hours, ${QUIET_LABEL}, station local time, over the last ${nights.length} complete nights.</p>`;
     }
 
     // ========================================================================
@@ -1971,7 +1975,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         return `
             <div class="panel-header">
                 <h2>\uD83C\uDF19 Night-Time Noise</h2>
-                <p>How often loud events happen between 10 pm and 6 am.</p>
+                <p>How often loud events happen during Denver's quiet hours, ${QUIET_LABEL}.</p>
             </div>
             <div class="info-card">
                 <h3>Choose a monitor</h3>
@@ -2179,7 +2183,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             const busiest = perHour.indexOf(Math.max(...perHour));
             const days = Math.max(...models.map(m => m.dates.length));
             put('kf-when', `Loud events were logged on <strong>${daysWith.size} of the last ${days} days</strong>. ` +
-                `${Math.round(100 * night / total)}% fell between 10 pm and 6 am, and the busiest hour was ${hourRange(busiest)}. ${pageLink('calculator', 'Night-time detail')}.`);
+                `${Math.round(100 * night / total)}% fell during Denver's quiet hours (${QUIET_LABEL}), and the busiest hour was ${hourRange(busiest)}. ${pageLink('calculator', 'Night-time detail')}.`);
         } catch (err) {
             console.warn('Key findings: could not load timing', err);
             put('kf-when', "Timing isn't available right now.");
@@ -3027,7 +3031,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             maintainAspectRatio: false,
             animation: false,
             scales: { x: xScale(showLabels), y: yScaleCfg },
-            plugins: { legend: { display: false }, tooltip: eventTooltip(), refLines: { lines }, demoMark: { enabled: data.demo } }
+            plugins: { legend: { display: false }, tooltip: eventTooltip(), refLines: { lines }, demoMark: { enabled: data.demo }, quietHours: { from: data.since, to: data.until, label: showLabels === false } }
         });
 
         const tlTotal = data.events.length, tlBass = data.events.filter(e => e.cls === 'LF').length;
@@ -3036,6 +3040,14 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
               (tlBass
                 ? `The ${tlBass} blue dot${tlBass === 1 ? '' : 's'} of ${tlTotal} never reached the yellow ${DECIBEL_THRESHOLD} dBA line, so a dBA-only limit would ignore ${tlBass === 1 ? 'it' : 'them'}, yet ${tlBass === 1 ? 'it' : 'they'} carried more than ${LF_DELTA_THRESHOLD} dB of extra bass.`
                 : `Every event in this range crossed the yellow ${DECIBEL_THRESHOLD} dBA line.`)
+            : '';
+        const rumbles = data.events.filter(e => e.cls === 'LF' || e.cls === 'A_LF');
+        const quietRumbles = rumbles.filter(e => isNight(stationHour(e.t))).length;
+        // A count, not a share: what matters is how many rumbles broke into quiet hours. Nothing is shown when there were none.
+        const nights = data.rangeKey === '14d' ? quietBands(data.since, data.until).length : 0;
+        const perNight = nights > 1 && quietRumbles ? ` That's about ${(quietRumbles / nights).toFixed(quietRumbles / nights < 10 ? 1 : 0)} a night.` : '';
+        document.getElementById('timeline-quiet').innerHTML = quietRumbles
+            ? `<strong>${quietRumbles.toLocaleString('en-US')} intense rumble${quietRumbles === 1 ? '' : 's'}</strong> during Denver's quiet hours, ${QUIET_LABEL} <span class="quiet-swatch" aria-hidden="true"></span>(shaded).${perNight}`
             : '';
         describeCanvas('timelineChart', `Timeline of ${data.events.length} loud events by dBA. Events under the ${DECIBEL_THRESHOLD} dBA line are intense rumble events, caught only by the \u0394 rule.`);
         describeCanvas('deltaChart', `Timeline of the difference between dBC and dBA for the same events. The \u0394 rule flags differences above ${LF_DELTA_THRESHOLD} dB.`);
@@ -3049,7 +3061,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             type: 'scatter',
             data: { datasets: topSets },
             options: base(yScale(dbaMin, dbaMax), false, [{ y: DECIBEL_THRESHOLD, color: '#ffeb3b', label: `${DECIBEL_THRESHOLD} dBA threshold` }]),
-            plugins: [refLinesPlugin, demoMarkPlugin]
+            plugins: [quietHoursPlugin, refLinesPlugin, demoMarkPlugin]
         });
 
         // Delta strip
@@ -3066,7 +3078,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                 { y: LF_DELTA_THRESHOLD, color: '#29b6f6', label: `\u0394 = ${LF_DELTA_THRESHOLD} dB` },
                 ...(baselineDelta() != null ? [{ y: baselineDelta(), color: '#bdbdbd', label: `typical \u0394 ${signed(baselineDelta())}`, align: 'left' }] : [])
             ]),
-            plugins: [refLinesPlugin, demoMarkPlugin]
+            plugins: [quietHoursPlugin, refLinesPlugin, demoMarkPlugin]
         });
     }
 
@@ -3138,7 +3150,42 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         return res.json();
     }
 
-    const isNight = h => h >= 22 || h < 6;
+    // Denver's quiet hours, station local time. Used by the timeline shading, the heat map, Night Noise and Key Findings.
+    const QUIET_START_H = 22, QUIET_END_H = 7, QUIET_LABEL = '10 PM to 7 AM';
+    const isNight = h => h >= QUIET_START_H || h < QUIET_END_H;
+    const stationHourFmt = new Intl.DateTimeFormat('en-GB', { timeZone: STATION_TZ, hour: '2-digit', hourCycle: 'h23' });
+    const stationHour = ms => Number(stationHourFmt.format(new Date(ms))) % 24;
+    // [start, end] ms ranges inside [from, to] that fall in quiet hours (hour steps; Denver's offset is whole hours).
+    function quietBands(from, to) {
+        const bands = [];
+        let start = null;
+        for (let t = Math.floor(from / 3600000) * 3600000; t < to; t += 3600000) {
+            if (isNight(stationHour(t))) { if (start === null) start = Math.max(t, from); }
+            else if (start !== null) { bands.push([start, t]); start = null; }
+        }
+        if (start !== null) bands.push([start, to]);
+        return bands;
+    }
+    // Shades quiet hours behind the timeline charts: options.plugins.quietHours = { from, to, label }.
+    const quietHoursPlugin = {
+        id: 'quietHours',
+        beforeDatasetsDraw(chart, args, opts) {
+            if (!opts || opts.from == null) return;
+            const { ctx, chartArea } = chart, x = chart.scales.x;
+            ctx.save();
+            quietBands(opts.from, opts.to).forEach((b, i) => {
+                const x0 = Math.max(chartArea.left, x.getPixelForValue(b[0])), x1 = Math.min(chartArea.right, x.getPixelForValue(b[1]));
+                if (x1 <= x0) return;
+                ctx.fillStyle = 'rgba(124, 77, 255, 0.16)';
+                ctx.fillRect(x0, chartArea.top, x1 - x0, chartArea.bottom - chartArea.top);
+                if (opts.label && x1 - x0 > 46) {
+                    ctx.fillStyle = '#b39ddb'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                    ctx.fillText(x1 - x0 > 80 ? 'Quiet hours' : '\u263E', x0 + 4, chartArea.top + 3);
+                }
+            });
+            ctx.restore();
+        }
+    };
     const signed = v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}`;
     function hourLabel(h) { return `${h % 12 || 12} ${h < 12 ? 'am' : 'pm'}`; }
     function hourRange(h) { return `${hourLabel(h)}\u2013${hourLabel((h + 1) % 24)}`; }
@@ -3228,7 +3275,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         }));
         if (!total) return `No ${HEAT_METRICS[metric].noun} in the last ${HEATMAP_DAYS} days.`;
         const busiest = perHour.indexOf(Math.max(...perHour));
-        return `${Math.round(100 * night / total)}% of these ${total} events happened between 10 pm and 6 am. Busiest hour: ${hourRange(busiest)} (${perHour[busiest]} events).`;
+        return `${Math.round(100 * night / total)}% of these ${total} events happened during Denver's quiet hours (${QUIET_LABEL}). Busiest hour: ${hourRange(busiest)} (${perHour[busiest]} events).`;
     }
 
     function heatDetail(model, i, h) {
@@ -4060,7 +4107,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
 
         destroyPanelCharts();
         lastEventsData = null; lastHourly = null; lastBaseline = null;
-        ['heatmap-sentence', 'baseline-note', 'audio-sentence', 'timeline-help'].forEach(id => { document.getElementById(id).textContent = ''; });
+        ['heatmap-sentence', 'baseline-note', 'audio-sentence', 'timeline-help', 'timeline-quiet'].forEach(id => { document.getElementById(id).textContent = ''; });
         document.getElementById('hm-grid').innerHTML = ''; document.getElementById('hm-days').innerHTML = '';
         document.getElementById('audio-bars').innerHTML = '';
         document.getElementById('heatmap-status').hidden = true;
