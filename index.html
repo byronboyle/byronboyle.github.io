@@ -118,6 +118,8 @@
         .nav-group.open > .nav-sub { display: flex; }
         .nav-sub .nav-btn { width: 100%; text-align: left; border-color: #2f2f2f; font-size: 0.82rem; padding: 8px 12px; }
         .nav-sub .nav-btn:hover, .nav-sub .nav-btn.active { border-color: #00e676; }
+        .nav-note { display: block; font-size: 0.7rem; font-weight: 400; color: #9a9a9a; margin-top: 1px; }
+        .nav-btn:hover .nav-note, .nav-btn.active .nav-note { color: #1b4d2e; }
 
         .stat-highlight { color: #00e676; font-weight: 700; }
 
@@ -259,6 +261,7 @@
         .kf-list li { margin-bottom: 10px; line-height: 1.45; }
         .kf-list li strong { color: #fff; }
         .welcome-more { margin: 10px 0 0; font-size: 0.8rem; }
+        .welcome-card .welcome-health { font-size: 0.82rem; color: #b8b8b8; }
         .welcome-more a { color: #00e676; }
         #siren-card.active {
             background: #192734;
@@ -705,7 +708,7 @@
                 <button class="nav-btn nav-parent" type="button" aria-expanded="false" aria-controls="nav-sub-problem" onclick="toggleNavGroup(this)">The Problem</button>
                 <div class="nav-sub" id="nav-sub-problem">
                     <button class="nav-btn" onclick="openInfoModal('gap')">The Gap</button>
-                    <button class="nav-btn" onclick="openInfoModal('dba-dbc')">dBA vs dBC</button>
+                    <button class="nav-btn" onclick="openInfoModal('dba-dbc')">Volume vs. rumble<span class="nav-note">dBA vs dBC</span></button>
                     <button class="nav-btn" onclick="openInfoModal('myths')">Myths & Facts</button>
                 </div>
             </div>
@@ -754,6 +757,7 @@
             <button type="button" class="welcome-close" id="welcome-close" aria-label="Dismiss the welcome message" onclick="dismissWelcome()">&times;</button>
             <h2>Tired of loud exhausts at night?</h2>
             <p>Neighbors across Denver are proving where and when it happens. Tap a marker to see the readings from that street.</p>
+            <p class="welcome-health">Repeated loud noise at night breaks up sleep, and long-term traffic noise is linked to stress and heart disease.</p>
             <div class="welcome-actions">
                 <button type="button" class="action-btn btn-primary" onclick="welcomeGo('hotspots')">See the loudest streets</button>
                 <button type="button" class="action-btn btn-secondary" onclick="welcomeGo('action')">Email your council member</button>
@@ -813,7 +817,7 @@
                 </div>
                 <div class="summary-grid">
                     <div class="stat stat-a"><div class="stat-num" id="sum-a">&ndash;</div><div class="stat-label" id="tile-a-label">Very loud</div></div>
-                    <div class="stat stat-lf"><div class="stat-num" id="sum-lf">&ndash;</div><div class="stat-label">Low-frequency bass</div></div>
+                    <div class="stat stat-lf"><div class="stat-num" id="sum-lf">&ndash;</div><div class="stat-label">Intense rumble</div></div>
                     <div class="stat stat-s"><div class="stat-num" id="sum-s">&ndash;</div><div class="stat-label">Sirens (excluded)</div></div>
                 </div>
                 <p class="summary-sentence" id="summary-sentence"></p>
@@ -851,7 +855,7 @@
                     <div class="range-toggle" role="group" aria-label="Heatmap measure">
                         <button type="button" class="heat-btn active" data-metric="all" onclick="setHeatMetric('all')">All</button>
                         <button type="button" class="heat-btn" data-metric="a" onclick="setHeatMetric('a')" aria-label="Very loud events, over the dBA threshold">Very loud</button>
-                        <button type="button" class="heat-btn" data-metric="lf" onclick="setHeatMetric('lf')" aria-label="Low-frequency bass events, caught by the delta rule">Low-freq bass</button>
+                        <button type="button" class="heat-btn" data-metric="lf" onclick="setHeatMetric('lf')" aria-label="Intense rumble events (low-frequency), caught by the delta rule">Intense rumble</button>
                     </div>
                 </div>
                 <p class="chart-help" id="heatmap-sentence"></p>
@@ -895,11 +899,12 @@
 
             <section class="chart-card next-steps" aria-labelledby="next-steps-title">
                 <h4 id="next-steps-title">What you can do</h4>
-                <p class="chart-help" id="next-steps-intro">These readings carry more weight when neighbors act on them.</p>
+                <p class="chart-help" id="next-steps-intro"></p>
                 <div class="host-actions">
                     <button type="button" class="action-btn btn-primary" id="next-email" onclick="openActionForDistrict(activeMarkerObj && activeMarkerObj.district)">✉️ Email your council member</button>
                     <button type="button" class="action-btn btn-secondary" onclick="openHostPage(null)">📍 Host a monitor</button>
                 </div>
+                <p class="fine" id="next-host-needs" style="margin:4px 0 0;"></p>
                 <p class="fine" style="margin-top:8px;"><a href="#" onclick="openInfoModal('action'); return false;" style="color:#00e676;">More ways to help, including talking points for a council meeting →</a></p>
             </section>
 
@@ -1124,7 +1129,7 @@
         const list = parts.length > 2 ? parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1] : parts.join(' and ');
         return `${prefix} ${list}.`;
     }
-    // The low-frequency bass breakdown is only worth its own sentence when it differs from the overall one.
+    // The intense-rumble breakdown is only worth its own sentence when it differs from the overall one.
     function audioSharesDiffer(a, aN, b, bN, points = 10) {
         const x = audioShares(a, aN), y = audioShares(b, bN);
         return x.some(([, , p], i) => Math.abs(p - y[i][2]) >= points);
@@ -1153,7 +1158,7 @@
         const lfCounts = {};
         let lfLabelled = 0;
         data.events.forEach(e => { if (e.cls === 'LF' && e.grp) { lfCounts[e.grp] = (lfCounts[e.grp] || 0) + 1; lfLabelled++; } });
-        if (lfLabelled >= 3 && audioSharesDiffer(lfCounts, lfLabelled, counts, b.labelled)) text += ' ' + audioShareSentence(lfCounts, lfLabelled, `For the ${lfLabelled} low-frequency bass events alone, it's`);
+        if (lfLabelled >= 3 && audioSharesDiffer(lfCounts, lfLabelled, counts, b.labelled)) text += ' ' + audioShareSentence(lfCounts, lfLabelled, `For the ${lfLabelled} intense rumble events alone, it's`);
         if (b.labelled < b.total) text += ` ${b.total - b.labelled} older events have no label.`;
         sentenceEl.textContent = text;
 
@@ -1192,7 +1197,7 @@
     function audioStatsHtml(s) {
         if (s.labelled < 10) return `Audio labels are still being collected (${s.labelled} labelled event${s.labelled === 1 ? '' : 's'} so far).`;
         let text = audioShareSentence(s.all, s.labelled, `Audio analysis labelled ${s.labelled} of these events. Its best guess is`);
-        if (s.lfLabelled >= 5 && audioSharesDiffer(s.lf, s.lfLabelled, s.all, s.labelled)) text += ' ' + audioShareSentence(s.lf, s.lfLabelled, `For the ${s.lfLabelled} low-frequency bass events alone, it's`);
+        if (s.lfLabelled >= 5 && audioSharesDiffer(s.lf, s.lfLabelled, s.all, s.labelled)) text += ' ' + audioShareSentence(s.lf, s.lfLabelled, `For the ${s.lfLabelled} intense rumble events alone, it's`);
         return text;
     }
     async function fillAudioStats(elementId, topic) {
@@ -1220,6 +1225,8 @@
     // stations' own distances once they load; each station's panel shows its own.
     let SENSOR_DISTANCE_FT = DEFAULT_SENSOR_DISTANCE_FT;
     const SITE_URL = 'https://milehighnoiseproject.org/';
+    const COUNCIL_ASKS = "We're asking council for a vehicle-noise standard that can be measured at the roadside, one department accountable for enforcing it, and a study of noise cameras like New York City's.";
+    const HOST_NEEDS = 'Needs an outdoor spot near a busy street, a power outlet and Wi-Fi. We supply and install the monitor.';
     const COUNCIL_COMMENT_URL = 'https://www.denvergov.org/Government/Agencies-Departments-Offices/Agencies-Departments-Offices-Directory/Denver-City-Council/Public-Input/General-Public-Comment';
     const CONTACT_FORM_VERSION = '2026-09';
 
@@ -1308,39 +1315,40 @@
         const host = document.getElementById('council-host');
         return { name: oneLine(get('council-name'), 80), hood: oneLine(get('council-hood'), 80), story: oneLine(get('council-story'), COUNCIL_STORY_MAX), host: !!(host && host.checked) };
     }
-    const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+    const plural = (n, word) => `${Number(n).toLocaleString('en-US')} ${word}${n === 1 ? '' : 's'}`;
     // Monitors that are really reporting (never demo stations or "host wanted" spots), in a district or everywhere.
     function reportingStations(district) {
         return METER_STATIONS.filter(s => !s.recruiting && (s.state === 'live' || s.state === 'stale') && (!district || s.district === Number(district)));
     }
     function emailStatsSentence(stats, district) {
-        const generic = `Community sensors run by the Mile High Noise Project (${SITE_URL}) record vehicle noise around the clock, and their readings are public.`;
+        const generic = `Community monitors record this noise around the clock, and the data is public: ${SITE_URL}`;
         if (!stats || (!stats.a && !stats.lf)) return generic;
-        const scope = stats.scopeDistrict ? `the Mile High Noise Project's monitor in District ${stats.scopeDistrict} (${SITE_URL})` : `the Mile High Noise Project's monitors (${SITE_URL})`;
-        const loud = stats.a ? `${plural(stats.a, 'event')} at or above ${DECIBEL_THRESHOLD} dBA${stats.peakA ? ` (loudest ${Math.round(stats.peakA)} dBA)` : ''}` : `no events at or above ${DECIBEL_THRESHOLD} dBA`;
-        return `In the last ${stats.days} days ${scope} logged ${loud} and ${plural(stats.lf, 'low-frequency bass event')} where dBC ran more than ${LF_DELTA_THRESHOLD} dB above dBA.`;
+        const who = stats.scopeDistrict ? `a community monitor in District ${stats.scopeDistrict}` : 'community monitors';
+        const loud = stats.a ? `${plural(stats.a, 'event')} at or above ${DECIBEL_THRESHOLD} dBA${stats.peakA ? ` (loudest ${Math.round(stats.peakA)} dBA)` : ''}` : null;
+        const rumble = stats.lf ? `${plural(stats.lf, 'intense low-frequency rumble')} that dBA-based limits miss` : null;
+        return `In the last ${stats.days} days, ${who} logged ${[loud, rumble].filter(Boolean).join(' and ')}. Details: ${SITE_URL}`;
     }
     function councilEmailParts(district, f = readCouncilFields(), stats = null) {
         const r = councilRecipient(district), d = r.district;
         const place = d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood ? `${f.hood}, Denver` : 'Denver');
-        const subject = `Addressing Denver's vehicle noise enforcement gap in ${d ? (f.hood ? `${f.hood} (District ${d})` : `District ${d}`) : (f.hood || 'Denver')}`;
-        const greeting = d ? `Dear Council Member ${r.member} (and At-Large Council Members),` : 'Dear Council Members,';
+        const subject = `Vehicle noise in ${d ? (f.hood ? `${f.hood} (District ${d})` : `District ${d}`) : (f.hood || 'Denver')}: please support enforcement`;
+        const greeting = d ? `Dear Council Member ${r.member},` : 'Dear Council Members,';
         const noMonitor = d && !reportingStations(d).length;
         const hostLine = noMonitor && f.host ? ` There is no monitor in District ${d} yet, and I'd welcome the chance to host one.` : '';
         const body = `${greeting}
 
-I live in ${place} and I'm asking you to support a clear, measurable standard for vehicle noise and one city office accountable for enforcing it.${f.story ? ' ' + oneLine(f.story, COUNCIL_STORY_MAX) : ''}
+I live in ${place}, and loud, modified vehicles are a constant problem on our streets.${f.story ? ' ' + oneLine(f.story, COUNCIL_STORY_MAX) : ''}
 
-- The rule exists but is hard to enforce. Denver's noise code (D.R.M.C. sec. 36-8, Table B) limits motor vehicles under 10,000 lb to 82 dB(A) measured at 25 ft. State law (C.R.S. 42-4-225) requires a muffler in constant operation and prohibits modifying an exhaust system to make a vehicle louder than its original muffler.
-- No single office owns it. ${CITY_CONFIRMATION} ${COUNCIL_311_FACT}
-- Measurements show the problem. ${emailStatsSentence(stats, d)} The sensors sit about ${SENSOR_DISTANCE_FT} ft from the center of the travel lane; at the code's 25 ft reference distance, those readings would be roughly 3 to 6 dB higher. New York City's noise cameras activate at 85 dB(A) at 50 ft.${hostLine}
-- Unequal enforcement. In 2023 the city permanently closed the Congress Park pickleball courts after inspectors measured over 70 dB at nearby homes (the residential limit is 55 dB). 85 dB carries more than 30 times the sound energy of 70 dB, yet I'm not aware of comparable enforcement along our major corridors.
+Denver's noise code limits cars, trucks and motorcycles to ${DENVER_VEHICLE_LIMIT_DBA} dB(A) at 25 ft, but no city office measures vehicle noise at the roadside. Police treat it as an equipment violation without meters, and the health department doesn't do traffic enforcement. In 2024, 213 of 323 police noise complaints filed through 311 were closed as "Out of Jurisdiction."
 
-Please consider: (1) a standard that can be measured at the roadside; (2) one department accountable for vehicle noise complaints and enforcement; (3) studying whether Denver could pilot automated noise cameras like New York City's, including any state authority it would need.
+${emailStatsSentence(stats, d)}${hostLine}
 
-Thank you for your leadership on this.
+I'm asking you to support:
+1. A vehicle-noise standard that can be measured at the roadside
+2. One department accountable for enforcing it
+3. A study of automated noise cameras like New York City's
 
-Sincerely,
+Thank you,
 ${f.name || '[Your name]'}
 ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[Your neighborhood]')}`;
         const cc = [COUNCIL_AT_LARGE.email];
@@ -1487,7 +1495,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         const total = s.a + s.lf;
         if (!total) return 'No loud events have been recorded yet.';
         let html = `In the last ${s.days} days our monitors logged <strong>${total}</strong> loud events: <strong>${s.a}</strong> at or above ${DECIBEL_THRESHOLD} dBA and ` +
-            `<strong>${s.lf}</strong> (${Math.round(100 * s.lf / total)}%) low-frequency bass events, under ${DECIBEL_THRESHOLD} dBA but with dBC more than ${LF_DELTA_THRESHOLD} dB higher.`;
+            `<strong>${s.lf}</strong> (${Math.round(100 * s.lf / total)}%) intense low-frequency rumble events, under ${DECIBEL_THRESHOLD} dBA but with dBC more than ${LF_DELTA_THRESHOLD} dB higher.`;
         if (s.latest) {
             const st = METER_STATIONS.find(x => x.id === s.latest.station_id);
             const dba = Number(s.latest.dba), dbc = Number(s.latest.dbc);
@@ -1644,8 +1652,8 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         }).join('');
         return `
             <div class="panel-header">
-                <h2>\uD83C\uDF9B\uFE0F dBA vs. dBC</h2>
-                <p>Why a normal loudness reading can miss the deep rumble of a modified exhaust.</p>
+                <h2>\uD83C\uDF9B\uFE0F Volume vs. rumble <span class="fine">(dBA vs. dBC)</span></h2>
+                <p>Why a normal loudness reading can miss the deep rumble of a modified exhaust. On this site, an <em>intense rumble</em> is low-frequency sound where dBC runs more than ${LF_DELTA_THRESHOLD} dB above dBA.</p>
             </div>
             <div class="info-card">
                 <h3>What the two weightings do</h3>
@@ -1707,7 +1715,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                 <p><strong>A limit that is hard to check.</strong> Denver's number is defined at 25 ft from a vehicle. In practice that means a meter beside the road and a specific vehicle to test, which is difficult once it has driven past.</p>
                 <p><strong>A state rule with no decibel number.</strong> Colorado bans modifying an exhaust to be louder than the muffler the vehicle came with (C.R.S. \u00A7 42-4-225), and requires a muffler that prevents "excessive or unusual noise". Neither has a number, so enforcement depends on an officer inspecting the vehicle.</p>
                 <p><strong>No single owner.</strong> Two city agencies share the problem, so it is easy for a complaint to fall between them.</p>
-                <p><strong>Bass slips through.</strong> A dBA reading can understate deep exhaust rumble. See <a href="#" onclick="openInfoModal('dba-dbc'); return false;">dBA vs. dBC</a>.</p>
+                <p><strong>Bass slips through.</strong> A dBA reading can understate deep exhaust rumble. See <a href="#" onclick="openInfoModal('dba-dbc'); return false;">Volume vs. rumble (dBA vs dBC)</a>.</p>
             </div>
             <div class="info-card">
                 <h3>What the numbers show</h3>
@@ -1837,6 +1845,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             <div class="panel-header">
                 <h2>\uD83D\uDCE2 Take Action</h2>
                 <p>Turn the readings into pressure for change. Start with an email; it takes a minute.</p>
+                <p>${COUNCIL_ASKS}</p>
             </div>
             <div class="info-card">
                 <h3>1. Email your City Council member <span class="start-badge">Start here</span></h3>
@@ -1856,7 +1865,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                     <a id="council-email-link" class="action-btn btn-primary" href="#" style="flex:1 1 12rem; text-align:center; text-decoration:none; min-height:44px; display:flex; align-items:center; justify-content:center; box-sizing:border-box;">\u2709\uFE0F Open in my email app</a>
                     <button type="button" class="action-btn btn-secondary" id="council-copy" style="flex:1 1 12rem; min-height:44px;" onclick="copyCouncilEmail()">\uD83D\uDCCB Copy the email</button>
                 </div>
-                <p class="fine" id="council-copy-status" aria-live="polite">The email is long. If your email app opens it cut off, or doesn't open, use Copy the email and paste it into a new message.</p>
+                <p class="fine" id="council-copy-status" aria-live="polite">If your email app doesn't open, use Copy the email and paste it into a new message.</p>
                 <details class="council-preview"><summary>Preview the email</summary><pre id="council-preview" style="white-space:pre-wrap; word-break:break-word; font:inherit; font-size:0.85rem; color:#ddd; margin:8px 0 0;"></pre></details>
                 <p class="fine">Council contact details checked September 2026. The At-Large seat B is vacant until the November 3 special election.</p>
             </div>
@@ -1937,7 +1946,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <div id="leaderboard">Loading\u2026</div>
-                <p class="fine" style="margin-top:10px;">Ranks only the places where we have a monitor, not all of Denver. Counts include very loud events and low-frequency bass events; sirens are excluded.</p>
+                <p class="fine" style="margin-top:10px;">Ranks only the places where we have a monitor, not all of Denver. Counts include very loud events and intense rumble events; sirens are excluded.</p>
             </div>
             <div class="info-card">
                 <h3>District coverage</h3>
@@ -2023,7 +2032,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <h3>What a host does</h3>
-                <p>A host gives a monitor a spot near a busy street, with power and Wi-Fi nearby. The monitor listens around the clock and posts its readings to the live map. Audio is analyzed on the monitor and never saved.</p>
+                <p>A host gives a monitor an outdoor spot near a busy street, with a power outlet and Wi-Fi in reach. We supply and install the monitor. It listens around the clock and posts its readings to the live map. Audio is analyzed on the monitor and never saved.</p>
                 <p>Tell us a little about your spot (a block-level location is plenty) and we'll get back to you.</p>
                 <div class="host-actions"><button type="button" class="action-btn btn-primary" onclick="startHostSignup(${d || 'null'})">Offer to host${d ? ' in District ' + d : ''}</button></div>
             </div>
@@ -2053,7 +2062,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <h3>What each monitor is</h3>
-                <p>Each monitor is a small computer connected to a digital sound-level sensor, installed near a busy street. The sensor is designed to IEC 61672 Class 2 guidelines and measures in dBA and dBC at the same time. ${pageLink('dba-dbc', 'dBA vs dBC')} explains the two.</p>
+                <p>Each monitor is a small computer connected to a digital sound-level sensor, installed near a busy street. The sensor is designed to IEC 61672 Class 2 guidelines and measures in dBA and dBC at the same time. ${pageLink('dba-dbc', 'Volume vs. rumble (dBA vs dBC)')} explains the two.</p>
             </div>
             <div class="info-card">
                 <h3>What a reading is</h3>
@@ -2062,7 +2071,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             <div class="info-card">
                 <h3>What counts as a loud event</h3>
                 <p>An event is logged when a reading is ${DECIBEL_THRESHOLD} dBA or louder, or when the deep, low-frequency part of the sound stands out: dBC more than ${LF_DELTA_THRESHOLD} dB above dBA, with ${DECIBEL_THRESHOLD} or more on either. The site calls these <em>${CLASS_META.A.label}</em> and <em>${CLASS_META.LF.label}</em>.</p>
-                <p>Each sound is logged once, however long it lasts, and the record shows its loudest second. A sound that goes on for more than 30 seconds is logged in 30-second pieces. If the level drops by at least 6 dB and then rises by at least 6 dB, the monitor treats that as a second vehicle. ${pageLink('dba-dbc', 'dBA vs dBC')} says more about the thresholds.</p>
+                <p>Each sound is logged once, however long it lasts, and the record shows its loudest second. A sound that goes on for more than 30 seconds is logged in 30-second pieces. If the level drops by at least 6 dB and then rises by at least 6 dB, the monitor treats that as a second vehicle. ${pageLink('dba-dbc', 'Volume vs. rumble (dBA vs dBC)')} says more about the thresholds.</p>
             </div>
             <div class="info-card">
                 <h3>What is left out</h3>
@@ -2078,7 +2087,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <h3>The audio guess</h3>
-                <p>A microphone on each monitor feeds a sound-recognition model that makes a best guess at what caused each loud event. The site shows that guess in four groups, which ${pageLink('dba-dbc', 'dBA vs dBC')} explains. It is approximate, it does not try to tell one kind of vehicle from another, and the audio itself is never saved.</p>
+                <p>A microphone on each monitor feeds a sound-recognition model that makes a best guess at what caused each loud event. The site shows that guess in four groups, which ${pageLink('dba-dbc', 'Volume vs. rumble (dBA vs dBC)')} explains. It is approximate, it does not try to tell one kind of vehicle from another, and the audio itself is never saved.</p>
             </div>
             <div class="info-card">
                 <h3>What you see on the site</h3>
@@ -2114,14 +2123,15 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             </div>
             <div class="info-card">
                 <ul class="kf-list">
-                    <li><strong>dBA-based limits understate exhaust bass.</strong> Most noise rules, including Denver's vehicle limit, are written in dBA, which turns down low frequencies. <span id="kf-bass">Loading the latest totals\u2026</span></li>
+                    <li><strong>dBA-based limits understate exhaust rumble.</strong> Most noise rules, including Denver's vehicle limit, are written in dBA, which turns down low frequencies. <span id="kf-bass">Loading the latest totals\u2026</span></li>
                     <li><strong>When it happens.</strong> <span id="kf-when">Loading\u2026</span></li>
+                    <li><strong>Why it matters.</strong> The World Health Organization links long-term road-traffic noise to sleep disturbance and heart disease, and recommends keeping it below 45 dB at night outside homes. Repeated loud events are what break up a night's sleep. ${pageLink('myths', 'More on health')}.</li>
                     <li><strong>The city isn't measuring it, and no one office owns it.</strong> Denver's limit (${DENVER_VEHICLE_LIMIT_DBA} dB(A) at 25 ft for vehicles under 10,000 lb) is written for a meter beside a specific vehicle. Police enforce exhaust noise as an equipment violation without meters, and the health department, which oversees the noise code, doesn't do traffic enforcement. ${COUNCIL_311_FACT}</li>
                 </ul>
             </div>
             <div class="info-card">
                 <h3>Go deeper</h3>
-                <p>${pageLink('gap', 'The enforcement gap')} \u00b7 ${pageLink('dba-dbc', 'dBA vs dBC')} \u00b7 ${pageLink('methods', 'How the data works')} \u00b7 ${pageLink('hotspots', 'Loudest streets')}</p>
+                <p>${pageLink('gap', 'The enforcement gap')} \u00b7 ${pageLink('dba-dbc', 'Volume vs. rumble')} \u00b7 ${pageLink('methods', 'How the data works')} \u00b7 ${pageLink('hotspots', 'Loudest streets')}</p>
                 <p class="fine">Open any monitor on the map to download its loud events (CSV) or a one-page PDF summary. The data is free to download.</p>
             </div>
             <div class="info-card">
@@ -2205,6 +2215,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                     <button type="button" class="action-btn btn-secondary" style="min-height:44px;" onclick="openInfoModal('action')">Email your council member</button>
                     <button type="button" class="action-btn btn-secondary" style="min-height:44px;" onclick="openInfoModal('contact')">Contact me</button>
                 </div>
+                <p class="fine">Hosting: ${HOST_NEEDS}</p>
                 <p class="fine">Press, hosts and corrections: write to ${contactEmailHtml()}</p>
             </div>
             <div class="info-card">
@@ -2220,7 +2231,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         let text = reporting ? `${reporting} monitor${reporting === 1 ? ' is' : 's are'} reporting right now.` : '';
         try {
             const f = await loadFlaggedStats(30);
-            if (f && f.a + f.lf > 0) text += ` In the last 30 days the monitors logged ${f.a + f.lf} loud events: ${f.a} at or above ${DECIBEL_THRESHOLD} dBA and ${f.lf} low-frequency bass.`;
+            if (f && f.a + f.lf > 0) text += ` In the last 30 days the monitors logged ${f.a + f.lf} loud events: ${f.a} at or above ${DECIBEL_THRESHOLD} dBA and ${f.lf} intense low-frequency rumble events.`;
         } catch (err) { console.warn('About page: could not load the live numbers.', err); }
         if (text.trim() && currentInfoTopic === 'about' && document.getElementById('about-live') === el) el.textContent = text.trim();
     }
@@ -2552,8 +2563,8 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
     const LF_FLOOR_DB = DECIBEL_THRESHOLD;
     const CLASS_META = {
         A: { label: `Very loud (${DECIBEL_THRESHOLD}+ dBA)`, desc: `Over ${DECIBEL_THRESHOLD} dBA`, color: '#ffb74d', text: '#ffcc80' },
-        A_LF: { label: 'Very loud + low-frequency bass', desc: 'Over the dBA threshold and the \u0394 rule also met', color: '#ef5350', text: '#ff8a80' },
-        LF: { label: 'Low-frequency bass', desc: `Under ${DECIBEL_THRESHOLD} dBA, caught only by the \u0394 rule`, color: '#29b6f6', text: '#81d4fa' }
+        A_LF: { label: 'Very loud + intense rumble', desc: 'Over the dBA threshold and the \u0394 rule also met', color: '#ef5350', text: '#ff8a80' },
+        LF: { label: 'Intense rumble', desc: `Under ${DECIBEL_THRESHOLD} dBA, caught only by the \u0394 rule`, color: '#29b6f6', text: '#81d4fa' }
     };
     const RANGES = {
         '1h':  { ms: 60 * 60 * 1000,           label: 'Past hour' },
@@ -2941,8 +2952,8 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         const eventsIn = `${total} loud event${total === 1 ? '' : 's'} in the ${RANGES[data.rangeKey].label.toLowerCase()}.`;
         if (total === 0) sentence = 'No loud events in this time range.';
         else if (lf === 0) sentence = `${eventsIn} ${total === 1 ? 'It was' : 'All were'} over ${DECIBEL_THRESHOLD} dBA.`;
-        else if (lf === total) sentence = `${eventsIn} ${total === 1 ? 'It was a low-frequency bass spike' : 'All were low-frequency bass spikes'} that dBA-based noise limits miss, the kind you feel through windows and walls.`;
-        else sentence = `${eventsIn} ${lf} ${lf === 1 ? 'was a low-frequency bass spike' : 'were low-frequency bass spikes'} that dBA-based noise limits miss, the kind you feel through windows and walls.`;
+        else if (lf === total) sentence = `${eventsIn} ${total === 1 ? 'It was an intense low-frequency rumble' : 'All were intense low-frequency rumbles'} that dBA-based noise limits miss, the kind you feel through windows and walls.`;
+        else sentence = `${eventsIn} ${lf} ${lf === 1 ? 'was an intense low-frequency rumble' : 'were intense low-frequency rumbles'} that dBA-based noise limits miss, the kind you feel through windows and walls.`;
         if (data.truncated) sentence += ` Showing the most recent ${EVENT_LIMIT.toLocaleString()} events.`;
         document.getElementById('summary-sentence').textContent = sentence;
     }
@@ -2960,7 +2971,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
 
         const datasets = classDatasets(events, toPoint, 4);
         if (showSirens) datasets.push(sirenDataset(sirens.map(toPoint), 4));
-        describeCanvas('scatterChart', `Scatter chart of ${events.length} loud events with dBA on the horizontal axis and dBC on the vertical axis. ${events.filter(e => e.cls === 'LF').length} of them are low-frequency bass events, under ${DECIBEL_THRESHOLD} dBA but caught by the \u0394 rule.`);
+        describeCanvas('scatterChart', `Scatter chart of ${events.length} loud events with dBA on the horizontal axis and dBC on the vertical axis. ${events.filter(e => e.cls === 'LF').length} of them are intense rumble events, under ${DECIBEL_THRESHOLD} dBA but caught by the \u0394 rule.`);
 
         const axisTitle = text => ({ display: true, text, color: '#9a9a9a', font: { size: 10 } });
         scatterChartInstance = new Chart(document.getElementById('scatterChart').getContext('2d'), {
@@ -3016,7 +3027,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
                 ? `The ${tlBass} blue dot${tlBass === 1 ? '' : 's'} of ${tlTotal} never reached the yellow ${DECIBEL_THRESHOLD} dBA line, so a dBA-only limit would ignore ${tlBass === 1 ? 'it' : 'them'}, yet ${tlBass === 1 ? 'it' : 'they'} carried more than ${LF_DELTA_THRESHOLD} dB of extra bass.`
                 : `Every event in this range crossed the yellow ${DECIBEL_THRESHOLD} dBA line.`)
             : '';
-        describeCanvas('timelineChart', `Timeline of ${data.events.length} loud events by dBA. Events under the ${DECIBEL_THRESHOLD} dBA line are low-frequency bass events, caught only by the \u0394 rule.`);
+        describeCanvas('timelineChart', `Timeline of ${data.events.length} loud events by dBA. Events under the ${DECIBEL_THRESHOLD} dBA line are intense rumble events, caught only by the \u0394 rule.`);
         describeCanvas('deltaChart', `Timeline of the difference between dBC and dBA for the same events. The \u0394 rule flags differences above ${LF_DELTA_THRESHOLD} dB.`);
         // dBA per event, with the limit line: blue dots below it are what a dBA-only rule never sees
         const dbaMin = Math.floor((Math.min(60, ...all.map(e => e.dba)) - 2) / 5) * 5;
@@ -3098,7 +3109,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
     const HEAT_METRICS = {
         all: { label: 'All loud events', noun: 'loud events', color: [255, 112, 67] },
         a: { label: 'Very loud', noun: 'very loud events', color: [255, 183, 77] },
-        lf: { label: 'Low-frequency bass', noun: 'low-frequency bass events', color: [41, 182, 246] }
+        lf: { label: 'Intense rumble', noun: 'intense rumble events', color: [41, 182, 246] }
     };
     let heatMetric = 'all';
     let lastHourly = null;
@@ -3212,7 +3223,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
 
     function heatDetail(model, i, h) {
         const c = model.cells[i][h];
-        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} loud event${c.a + c.lf === 1 ? '' : 's'} (${c.a} very loud, ${c.lf} low-frequency bass)`;
+        return `${dayLabel(model.dates[i])}, ${hourRange(h)}: ${c.a + c.lf} loud event${c.a + c.lf === 1 ? '' : 's'} (${c.a} very loud, ${c.lf} intense rumble)`;
     }
 
     function renderHeatmap(model) {
@@ -3448,7 +3459,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         }
         const lf = station.state === 'live' ? (station.hourlyLF || 0) : 0;
         const pip = lf > 0
-            ? `<span class="lf-pip" title="${lf} low-frequency bass event(s) in the last hour: under the dBA threshold but caught by the delta rule">\u0394${lf}</span>`
+            ? `<span class="lf-pip" title="${lf} intense rumble event(s) in the last hour: under the dBA threshold but caught by the delta rule">\u0394${lf}</span>`
             : '';
 
         return L.divIcon({
@@ -3725,7 +3736,9 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         const btn = document.getElementById('next-email');
         if (btn) btn.textContent = station.district ? `\u2709\uFE0F Email the District ${station.district} council member` : '\u2709\uFE0F Email your council member';
         const intro = document.getElementById('next-steps-intro');
-        if (intro) intro.textContent = `These readings from ${station.corridor || station.name} carry more weight when neighbors act on them.`;
+        const needs = document.getElementById('next-host-needs');
+        if (needs) needs.textContent = `Hosting: ${HOST_NEEDS}`;
+        if (intro) intro.textContent = `These readings from ${station.corridor || station.name} carry more weight when neighbors act on them. ${COUNCIL_ASKS}`;
     }
     const escapeHtmlText = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     (function watchPanelHeader() {
@@ -3775,7 +3788,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
         refreshDistrictStyles();
         const covered = coveredDistricts();
         summary.textContent = `${covered.size} of ${COUNCIL_DISTRICT_COUNT} council districts have a monitor. The goal is at least one in every district, placed where residents report the most problems.` +
-            (covered.size < COUNCIL_DISTRICT_COUNT ? ' Live in one of the others? Tap Host to offer a spot.' : '');
+            (covered.size < COUNCIL_DISTRICT_COUNT ? ` Live in one of the others? Tap Host to offer a spot. ${HOST_NEEDS}` : '');
         list.innerHTML = COUNCIL_DISTRICTS.map(m => {
             const here = METER_STATIONS.filter(s => s.district === m.d);
             const reporting = here.filter(s => s.state === 'live' || s.state === 'stale');
@@ -4436,7 +4449,7 @@ ${d ? (f.hood ? `${f.hood}, District ${d}` : `District ${d}`) : (f.hood || '[You
             ? `The ${st.name} monitor will file one report with Denver 311 (Police, non-emergency) summarizing today so far:`
             : `There are no loud events at ${st.name} yet today, so there's nothing to file. Try again later.`;
         document.getElementById('report-preview-list').innerHTML = a + lf ? [
-            `<li><strong>The numbers.</strong> ${plural(a, 'loud event')} at or above ${DECIBEL_THRESHOLD} dBA and ${plural(lf, 'low-frequency bass event')}, with the peak level and busiest hour.</li>`,
+            `<li><strong>The numbers.</strong> ${plural(a, 'loud event')} at or above ${DECIBEL_THRESHOLD} dBA and ${plural(lf, 'intense low-frequency rumble event')}, with the peak level and busiest hour.</li>`,
             `<li><strong>The rules.</strong> Denver's ${DENVER_VEHICLE_LIMIT_DBA} dB(A) vehicle limit and Colorado's muffler law, and a request for enforcement at this spot.</li>`,
             `<li><strong>Where.</strong> The block the monitor is on, never the host's address.</li>`,
             `<li><strong>Who.</strong> Filed under the Mile High Noise Project's name and email. Nothing about you is sent.</li>`,
